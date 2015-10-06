@@ -328,6 +328,18 @@
 		}
 
 		/// <summary>
+		/// Determines if a <see cref="JsonObject"/> exists within the <see cref="JsonArray"/> that has a property with a certain value.
+		/// </summary>
+		/// <param name="property">The property to search.</param>
+		/// <param name="value">The value of the property that should match.</param>
+		/// <returns></returns>
+		public bool Contains(string property, JsonValue value)
+		{
+			JsonObject results = FindObject(property, value);
+			return results != null;
+		}
+
+		/// <summary>
 		/// Copies the contents of this <see cref="JsonArray"/> to a <see cref="JsonValue"/> array.
 		/// </summary>
 		/// <param name="array">The one-dimensional <see cref="JsonValue"/> array to copy to.</param>
@@ -579,13 +591,77 @@
 				}
 			}
 		}
-		
+
+		/// <summary>
+		/// Searches the array for a <see cref="JsonObject"/> with a property with matching <see cref="JsonValue"/>.
+		/// </summary>
+		/// <param name="property">The property to match within a <see cref="JsonObject"/>.</param>
+		/// <param name="value">The property's value to match within a <see cref="JsonObject"/>.</param>
+		/// <returns>A <see cref="JsonObject"/> with a matching property and value; otherwise null.</returns>
+		public JsonObject FindObject(string property, JsonValue value)
+		{
+			int index = IndexOf(property, value);
+			if (index == -1)
+				return null;
+			else
+				return this[index] as JsonObject;
+		}
+
 		/// <summary>
 		/// Returns an enumerator that iterates through <see cref="JsonValue"/>s.
 		/// </summary>
 		public IEnumerator<JsonValue> GetEnumerator()
 		{
 			return _values.GetEnumerator();
+		}
+
+		/// <summary>
+		/// Searches for the specified <see cref="JsonObject"/> and returns the zero-based index of the first occurance within the entire <see cref="JsonArray"/>.
+		/// </summary>
+		/// <param name="property">The property name within a <see cref="JsonObject"/>. Cannot be null.</param>
+		/// <param name="value">The value of the property that should match.</param>
+		/// <returns>The zero-based index of the matching <see cref="JsonObject"/>; otherwise -1 is returned.</returns>
+		public int IndexOf(string property, JsonValue value)
+		{
+			if (string.IsNullOrEmpty(property))
+				throw new ArgumentNullException("property");
+			for (int i = 0; i < Count; i++)
+			{
+				JsonObject item = this[i] as JsonObject;
+				if (item != null && item.ContainsProperty(property))
+				{
+					JsonValue prop = item[property];
+					if (prop.ValueType == value.ValueType)
+					{
+						switch (value.ValueType)
+						{
+							case JsonValueTypes.String:
+								if ((prop as JsonString).Value == (value as JsonString).Value)
+									return i;
+								break;
+							case JsonValueTypes.Number:
+								if ((prop as JsonNumber).Value == (value as JsonNumber).Value)
+									return i;
+								break;
+							case JsonValueTypes.Boolean:
+								if ((prop as JsonBoolean).Value == (value as JsonBoolean).Value)
+									return i;
+								break;
+							case JsonValueTypes.Binary:
+							case JsonValueTypes.Array:
+							case JsonValueTypes.Object:
+								if (prop.ToString() == value.ToString())
+									return i;
+								break;
+							case JsonValueTypes.Null:
+								return i;
+							default:
+								break;
+						}
+					}
+				}
+			}
+			return -1;
 		}
 
 		/// <summary>
