@@ -5,17 +5,18 @@
 	using System.Text;
 
 
-	/// <summary>
-	/// Represents a string json value.
-	/// </summary>
-	/// <remarks>
-	///	Does not escape or unescape Unicode.
-	/// </remarks>
-	#if !DEBUG
+    /// <summary>
+    /// Represents a string json value.
+    /// </summary>
+    /// <remarks>
+    ///	Does not escape or unescape Unicode.
+    /// </remarks>
+#if !DEBUG
     [System.Diagnostics.DebuggerStepThrough()]
-	#endif
-	[System.ComponentModel.TypeConverter(typeof(JsonStringTypeConverter))]
-	public class JsonString : JsonValue
+#endif
+    //[System.ComponentModel.TypeConverter(typeof(JsonStringTypeConverter))]
+    [System.ComponentModel.TypeConverter(typeof(System.ComponentModel.StringConverter))]
+    public class JsonString : JsonValue
 	{
 		#region Fields
 
