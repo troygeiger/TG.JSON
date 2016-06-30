@@ -13,13 +13,37 @@ namespace TestApp
 {
     public partial class Form1 : Form
     {
+        JsonObject o;
         public Form1()
         {
             InitializeComponent();
-            JsonObject o = new JsonObject();
-            o.Add("Hello", "World");
-            o.Add("Monkey", new JsonString());
+            o = new JsonObject("Hello", "World", "Name", "Troy", "YesNo", true);
+            Obj co = o.DeserializeObject(typeof(Obj)) as Obj;
             propertyGrid1.SelectedObject = o;
+            try
+            {
+                textBox1.DataBindings.Add(new Binding("Text", o, "Hello"));
+            }
+            catch (Exception ex)
+            {
+                
+            }
+            
+        }
+
+        public class Obj
+        {
+            public string Hello { get; set; }
+
+            public string Name { get; set; }
+
+            public bool YesNo { get; set; }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            bool yesno = (bool)o["YesNo"];
         }
     }
+
 }

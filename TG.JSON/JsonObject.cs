@@ -77,7 +77,7 @@
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="JsonObject"/> that parses the specified stringified JSON object.
+        /// Initializes a new instance of <see cref="JsonObject"/> that parses the specified JSON string.
         /// </summary>
         /// <param name="json">JSON Object formatted string. Ex. { "Hello" : "World" } </param>
         /// <example>
@@ -136,7 +136,7 @@
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="JsonObject"/> using the specified <see cref="JsonReader"/> to parse a stringified JSON object.
+        /// Initializes a new instance of <see cref="JsonObject"/> using the specified <see cref="JsonReader"/> to parse a JSON string.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> that will be used to parse a JSON string.</param>
 		public JsonObject(JsonReader reader)
@@ -202,7 +202,7 @@
                 if (attTable == null)
                 {
                     attTable = new JsonObject();
-                    this.Add("_attributesTable", attTable);
+                    this.internalAdd("_attributesTable", attTable);
                 }
                 return attTable;
             }
@@ -335,6 +335,8 @@
             {
                 if (propertyValue.ContainsKey(property))
                 {
+                    if (value == null)
+                        value = new JsonNull();
                     propertyValue[property] = value;
                     OnValueChanged();
                     OnPropertyChanged(property);
@@ -539,8 +541,14 @@
                     obj = Activator.CreateInstance(type);
                 foreach (var property in GetTypeProperties(type))
                 {
-                    if (this.ContainsProperty(property.Name))
-                        DeserializeJsonValueInto(property, obj, this[property.Name]);
+                    var atts = property.GetCustomAttributes(typeof(JsonPropertyAttribute), true);
+                    string pname;
+                    if (atts.Length == 1)
+                        pname = (atts[0] as JsonPropertyAttribute).JsonPropertyName;
+                    else
+                        pname = property.Name;
+                    if (this.ContainsProperty(pname))
+                        DeserializeJsonValueInto(property, obj, this[pname]);
                 }
             }
             return obj;
@@ -601,8 +609,22 @@
         /// </summary>
 		public IEnumerator GetEnumerator()
         {
-            return propertyValue.GetEnumerator();
+            switch (EnumeratorType)
+            {
+                case JsonObjectEnumeratorTypes.Bindable:
+                    return new JsonObjectBindableEnumerator(this);
+                case JsonObjectEnumeratorTypes.Property:
+                    return new JsonObjectPropertyEnumerator(this);
+                default:
+                    return propertyValue.GetEnumerator();
+            }
+            
         }
+
+        /// <summary>
+        /// Selects the type of <see cref="IEnumerator"/> returned by the <see cref="IEnumerable.GetEnumerator"/> method.
+        /// </summary>
+        public JsonObjectEnumeratorTypes EnumeratorType { get; set; }
 
         /// <summary>
         /// Returns the type of pattern of the specified property.
@@ -1201,8 +1223,29 @@
                     browsable = false;
                 if (key.EndsWith("_"))
                     readOnly = true;
+                JsonValue value = this[key];
+                Type ptype;
+                switch (value.ValueType)
+                {
+                    case JsonValueTypes.String:
+                        ptype = typeof(string);
+                        break;
+                    case JsonValueTypes.Number:
+                        ptype = typeof(double);
+                        break;
+                    case JsonValueTypes.Boolean:
+                        ptype = typeof(bool);
+                        break;
+                    case JsonValueTypes.Object:
+                    case JsonValueTypes.Array:
+                    case JsonValueTypes.Binary:
+                    case JsonValueTypes.Null:
+                    default:
+                        ptype = value.GetType();
+                        break;
+                }
 
-                props.Add(new JsonObjectPropertyDescriptor(key, this[key].GetType(), category, desc, readOnly, browsable)
+                props.Add(new JsonObjectPropertyDescriptor(key, ptype, category, desc, readOnly, browsable)
                 {
                     DefaultValue = defaultValue
 
@@ -1636,7 +1679,7 @@
             /// <summary>
             /// Resets the value of the property with the value from <see cref="DefaultValue"/>.
             /// </summary>
-            /// <param name="component">The component whos value should be reset.</param>
+            /// <param name="component">The component who's value should be reset.</param>
             public override void ResetValue(object component)
             {
                 if (DefaultValue != null)
@@ -1650,7 +1693,7 @@
             }
 
             /// <summary>
-            /// A mothod used to set the category.
+            /// A method used to set the category.
             /// </summary>
             /// <param name="category"></param>
             public void SetCategory(string category)
@@ -1661,7 +1704,7 @@
             /// <summary>
             /// Sets the value of the property.
             /// </summary>
-            /// <param name="component">The properties whos value should be set.</param>
+            /// <param name="component">The properties who's value should be set.</param>
             /// <param name="value">The value that should be set to the property.</param>
             public override void SetValue(object component, object value)
             {
@@ -1717,6 +1760,157 @@
             }
 
             #endregion Methods
+        }
+
+        /// <summary>
+        /// The Enumerator used to step through the properties of a <see cref="JsonObject"/>.
+        /// </summary>
+        public class JsonObjectPropertyEnumerator : IEnumerator
+        {
+            JsonObject thisObj = null;
+            string[] props = null;
+            int propIdx = -1;
+
+            /// <summary>
+            /// Initializes a new instance of <see cref="JsonObjectPropertyEnumerator"/>.
+            /// </summary>
+            /// <param name="obj"></param>
+            public JsonObjectPropertyEnumerator(JsonObject obj)
+            {
+                thisObj = obj;
+                props = obj.Properties;
+            }
+
+            /// <summary>
+            /// The current value.
+            /// </summary>
+            public object Current
+            {
+                get
+                {
+                    if (propIdx > -1 && propIdx < props.Length)
+                        return new JsonObjectPropertyValueEntry(props[propIdx], thisObj[props[propIdx]]);
+                    else
+                        return null;
+                }
+            }
+
+            /// <summary>
+            /// Moves to the next property.
+            /// </summary>
+            /// <returns>Returns true if the next property index is within range; otherwise false.</returns>
+            public bool MoveNext()
+            {
+
+                if (propIdx + 1 < props.Length)
+                {
+                    propIdx++;
+                    return true;
+                }
+                else
+                    return false;
+            }
+
+            /// <summary>
+            /// Resets the property index to 0;
+            /// </summary>
+            public void Reset()
+            {
+                propIdx = -1;
+            }
+        }
+
+        /// <summary>
+        /// A Enumerator used when binding to a <see cref="System.Windows.Forms.Control"/>, using the property <see cref="System.Windows.Forms.Control.DataBindings"/>.
+        /// </summary>
+        public class JsonObjectBindableEnumerator : IEnumerator
+        {
+            JsonObject thisObj = null;
+            bool stepped = false;
+
+            /// <summary>
+            /// Initializes a new instance of <see cref="JsonObjectBindableEnumerator"/>.
+            /// </summary>
+            /// <param name="obj"></param>
+            public JsonObjectBindableEnumerator(JsonObject obj)
+            {
+                thisObj = obj;
+            }
+
+            /// <summary>
+            /// The <see cref="JsonObject"/> set during construction.
+            /// </summary>
+            public object Current
+            {
+                get
+                {
+
+                    return thisObj;
+
+                }
+            }
+
+            /// <summary>
+            /// This does nothing.
+            /// </summary>
+            /// <returns>Always True</returns>
+            public bool MoveNext()
+            {
+                if (stepped)
+                    return false;
+                stepped = true;
+                return true;
+            }
+
+            /// <summary>
+            /// This does nothing.
+            /// </summary>
+            public void Reset()
+            {
+                stepped = false;
+            }
+        }
+
+        /// <summary>
+        /// Determines the type of <see cref="IEnumerator"/> to use when GetEnumerator is called.
+        /// </summary>
+        public enum JsonObjectEnumeratorTypes
+        {
+            /// <summary>
+            /// Indicates that <see cref="JsonObjectBindableEnumerator"/> should be used. 
+            /// </summary>
+            Bindable,
+            /// <summary>
+            /// Indicates that the <see cref="IEnumerator"/> should return a 
+            /// </summary>
+            Property
+        }
+
+        /// <summary>
+        /// A Property/Value structure returned by the <see cref="JsonObjectPropertyEnumerator"/>.
+        /// </summary>
+        public struct JsonObjectPropertyValueEntry
+        {
+            /// <summary>
+            /// The name of the property.
+            /// </summary>
+            public string PropertyName;
+
+            /// <summary>
+            /// The value of the property.
+            /// </summary>
+            public JsonValue Value;
+            
+            /// <summary>
+            /// A constructor used to set the parameters.
+            /// </summary>
+            /// <param name="property"></param>
+            /// <param name="value"></param>
+            public JsonObjectPropertyValueEntry(string property, JsonValue value)
+            {
+                PropertyName = property;
+                Value = value;
+            }
         }
 
         #endregion Nested Types

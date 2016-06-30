@@ -11,17 +11,28 @@ namespace TestApp
 {
     class Program
     {
+        class Test
+        {
+            public string Hello { get; set; }
+
+            public bool Edger { get; set; }
+        }
+
         [STAThread]
         static void Main(string[] args)
         {
+            
+      
+            return;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
-
-            JsonObject obj = new JsonObject("Hello", "World");
-            var pd = TypeDescriptor.GetProperties(obj);
             
         }
 
+        private static void Program_ValueChanged(object sender, EventArgs e)
+        {
+            
+        }
     }
 }

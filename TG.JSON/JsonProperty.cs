@@ -195,13 +195,18 @@
         /// <returns>A new attribute entry as <see cref="JsonObject"/>.</returns>
         internal JsonObject CreateAttributeEntry()
         {
-            return new JsonObject(
-                "Category", Category,
-                "Description", Description,
-                "DefaultValue", DefaultValue,
-                "Browsable", Browsable,
-                "ReadOnly", ReadOnly
-                );
+            JsonObject e = new JsonObject();
+            if (!string.IsNullOrEmpty(Category))
+                e.Add("Category", Category);
+            if (!string.IsNullOrEmpty(Description))
+                e.Add("Description", Description);
+            if (DefaultValue != null)
+                e.Add("DefaultValue", DefaultValue);
+            if (!Browsable)
+                e.Add("Browsable", false);
+            if (ReadOnly)
+                e.Add("ReadOnly", true);
+            return e;
         }
 
         /// <summary>
@@ -211,14 +216,39 @@
         /// <returns>A new attribute entry as <see cref="JsonObject"/>.</returns>
         internal JsonObject CreateAttributeEntry(JsonObject attributesTable)
         {
-            if (!HasAttributes)
-                return null;
             JsonObject att = CreateAttributeEntry();
-            if (attributesTable != null)
+            if (att.Count > 0 && attributesTable != null)
                 attributesTable[PropertyName] = att;
             return att;
         }
 
         #endregion Methods
+    }
+
+    /// <summary>
+    /// Can be used to match a class's property to a JSON property.
+    /// </summary>
+    [System.AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
+    public sealed class JsonPropertyAttribute : Attribute
+    {
+        readonly string _jsonProperty;
+
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonPropertyAttribute"/>.
+        /// </summary>
+        /// <param name="jsonProperty">The name of the JSON property to be matched.</param>
+        public JsonPropertyAttribute(string jsonProperty)
+        {
+            this._jsonProperty = jsonProperty;
+        }
+
+        /// <summary>
+        /// Gets the JSON property name to be matched.
+        /// </summary>
+        public string JsonPropertyName
+        {
+            get { return _jsonProperty; }
+        }
+        
     }
 }

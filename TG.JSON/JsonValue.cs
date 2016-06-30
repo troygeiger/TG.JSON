@@ -47,7 +47,7 @@
 	#region Enumerations
 	
 	/// <summary>
-	/// This represents the format of stringified <see cref="JsonValue"/> that is output from <seealso cref="JsonValue.ToString()"/>.
+	/// This represents the format of a <see cref="JsonValue"/> when outputting from <seealso cref="JsonValue.ToString()"/>.
 	/// </summary>
 	public enum Formatting
 	{
