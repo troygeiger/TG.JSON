@@ -918,7 +918,7 @@
 		{
 			if (obj == null)
 				obj = new JsonNull();
-			obj.Parent = this;
+			obj.SetParent(this);
 			int i = this.Count;
 			_values.Add(obj);
 			return i;

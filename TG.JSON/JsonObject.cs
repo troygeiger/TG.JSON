@@ -98,7 +98,7 @@
         /// <param name="value">A <see cref="System.String"/> value for the initial entry.</param>
         /// <example>
         ///	<code>
-        ///	JsonObject json = new JsonObject("{\"Hello\": \"World\"}");
+        ///	JsonObject json = new JsonObject("Hello", "World");
         ///	</code>
         /// </example>
         public JsonObject(string property, string value)
@@ -115,7 +115,7 @@
         /// JsonObject json = new JsonObject(
         ///		"hello", "world",
         ///		"awesome", true,
-        ///		"IAM", 35);
+        ///		"IAMNUMBER", 1);
         /// </code>
         /// </example>
         /// <param name="propertiesValues">A series of property string/value arguments using a "property, value, property, value...." pattern.</param>
@@ -953,7 +953,7 @@
         {
             if (value == null)
                 value = new JsonNull();
-            value.Parent = this;
+            value.SetParent(this);
             //key = Unescape(key);
             if (!propertyValue.ContainsKey(property))
                 propertyValue.Add(property, value);

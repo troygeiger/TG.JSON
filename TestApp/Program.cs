@@ -18,11 +18,20 @@ namespace TestApp
             public bool Edger { get; set; }
         }
 
+        class Test2
+        {
+            public string Monkey { get; set; }
+        }
+
         [STAThread]
         static void Main(string[] args)
         {
-            
-      
+            JsonObject obj = new JsonObject(new Test() { Hello = "Test" });
+            obj.SerializeObject(new Test2() { Monkey = "Banana" });
+
+            var t = obj.DeserializeObject<Test>();
+            var t2 = obj.DeserializeObject<Test2>();
+
             return;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

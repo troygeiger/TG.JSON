@@ -132,6 +132,7 @@
 		/// The mime type application/json
 		/// </summary>
 		public const string MIME_Type = "application/json";
+        private JsonValue _parent = null;
 
 		#endregion Fields
 
@@ -165,15 +166,6 @@
 		{
 			get;
 			set;
-		}
-
-		/// <summary>
-		/// Gets the JsonValue's Parent.
-		/// </summary>
-		public JsonValue Parent
-		{
-			get;
-			internal set;
 		}
 
 		/// <summary>
@@ -966,22 +958,36 @@
 		/// <returns></returns>
 		public abstract JsonValue Clone();
 
+        /// <summary>
+        /// Gets the JsonValue's Parent.
+        /// </summary>
+        /// <returns>Parent <see cref="JsonValue"/></returns>
+        public JsonValue GetParent()
+        {
+            return _parent;
+        }
+
 		/// <summary>
 		/// Iterates up the Parent chain to retrieve the top most Parent.
 		/// </summary>
 		/// <returns><see cref="TG.JSON.JsonValue"/></returns>
 		public JsonValue GetRoot()
 		{
-			JsonValue p = this.Parent;
+			JsonValue p = this.GetParent();
 			while (p != null)
 			{
-				if (p.Parent == null)
+				if (p._parent == null)
 					break;
 				else
-					p = p.Parent;
+					p = p.GetParent();
 			}
 			return p;
 		}
+
+        internal void SetParent(JsonValue parent)
+        {
+            _parent = parent;
+        }
 
 		/// <summary>
 		/// Generates a JSON formatted array string. Ex. [ \"Hello\" , 1 ]

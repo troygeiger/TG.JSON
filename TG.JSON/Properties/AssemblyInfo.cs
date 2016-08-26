@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("TG.JSON")]
-[assembly: AssemblyDescription("Used to generate and parse JSON.")]
+[assembly: AssemblyDescription("TG.JSON is a library for creating, parsing, serializing and deserializing JSON. It's small, fast and very easy to use.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Troy Geiger")]
 [assembly: AssemblyProduct("TG.JSON")]
-[assembly: AssemblyCopyright("Copyright © * 2014")]
+[assembly: AssemblyCopyright("Copyright © Troy Geiger 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyVersion("1.1.1.0")]
+[assembly: AssemblyFileVersion("1.1.1.0")]

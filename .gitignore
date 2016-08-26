@@ -7,3 +7,9 @@
 /TG.JSON/bin
 /TG.JSON/obj
 /.vs/TG.JSON/v14
+/TG.JSON/NuGet-Create NuSpec.bat
+/TG.JSON/NuGet-Package.bat
+/TG.JSON/nuget.exe
+/TG.JSON/TG.JSON.1.1.0.0.nupkg
+/TG.JSON/TG.JSON.nuspec
+/TG.JSON/TG.JSON.1.1.1.0.nupkg
