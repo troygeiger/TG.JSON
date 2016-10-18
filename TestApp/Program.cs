@@ -32,6 +32,13 @@ namespace TestApp
             var t = obj.DeserializeObject<Test>();
             var t2 = obj.DeserializeObject<Test2>();
 
+            JsonArray a = new JsonArray() {
+                new JsonObject("i", "hello"),
+                new JsonObject("i", null)
+            };
+
+            var i = a.FindAllObjects("i", null);
+
             return;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

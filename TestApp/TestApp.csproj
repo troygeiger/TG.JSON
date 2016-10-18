@@ -60,16 +60,16 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TG.JSON\TG.JSON.csproj">
-      <Project>{e30f0802-609b-4f4d-aed8-658f9ccab86b}</Project>
-      <Name>TG.JSON</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TG.JSON\TG.JSON.csproj">
+      <Project>{e30f0802-609b-4f4d-aed8-658f9ccab86b}</Project>
+      <Name>TG.JSON</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
