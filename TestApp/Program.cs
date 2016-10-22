@@ -28,17 +28,18 @@ namespace TestApp
         {
             JsonObject obj = new JsonObject(new Test() { Hello = "Test" });
             obj.SerializeObject(new Test2() { Monkey = "Banana" });
-
+            
             var t = obj.DeserializeObject<Test>();
             var t2 = obj.DeserializeObject<Test2>();
-
+            
             JsonArray a = new JsonArray() {
                 new JsonObject("i", "hello"),
                 new JsonObject("i", null)
             };
-
+            obj.Properties.Test = "true";
+            bool b = obj.Properties.Test;
             var i = a.FindAllObjects("i", null);
-
+            var s = obj.GetValueAs<string>("Hello");
             return;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

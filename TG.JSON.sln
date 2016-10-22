@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TG.JSON", "TG.JSON\TG.JSON.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{B499DE14-1459-4122-ABFA-E1AA7D730F45}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TG.JSON40", "TG.JSON\TG.JSON40.csproj", "{4926BADB-F98A-4894-908E-4E4F8CFFC006}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B499DE14-1459-4122-ABFA-E1AA7D730F45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B499DE14-1459-4122-ABFA-E1AA7D730F45}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B499DE14-1459-4122-ABFA-E1AA7D730F45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4926BADB-F98A-4894-908E-4E4F8CFFC006}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4926BADB-F98A-4894-908E-4E4F8CFFC006}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4926BADB-F98A-4894-908E-4E4F8CFFC006}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4926BADB-F98A-4894-908E-4E4F8CFFC006}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

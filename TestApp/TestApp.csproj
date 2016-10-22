@@ -66,9 +66,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TG.JSON\TG.JSON.csproj">
-      <Project>{e30f0802-609b-4f4d-aed8-658f9ccab86b}</Project>
-      <Name>TG.JSON</Name>
+    <ProjectReference Include="..\TG.JSON\TG.JSON40.csproj">
+      <Project>{4926badb-f98a-4894-908e-4e4f8cffc006}</Project>
+      <Name>TG.JSON40</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

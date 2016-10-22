@@ -63,6 +63,9 @@
         Dictionary<string, JsonValue> propertyValue = new Dictionary<string, JsonValue>();
         static Dictionary<Type, PropertyInfo[]> propertyCache = new Dictionary<Type, PropertyInfo[]>();
         static object locker = new object();
+#if NET40
+        private DynamicObjectHandler dynObjHandler = null;
+#endif
 
         #endregion Fields
 
@@ -213,9 +216,9 @@
         }
 
         /// <summary>
-        /// Get a string array of all keys.
+        /// Get a string array of all property names.
         /// </summary>
-        public string[] Properties
+        public string[] PropertyNames
         {
             get
             {
@@ -227,7 +230,7 @@
             {
                 if (value != null)
                 {
-                    foreach (var cur in Properties)
+                    foreach (var cur in PropertyNames)
                     {
                         foreach (var item in value)
                         {
@@ -300,10 +303,26 @@
             }
         }
 
+#if NET40
+
+        /// <summary>
+        /// Dynamic representation of the properties.
+        /// </summary>
+        public dynamic Properties
+        {
+            get
+            {
+                if (dynObjHandler == null)
+                    dynObjHandler = new DynamicObjectHandler(this);
+                return dynObjHandler;
+            }
+        }
+#endif
+
         /// <summary>
         /// Returns <see cref="JsonValueTypes.Object"/>
         /// </summary>
-		public override JsonValueTypes ValueType
+        public override JsonValueTypes ValueType
         {
             get { return JsonValueTypes.Object; }
         }
@@ -329,7 +348,7 @@
                 if (propertyValue.ContainsKey(property))
                     return propertyValue[property];
 
-                return null;
+                return new JsonNull();
             }
             set
             {
@@ -638,6 +657,25 @@
                 return JsonValueTypes.Null;
         }
 
+        /// <summary>
+        /// Get the value of a property as the specified type.
+        /// </summary>
+        /// <typeparam name="T">The type of value to return.</typeparam>
+        /// <param name="property">The name of the property</param>
+        /// <returns>T</returns>
+        public T GetValueAs<T>(string property)
+        {
+            try
+            {
+                return (T)Convert.ChangeType(this[property], typeof(T));
+            }
+            catch (Exception)
+            {
+                
+            }
+            return default(T);
+        }
+
         AttributeCollection ICustomTypeDescriptor.GetAttributes()
         {
             return new AttributeCollection(new Attribute[0]);
@@ -918,7 +956,7 @@
 		public void Sort(ListSortDirection sortOrder)
         {
             List<string> k = new List<string>(this.Count);
-            k.AddRange(this.Properties);
+            k.AddRange(this.PropertyNames);
             k.Sort();
             if (sortOrder == ListSortDirection.Descending)
                 k.Reverse();
@@ -1197,7 +1235,7 @@
                 if (this["_category"] is JsonString)
                     category = ((JsonString)this["_category"]).Value;
 			*/
-            foreach (string key in this.Properties)
+            foreach (string key in this.PropertyNames)
             {
                 if (key == dt)
                     continue;
@@ -1778,7 +1816,7 @@
             public JsonObjectPropertyEnumerator(JsonObject obj)
             {
                 thisObj = obj;
-                props = obj.Properties;
+                props = obj.PropertyNames;
             }
 
             /// <summary>
