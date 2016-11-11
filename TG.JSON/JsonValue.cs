@@ -890,16 +890,63 @@
         }
 
         /// <summary>
+        /// Tests if two values are equal.
+        /// </summary>
+        /// <param name="left">The value on the left side of the operator.</param>
+        /// <param name="right">The value on the right side of the operator.</param>
+        /// <returns>Returns true if the values are equal; otherwise false.</returns>
+        public static bool operator ==(JsonValue left, JsonValue right)
+        {
+            bool l = JsonNull.IsNull(left), r = JsonNull.IsNull(right);
+            if (l && r)
+                return true;
+            if ((l && !r) || (r && !l))
+                return false;
+            if (left.ValueType == right.ValueType)
+            {
+                switch (left.ValueType)
+                {
+                    case JsonValueTypes.String:
+                        return (left as JsonString).Value == (right as JsonString).Value;
+                    case JsonValueTypes.Object:
+                    case JsonValueTypes.Array:
+                    case JsonValueTypes.Binary:
+                        return left.ToString() == right.ToString();
+                    case JsonValueTypes.Number:
+                        return (left as JsonNumber).Value == (right as JsonNumber).Value;
+                    case JsonValueTypes.Boolean:
+                        return (left as JsonBoolean).Value == (right as JsonBoolean).Value;
+                    case JsonValueTypes.Null:
+                        return true;
+                    default:
+                        break;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Tests if two values are not equal.
+        /// </summary>
+        /// <param name="left">The value on the left side of the operator.</param>
+        /// <param name="right">The value on the right side of the operator.</param>
+        /// <returns>Returns true if the values are not equal; otherwise false.</returns>
+        public static bool operator !=(JsonValue left, JsonValue right)
+        {
+            return !(left == right);
+        }
+
+        /// <summary>
         /// Determine if a <see cref="JsonValue"/> is null.
         /// </summary>
         /// <param name="value">A value to determine.</param>
         /// <returns>Returns true if <paramref name="value"/> is null or is a <see cref="JsonNull"/></returns>
         public static bool IsNull(JsonValue value)
         {
-            if (value == null)
+            if ((object)value == null)
                 return true;
             JsonNull n = value as JsonNull;
-            if ((JsonValue)n != null)
+            if ((object)n != null)
                 return true;
             return false;
         }

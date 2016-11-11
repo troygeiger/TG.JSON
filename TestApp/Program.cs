@@ -40,6 +40,7 @@ namespace TestApp
             bool b = obj.Properties.Test;
             var i = a.FindAllObjects("i", null);
             var s = obj.GetValueAs<string>("Hello");
+            (obj.Navigate("Parent/Child/GrandChild", true) as JsonObject)["Age"] = 15;
             return;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
