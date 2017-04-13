@@ -133,6 +133,7 @@
         /// </summary>
         public const string MIME_Type = "application/json";
         private JsonValue _parent = null;
+        private static JsonNull generic = null;
 
         #endregion Fields
 
@@ -1068,7 +1069,7 @@
         {
             return ValueFromObject(obj, int.MaxValue);
         }
-
+        
         /// <summary>
         /// Returns the equivalent <see cref="JsonValue"/> from the specified object <paramref name="obj"/>.
         /// </summary>
@@ -1124,6 +1125,38 @@
                 return new JsonObject().SerializeObject(obj, maxDepth - 1, ignoreProperties);
 
             return new JsonNull();
+        }
+
+        /// <summary>
+        /// Returns the equivalent <see cref="JsonValue"/> from the specified object <paramref name="obj"/>.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="obj"/> cannot be matched with a <see cref="JsonNull"/>, <see cref="JsonBoolean"/>,
+        /// <see cref="JsonNumber"/> or a <see cref="JsonString"/>; the <seealso cref="JsonObject.SerializeObject(object)"/> method is called.
+        /// </remarks>
+        /// <param name="obj">The object to be converted to a <see cref="JsonValue"/>.</param>
+        /// <returns>A new <see cref="JsonValue"/> based on <paramref name="obj"/>.</returns>
+        public static JsonValue GetValueFromObject(object obj)
+        {
+            return GetValueFromObject(obj, int.MaxValue);
+        }
+
+        /// <summary>
+        /// Returns the equivalent <see cref="JsonValue"/> from the specified object <paramref name="obj"/>.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="obj"/> cannot be matched with a <see cref="JsonNull"/>, <see cref="JsonBoolean"/>,
+        /// <see cref="JsonNumber"/> or a <see cref="JsonString"/>; the <seealso cref="JsonObject.SerializeObject(object)"/> method is called.
+        /// </remarks>
+        /// <param name="obj">The object to be converted to a <see cref="JsonValue"/>.</param>
+        /// <param name="maxDepth">The maximum depth to serialize if method <see cref="JsonObject.SerializeObject(object, int, string[])"/> needs to be called.</param>
+        /// <param name="ignoreProperties">Property names that should be ignored if method <see cref="JsonObject.SerializeObject(object, int, string[])"/> needs to be called.</param>
+        /// <returns>A new <see cref="JsonValue"/> based on <paramref name="obj"/>.</returns>
+        public static JsonValue GetValueFromObject(object obj, int maxDepth, params string[] ignoreProperties)
+        {
+            if (generic == null)
+                generic = new JsonNull();
+            return generic.ValueFromObject(obj, maxDepth, ignoreProperties);
         }
 
         /// <summary>

@@ -4,6 +4,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Reflection;
     using System.Text;
 
     /// <summary>
@@ -73,6 +74,7 @@
         /// </code>
         /// </example>
         /// <param name="range">A range of <see cref="JsonValue"/> values.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public JsonArray(params JsonValue[] range)
             : this()
         {
@@ -113,7 +115,7 @@
             : this()
         {
             foreach (object item in array)
-                internalAdd(base.ValueFromObject(item));
+                InternalAdd(base.ValueFromObject(item));
         }
 
 
@@ -249,7 +251,7 @@
         /// <param name="obj">A <see cref="JsonValue"/> value.</param>
         public int Add(JsonValue obj)
         {
-            int i = this.internalAdd(obj);
+            int i = this.InternalAdd(obj);
             OnValueChanged();
             return i;
         }
@@ -261,7 +263,7 @@
         public void AddRange(IEnumerable<JsonValue> range)
         {
             foreach (var item in range)
-                this.internalAdd(item);
+                this.InternalAdd(item);
         }
 
         /// <summary>
@@ -274,7 +276,7 @@
                 return;
             foreach (JsonValue item in range)
             {
-                this.internalAdd(item);
+                this.InternalAdd(item);
             }
             OnValueChanged();
         }
@@ -456,6 +458,12 @@
         {
             if (lst == null)
                 return;
+            Type t = lst.GetType();
+            MethodInfo addMethod = t.GetMethod("Add");
+            ParameterInfo[] parameters = addMethod.GetParameters();
+            if (parameters.Length < 1)
+                return;
+            ParameterInfo addParam = parameters[0];
             for (int i = 0; i < Count; i++)
             {
                 JsonValue v = this[i];
@@ -467,9 +475,7 @@
                             lst.Add((string)v);
                             break;
                         case JsonValueTypes.Object:
-                            Type[] args = lst.GetType().GetGenericArguments();
-                            if (args.Length == 1)
-                                lst.Add(((JsonObject)v).DeserializeObject(args[0]));
+                            lst.Add(((JsonObject)v).DeserializeObject(addParam.ParameterType));
                             break;
                         case JsonValueTypes.Array:
                             break;
@@ -501,11 +507,14 @@
             if (dictionary == null)
                 return;
             Type dType = dictionary.GetType();
-            Type[] args = dType.GetGenericArguments();
-            if (args.Length != 2)
+            MethodInfo addMethod = dType.GetMethod("Add");
+            if (addMethod == null)
                 return;
-            Type keyType = args[0];
-            Type valueType = args[1];
+            ParameterInfo[] addParams = addMethod.GetParameters();
+            if (addParams.Length != 2)
+                return;
+            Type keyType = addParams[0].ParameterType;
+            Type valueType = addParams[1].ParameterType;
 
             for (int i = 0; i < Count; i++)
             {
@@ -945,7 +954,7 @@
         /// Used internally to add a <see cref="JsonValue"/> to the array without ValueChanged event.
         /// </summary>
         /// <param name="obj">A <see cref="JsonValue"/> value.</param>
-        private int internalAdd(JsonValue obj)
+        private int InternalAdd(JsonValue obj)
         {
             if (obj == null)
                 obj = new JsonNull();
@@ -1013,9 +1022,9 @@
                         {
                             string value = buffer.Dump();
                             if (value.StartsWith("base64"))
-                                this.internalAdd(new JsonBinary(value));
+                                this.InternalAdd(new JsonBinary(value));
                             else
-                                this.internalAdd(new JsonString(value));
+                                this.InternalAdd(new JsonString(value));
                         }
                         break;
                     case '[':
@@ -1026,7 +1035,7 @@
                         else
                         {
                             reader.Position--;
-                            this.internalAdd(new JsonArray(reader));
+                            this.InternalAdd(new JsonArray(reader));
                         }
                         break;
                     case ']':
@@ -1035,7 +1044,7 @@
                         else
                         {
                             if (buffer.Length > 0)
-                                this.internalAdd(ValueFromString(buffer.Dump()));
+                                this.InternalAdd(ValueFromString(buffer.Dump()));
                             return;
                         }
                         break;
@@ -1043,7 +1052,7 @@
                         if (inString)
                             buffer.Add(chr);
                         else if (buffer.Length > 0)
-                            this.internalAdd(ValueFromString(buffer.Dump()));
+                            this.InternalAdd(ValueFromString(buffer.Dump()));
                         break;
                     case '{':
                         if (inString)
@@ -1051,7 +1060,7 @@
                         else
                         {
                             reader.Position--;
-                            this.internalAdd(new JsonObject(reader));
+                            this.InternalAdd(new JsonObject(reader));
                         }
                         break;
                     case '\r':

@@ -11,37 +11,34 @@ namespace TestApp
 {
     class Program
     {
-        class Test
-        {
-            public string Hello { get; set; }
-
-            public bool Edger { get; set; }
-        }
-
-        class Test2
-        {
-            public string Monkey { get; set; }
-        }
+   
 
         [STAThread]
         static void Main(string[] args)
         {
-            JsonObject obj = new JsonObject(new Test() { Hello = "Test" });
-            obj.SerializeObject(new Test2() { Monkey = "Banana" });
-            
-            var t = obj.DeserializeObject<Test>();
-            var t2 = obj.DeserializeObject<Test2>();
-            
-            JsonArray a = new JsonArray() {
-                new JsonObject("i", "hello"),
-                new JsonObject("i", null)
-            };
-            obj.Properties.Test = "true";
-            bool b = obj.Properties.Test;
-            var i = a.FindAllObjects("i", null);
-            var s = obj.GetValueAs<string>("Hello");
-            (obj.Navigate("Parent/Child/GrandChild", true) as JsonObject)["Age"] = 15;
-            return;
+            //JsonObject obj = new JsonObject(new Test() { Hello = "Test" });
+            //obj.SerializeObject(new Test2() { Monkey = "Banana" });
+
+            //var t = obj.DeserializeObject<Test>();
+            //var t2 = obj.DeserializeObject<Test2>();
+
+            JsonObject oj = new JsonObject(
+                "Name", "Parent Test",
+                "Tests", new JsonArray(new JsonObject[] {
+                    new JsonObject(
+                        "Key", "First",
+                        "Value", new JsonObject("Name", "Child")
+                    )
+                })
+                );
+            Test t = oj.DeserializeObject<Test>();
+            oj = new JsonObject(t);
+            //obj.Properties.Test = "true";
+            //bool b = obj.Properties.Test;
+            //var i = a.FindAllObjects("i", null);
+            //var s = obj.GetValueAs<string>("Hello");
+            //(obj.Navigate("Parent/Child/GrandChild", true) as JsonObject)["Age"] = 15;
+            //return;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
@@ -52,5 +49,30 @@ namespace TestApp
         {
             
         }
+    }
+
+    class Test
+    {
+        public string Name { get; set; }
+
+        public Test2Collection Tests { get; } = new Test2Collection();
+    }
+
+    class Test2Collection : System.Collections.DictionaryBase
+    {
+        public void Add(string key, Test2 item)
+        {
+            Dictionary.Add(key, item);
+        }
+
+        public Test2 this[string i]
+        {
+            get { return Dictionary[i] as Test2; }
+        }
+    }
+
+    class Test2
+    {
+        public string Name { get; set; }
     }
 }

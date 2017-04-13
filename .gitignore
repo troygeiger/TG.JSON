@@ -12,3 +12,4 @@
 /TG.JSON/nuget.exe
 *.nupkg
 *.nuspec
+*.suo

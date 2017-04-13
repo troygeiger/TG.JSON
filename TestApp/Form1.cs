@@ -14,6 +14,7 @@ namespace TestApp
     public partial class Form1 : Form
     {
         JsonObject o;
+        JsonArray arr = new JsonArray();
         public Form1()
         {
             InitializeComponent();
@@ -28,7 +29,7 @@ namespace TestApp
             {
                 
             }
-            
+            dataGridView1.DataSource = o;
         }
 
         public class Obj
