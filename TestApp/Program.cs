@@ -23,15 +23,14 @@ namespace TestApp
             //var t2 = obj.DeserializeObject<Test2>();
 
             JsonObject oj = new JsonObject(
-                "Name", "Parent Test",
-                "Tests", new JsonArray(new JsonObject[] {
-                    new JsonObject(
-                        "Key", "First",
-                        "Value", new JsonObject("Name", "Child")
-                    )
-                })
+                "Name", null,
+                "Date", null,
+                "Number", null
                 );
+            
             Test t = oj.DeserializeObject<Test>();
+            t.Date = DateTime.Now;
+
             oj = new JsonObject(t);
             //obj.Properties.Test = "true";
             //bool b = obj.Properties.Test;
@@ -55,7 +54,10 @@ namespace TestApp
     {
         public string Name { get; set; }
 
-        public Test2Collection Tests { get; } = new Test2Collection();
+        public DateTime? Date { get; set; }
+
+        public int? Number { get; set; }
+        //public Test2Collection Tests { get; } = new Test2Collection();
     }
 
     class Test2Collection : System.Collections.DictionaryBase

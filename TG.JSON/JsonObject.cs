@@ -1141,6 +1141,20 @@
                                 property.SetValue(obj, Enum.Parse(property.PropertyType, (string)value), null);
 
                             }
+                            else if (property.PropertyType == typeof(DateTime))
+                            {
+                                DateTime dt;
+                                DateTime.TryParse((string)value, out dt);
+                                property.SetValue(obj, dt, null);
+                            }
+                            else if (property.PropertyType == typeof(Nullable<DateTime>))
+                            {
+                                DateTime dt;
+                                if (DateTime.TryParse((string)value, out dt))
+                                    property.SetValue(obj, dt, null);
+                                else
+                                    property.SetValue(obj, null, null);
+                            }
                             break;
                         case JsonValueTypes.Object:
                             if (!property.CanWrite)
