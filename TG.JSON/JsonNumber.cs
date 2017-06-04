@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Text;
 
     /// <summary>
@@ -24,7 +25,7 @@
     public class JsonNumber : JsonValue
     {
         #region Fields
-
+        static CultureInfo en_US = new CultureInfo("en-US");
         double _value = 0;
 
         #endregion Fields
@@ -380,7 +381,7 @@
         /// <returns>The string representation of the value of this instance.</returns>
         public override string ToString()
         {
-            return this.Value.ToString();
+            return this.Value.ToString(en_US);
         }
 
         internal override string InternalToString(Formatting format, int depth)
