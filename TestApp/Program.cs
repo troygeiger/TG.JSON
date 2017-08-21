@@ -16,22 +16,15 @@ namespace TestApp
         [STAThread]
         static void Main(string[] args)
         {
+            Test test = new Test() { Name = "Hello World" };
+            JsonObject obj = new JsonObject(test);
+
             //JsonObject obj = new JsonObject(new Test() { Hello = "Test" });
             //obj.SerializeObject(new Test2() { Monkey = "Banana" });
 
             //var t = obj.DeserializeObject<Test>();
             //var t2 = obj.DeserializeObject<Test2>();
-
-            JsonObject oj = new JsonObject(
-                "Name", null,
-                "Date", null,
-                "Number", null
-                );
             
-            Test t = oj.DeserializeObject<Test>();
-            t.Date = DateTime.Now;
-
-            oj = new JsonObject(t);
             //obj.Properties.Test = "true";
             //bool b = obj.Properties.Test;
             //var i = a.FindAllObjects("i", null);
@@ -54,6 +47,7 @@ namespace TestApp
     {
         public string Name { get; set; }
 
+        [JsonIgnoreProperty]
         public DateTime? Date { get; set; }
 
         public int? Number { get; set; }

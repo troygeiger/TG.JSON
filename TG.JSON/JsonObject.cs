@@ -809,6 +809,9 @@
             {
                 if (ignore.Contains(property.Name) || !property.CanRead)
                     continue;
+                object[] atts = property.GetCustomAttributes(typeof(JsonIgnorePropertyAttribute), false);
+                if (atts.Length > 0 && (atts[0] as JsonIgnorePropertyAttribute).IgnoreProperty)
+                    continue;
                 try
                 {
                     if (property.PropertyType == typeof(object))
@@ -869,6 +872,9 @@
             foreach (var property in GetTypeProperties(obj.GetType()))
             {
                 if (ignore.Contains(property.Name) || !property.CanRead)
+                    continue;
+                object[] atts = property.GetCustomAttributes(typeof(JsonIgnorePropertyAttribute), false);
+                if (atts.Length > 0 && (atts[0] as JsonIgnorePropertyAttribute).IgnoreProperty)
                     continue;
                 try
                 {

@@ -6,10 +6,12 @@
 /TestApp/obj
 /TG.JSON/bin
 /TG.JSON/obj
-/.vs/TG.JSON/v14
+/.vs/TG.JSON/*
 /TG.JSON/NuGet-Create NuSpec.bat
 /TG.JSON/NuGet-Package.bat
 /TG.JSON/nuget.exe
 *.nupkg
 *.nuspec
 *.suo
+/Documentation/Help/LastBuild.log
+/Documentation/Help/LastBuild.log
