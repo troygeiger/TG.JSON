@@ -1286,7 +1286,10 @@
                 switch (value.ValueType)
                 {
                     case JsonValueTypes.String:
-                        ptype = typeof(string);
+                        if ((value as JsonString).ContainsDateTime)
+                            ptype = typeof(DateTime);
+                        else
+                            ptype = typeof(string);
                         break;
                     case JsonValueTypes.Number:
                         ptype = typeof(double);
@@ -1711,7 +1714,10 @@
                     switch (v.ValueType)
                     {
                         case JsonValueTypes.String:
-                            return (string)v;
+                            if (_propertyType == typeof(DateTime))
+                                return (DateTime)v;
+                            else
+                                return (string)v;
                         case JsonValueTypes.Object:
                         case JsonValueTypes.Array:
                             return v;

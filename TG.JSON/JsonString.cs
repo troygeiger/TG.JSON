@@ -47,6 +47,18 @@
 
 		#region Properties
 
+        /// <summary>
+        /// Check to see if the value contains a <see cref="DateTime"/> value.
+        /// </summary>
+        public bool ContainsDateTime
+        {
+            get
+            {
+                DateTime d;
+                return DateTime.TryParse(Value, out d);
+            }
+        }
+
 		/// <summary>
 		/// Gets or Sets the string value of the current instance.
 		/// </summary>
