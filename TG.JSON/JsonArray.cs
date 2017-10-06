@@ -471,19 +471,19 @@
                 {
                     switch (v.ValueType)
                     {
-                        case JsonValueTypes.String:
-                            lst.Add((string)v);
-                            break;
                         case JsonValueTypes.Object:
                             lst.Add(((JsonObject)v).DeserializeObject(addParam.ParameterType));
                             break;
                         case JsonValueTypes.Array:
+                            throw new NotImplementedException("Deserializing array values has not been implemented.");
                             break;
+                        case JsonValueTypes.String:
                         case JsonValueTypes.Number:
-                            break;
                         case JsonValueTypes.Boolean:
+                            lst.Add(Convert.ChangeType(v, addParam.ParameterType));
                             break;
                         case JsonValueTypes.Binary:
+                            throw new NotImplementedException("Deserializing Binary values has not been implemented.");
                             break;
                         case JsonValueTypes.Null:
                             break;

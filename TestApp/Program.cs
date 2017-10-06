@@ -16,8 +16,14 @@ namespace TestApp
         [STAThread]
         static void Main(string[] args)
         {
-            Test test = new Test() { Name = "Hello World" };
-            JsonObject obj = new JsonObject(test);
+            Test test = new Test();
+            test.Numbers.Add(1);
+            test.Bools.Add(true);
+            test.Strings.Add("Hello World");
+            List<Test> tests = new List<Test>() { test };
+            JsonArray a = new JsonArray(tests.ToArray());
+            tests.Clear();
+            a.DeserializeInto(tests);
 
             //JsonObject obj = new JsonObject(new Test() { Hello = "Test" });
             //obj.SerializeObject(new Test2() { Monkey = "Banana" });
@@ -30,7 +36,7 @@ namespace TestApp
             //var i = a.FindAllObjects("i", null);
             //var s = obj.GetValueAs<string>("Hello");
             //(obj.Navigate("Parent/Child/GrandChild", true) as JsonObject)["Age"] = 15;
-            //return;
+            return;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
@@ -52,6 +58,12 @@ namespace TestApp
 
         public int? Number { get; set; }
         //public Test2Collection Tests { get; } = new Test2Collection();
+
+        public List<int> Numbers { get; } = new List<int>();
+
+        public List<string> Strings { get; } = new List<string>();
+
+        public List<bool> Bools { get; } = new List<bool>();
     }
 
     class Test2Collection : System.Collections.DictionaryBase
