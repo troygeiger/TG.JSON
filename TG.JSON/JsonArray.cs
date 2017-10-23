@@ -966,6 +966,11 @@
 
         private void InternalParse(string json)
         {
+            if (string.IsNullOrEmpty(json))
+                return;
+            json = json.Trim();
+            if (!json.StartsWith("[") && !json.EndsWith("]"))
+                return;
             InternalParse(new JsonReader(json));
         }
 

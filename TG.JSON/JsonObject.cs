@@ -1322,6 +1322,11 @@
 
         private void InternalParser(string json)
         {
+            if (string.IsNullOrEmpty(json))
+                return;
+            json = json.Trim();
+            if (!json.StartsWith("{") && !json.EndsWith("}"))
+                return;
             InternalParser(new JsonReader(json));
         }
 

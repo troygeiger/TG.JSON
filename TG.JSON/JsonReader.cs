@@ -15,6 +15,7 @@
 
         string jstring;
         int _position = 0;
+        bool _isNull;
 
         #endregion Fields
 
@@ -26,7 +27,7 @@
 		/// <param name="json">The JSON string that will be read from.</param>
         public JsonReader(string json)
         {
-            jstring = json;
+            StringValue = json;
         }
 
         #endregion Constructors
@@ -78,7 +79,16 @@
             {
                 Reset();
                 jstring = value;
+                _isNull = string.IsNullOrEmpty(value);
             }
+        }
+
+        /// <summary>
+        /// Gets whether the StringValue is null.
+        /// </summary>
+        public bool IsNull
+        {
+            get { return _isNull; }
         }
 
         #endregion Properties
@@ -106,7 +116,6 @@
 		/// </summary>
         public void Reset()
         {
-            jstring = null;
             _position = 0;
         }
 

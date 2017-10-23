@@ -16,14 +16,16 @@ namespace TestApp
         [STAThread]
         static void Main(string[] args)
         {
-            Test test = new Test();
-            test.Numbers.Add(1);
-            test.Bools.Add(true);
-            test.Strings.Add("Hello World");
-            List<Test> tests = new List<Test>() { test };
-            JsonArray a = new JsonArray(tests.ToArray());
-            tests.Clear();
-            a.DeserializeInto(tests);
+            JsonObject obj = new JsonObject("[{\"IsAwesome\":true}]");
+
+            //Test test = new Test();
+            //test.Numbers.Add(1);
+            //test.Bools.Add(true);
+            //test.Strings.Add("Hello World");
+            //List<Test> tests = new List<Test>() { test };
+            //JsonArray a = new JsonArray(tests.ToArray());
+            //tests.Clear();
+            //a.DeserializeInto(tests);
 
             //JsonObject obj = new JsonObject(new Test() { Hello = "Test" });
             //obj.SerializeObject(new Test2() { Monkey = "Banana" });
