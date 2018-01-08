@@ -2,7 +2,12 @@
 This is a .net library for creating, parsing, serializing and deserializing JSON.
 It's small, fast and very easy to use.
 
-## Example
+## Basic Usage
 ```
 JsonObject obj = new JsonObject("name", "John Doe", "age", 33, "sex", "Male", "married", true);
+if (obj["age"] == 33)
+{
+  obj["isAwesome"] = true;
+}
+string json = obj.ToString(Formatting.Indented);
 ```
