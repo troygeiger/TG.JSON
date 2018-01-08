@@ -6,18 +6,41 @@ using System.Threading.Tasks;
 using TG.JSON;
 using System.Windows.Forms;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace TestApp
 {
     class Program
     {
-   
+
 
         [STAThread]
         static void Main(string[] args)
         {
-            JsonObject obj = new JsonObject("[{\"IsAwesome\":true}]");
-
+            Test test = new Test()
+            {
+                Name = "TEST",
+                Date = DateTime.Now,
+                Number = 1,
+                Numbers = { 1, 2, 3, 4, 5 },
+                Strings = { "Hello", "World" }
+            };
+            Console.WriteLine("Press Ctrl+c to Exit; Enter to run again.");
+            Stopwatch stopwatch = new Stopwatch();
+            JsonValue value;
+            DoAgain:
+            stopwatch.Reset();
+            stopwatch.Start();
+            string json = JsonValue.GetValueFromObject(test).ToString(Formatting.Indented);// new JsonObject(test).ToString(Formatting.Indented);
+            stopwatch.Stop();
+            Console.WriteLine($"Serialize Elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
+            stopwatch.Reset();
+            stopwatch.Start();
+            Test test2 =  new JsonObject(json).DeserializeObject<Test>();
+            stopwatch.Stop();
+            Console.WriteLine($"Deserialize Elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
+            string cmd = Console.ReadLine();
+            if (cmd == "") goto DoAgain;
             //Test test = new Test();
             //test.Numbers.Add(1);
             //test.Bools.Add(true);
@@ -32,7 +55,7 @@ namespace TestApp
 
             //var t = obj.DeserializeObject<Test>();
             //var t2 = obj.DeserializeObject<Test2>();
-            
+
             //obj.Properties.Test = "true";
             //bool b = obj.Properties.Test;
             //var i = a.FindAllObjects("i", null);
@@ -42,12 +65,12 @@ namespace TestApp
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
-            
+
         }
 
         private static void Program_ValueChanged(object sender, EventArgs e)
         {
-            
+
         }
     }
 
@@ -55,7 +78,7 @@ namespace TestApp
     {
         public string Name { get; set; }
 
-        [JsonIgnoreProperty]
+        //[JsonIgnoreProperty]
         public DateTime? Date { get; set; }
 
         public int? Number { get; set; }
