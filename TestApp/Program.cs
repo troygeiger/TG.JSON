@@ -17,6 +17,25 @@ namespace TestApp
         [STAThread]
         static void Main(string[] args)
         {
+            Test test = new Test();
+            test.Number = 32;
+            test.Numbers.AddRange(new int[] { 3, 2, 1 });
+
+            EncryptionHandler encryption = new EncryptionHandler("Hello World");
+            JsonObject obj = new JsonObject(encryption);
+            obj.SerializeObject(test);
+            string s = obj.ToString(Formatting.Indented);
+            obj = new JsonObject(s, encryption);
+
+            Test test2 = obj.DeserializeObject<Test>();
+            //Application.EnableVisualStyles();
+            //Application.SetCompatibleTextRenderingDefault(false);
+            //Application.Run(new Form1());
+            PerformanceTest();
+        }
+
+        static void PerformanceTest()
+        {
             Test test = new Test()
             {
                 Name = "TEST",
@@ -26,46 +45,23 @@ namespace TestApp
                 Strings = { "Hello", "World" }
             };
             Console.WriteLine("Press Ctrl+c to Exit; Enter to run again.");
+            EncryptionHandler encryption = new EncryptionHandler("Hello World");
+
             Stopwatch stopwatch = new Stopwatch();
             JsonValue value;
             DoAgain:
             stopwatch.Reset();
             stopwatch.Start();
-            string json = JsonValue.GetValueFromObject(test).ToString(Formatting.Indented);// new JsonObject(test).ToString(Formatting.Indented);
+            string json = new JsonObject(test, encryption).ToString(Formatting.Indented);// new JsonObject(test).ToString(Formatting.Indented);
             stopwatch.Stop();
             Console.WriteLine($"Serialize Elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
             stopwatch.Reset();
             stopwatch.Start();
-            Test test2 =  new JsonObject(json).DeserializeObject<Test>();
+            Test test2 = new JsonObject(json, encryption).DeserializeObject<Test>();
             stopwatch.Stop();
             Console.WriteLine($"Deserialize Elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
             string cmd = Console.ReadLine();
             if (cmd == "") goto DoAgain;
-            //Test test = new Test();
-            //test.Numbers.Add(1);
-            //test.Bools.Add(true);
-            //test.Strings.Add("Hello World");
-            //List<Test> tests = new List<Test>() { test };
-            //JsonArray a = new JsonArray(tests.ToArray());
-            //tests.Clear();
-            //a.DeserializeInto(tests);
-
-            //JsonObject obj = new JsonObject(new Test() { Hello = "Test" });
-            //obj.SerializeObject(new Test2() { Monkey = "Banana" });
-
-            //var t = obj.DeserializeObject<Test>();
-            //var t2 = obj.DeserializeObject<Test2>();
-
-            //obj.Properties.Test = "true";
-            //bool b = obj.Properties.Test;
-            //var i = a.FindAllObjects("i", null);
-            //var s = obj.GetValueAs<string>("Hello");
-            //(obj.Navigate("Parent/Child/GrandChild", true) as JsonObject)["Age"] = 15;
-            return;
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
-
         }
 
         private static void Program_ValueChanged(object sender, EventArgs e)
@@ -76,14 +72,17 @@ namespace TestApp
 
     class Test
     {
+        [JsonEncryptValue]
         public string Name { get; set; }
 
-        //[JsonIgnoreProperty]
+        [JsonEncryptValue]
         public DateTime? Date { get; set; }
 
-        public int? Number { get; set; }
+        [JsonEncryptValue]
+        public int Number { get; set; }
         //public Test2Collection Tests { get; } = new Test2Collection();
 
+        [JsonEncryptValue]
         public List<int> Numbers { get; } = new List<int>();
 
         public List<string> Strings { get; } = new List<string>();

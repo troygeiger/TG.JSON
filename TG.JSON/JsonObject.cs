@@ -80,6 +80,15 @@
         }
 
         /// <summary>
+        /// Initialize a new instance of <see cref="JsonObject"/> with an <see cref="EncryptionHandler"/>.
+        /// </summary>
+        /// <param name="encryption">The <see cref="EncryptionHandler"/> to use for encryption.</param>
+        public JsonObject(EncryptionHandler encryption)
+        {
+            this.GlobalEncryptionHandler = encryption;
+        }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> that parses the specified JSON string.
         /// </summary>
         /// <param name="json">JSON Object formatted string. Ex. { "Hello" : "World" } </param>
@@ -91,6 +100,17 @@
         public JsonObject(string json)
             : this()
         {
+            this.InternalParser(json);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonObject"/> that parses the specified JSON string.
+        /// </summary>
+        /// <param name="json">JSON Object formatted string. Ex. { "Hello" : "World" } </param>
+        /// <param name="encryption">The <see cref="EncryptionHandler"/> to use for encryption.</param>
+        public JsonObject(string json, EncryptionHandler encryption) : this()
+        {
+            this.GlobalEncryptionHandler = encryption;
             this.InternalParser(json);
         }
 
@@ -135,6 +155,18 @@
 		public JsonObject(object obj)
             : this()
         {
+            SerializeObject(obj);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonObject"/> that serializes the specified object.
+        /// </summary>
+        /// <param name="obj">The object to serialize.</param>
+        /// <param name="encryption">The <see cref="EncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonObject(object obj, EncryptionHandler encryption)
+            : this()
+        {
+            GlobalEncryptionHandler = encryption;
             SerializeObject(obj);
         }
 
@@ -406,6 +438,30 @@
         }
 
         /// <summary>
+        /// A static method for creating a JsonObject using provided JSON object string.
+        /// </summary>
+        /// <param name="json">A JSON object string</param>
+        /// <param name="encryption">The <see cref="EncryptionHandler"/> used to encrypt and decrypt values.</param>
+        /// <returns>A new instance of <see cref="JsonObject"/> based on the parsed JSON string.</returns>
+        /// <example>
+        /// <code>
+        /// class MyClass
+        /// {
+        ///		static void Main()
+        ///		{
+        ///		    EncryptionHandler enc = new EncryptionHandler("EncryptMe");
+        ///			JsonObject json = JsonObject.Parse("{ \"Hello\" : \"World\" , \"IsAwesome\" : true }", enc);
+        ///			Console.Write(json.ToString(false));
+        ///		}
+        /// }
+        /// </code>
+        /// </example>
+        public static JsonObject Parse(string json, EncryptionHandler encryption)
+        {
+            return new JsonObject(json, encryption);
+        }
+
+        /// <summary>
         /// Adds a new entry to the current JsonObject's collection.
         /// </summary>
         /// <param name="property">A unique key used for the new entry.</param>
@@ -637,7 +693,7 @@
                 default:
                     return propertyValue.GetEnumerator();
             }
-            
+
         }
 
         /// <summary>
@@ -671,7 +727,7 @@
             }
             catch (Exception)
             {
-                
+
             }
             return default(T);
         }
@@ -809,25 +865,58 @@
             {
                 if (ignore.Contains(property.Name) || !property.CanRead)
                     continue;
-                object[] atts = property.GetCustomAttributes(typeof(JsonIgnorePropertyAttribute), false);
-                if (atts.Length > 0 && (atts[0] as JsonIgnorePropertyAttribute).IgnoreProperty)
-                    continue;
+
+                bool encrypt = false;
+                foreach (object att in property.GetCustomAttributes(false))
+                {
+                    if (att is JsonIgnorePropertyAttribute)
+                    {
+                        continue;
+                    }
+                    else if (att is JsonEncryptValueAttribute)
+                    {
+                        encrypt = true;
+                    }
+                }
+
                 try
                 {
+                    object pval = property.GetValue(obj, null);
+
                     if (property.PropertyType == typeof(object))
                     {
-                        object pval = property.GetValue(obj, null);
-                        JsonValue v = ValueFromObject(pval, maxDepth, ignoreProperties);
-                        if (v.ValueType == JsonValueTypes.Object)
+
+                        JsonValue value;
+                        if (encrypt && pval != null)
                         {
-                            ((JsonObject)v).internalAdd("_type", pval.GetType().AssemblyQualifiedName);
+                            value = new JsonString(pval?.ToString()) { EncryptValue = true };
+                        }
+                        else
+                        {
+                            value = ValueFromObject(pval, maxDepth, ignoreProperties);
+                        }
+                        if (value.ValueType == JsonValueTypes.Object)
+                        {
+                            ((JsonObject)value).internalAdd("_type", pval.GetType().AssemblyQualifiedName);
                         }
 
-                        this.internalAdd(property.Name, v);
+                        this.internalAdd(property.Name, value);
                     }
                     else
-                        this.internalAdd(property.Name, ValueFromObject(property.GetValue(obj, null), maxDepth, ignoreProperties));
-                    
+                    {
+                        JsonValue value;
+                        if (encrypt && pval != null && !(pval is System.Collections.IEnumerable))
+                        {
+                            value = new JsonString(pval?.ToString()) { EncryptValue = true };
+
+                        }
+                        else
+                        {
+                            value = ValueFromObject(pval, maxDepth, ignoreProperties);
+                        }
+                        this.internalAdd(property.Name, value);
+                    }
+
                 }
                 catch (Exception)
                 {
@@ -873,24 +962,55 @@
             {
                 if (ignore.Contains(property.Name) || !property.CanRead)
                     continue;
-                object[] atts = property.GetCustomAttributes(typeof(JsonIgnorePropertyAttribute), false);
-                if (atts.Length > 0 && (atts[0] as JsonIgnorePropertyAttribute).IgnoreProperty)
-                    continue;
+                bool encrypt = false;
+                foreach (object att in property.GetCustomAttributes(false))
+                {
+                    if (att is JsonIgnorePropertyAttribute)
+                    {
+                        continue;
+                    }
+                    else if (att is JsonEncryptValueAttribute)
+                    {
+                        encrypt = true;
+                    }
+                }
                 try
                 {
+                    object pval = property.GetValue(obj, null);
+
                     if (property.PropertyType == typeof(object))
                     {
-                        object pval = property.GetValue(obj, null);
-                        JsonValue v = ValueFromObject(pval, maxDepth, ignoreProperties);
-                        if (v.ValueType == JsonValueTypes.Object)
+
+                        JsonValue value;
+                        if (encrypt && pval != null)
                         {
-                            ((JsonObject)v).internalAdd("_type", pval.GetType().AssemblyQualifiedName);
+                            value = new JsonString(pval?.ToString()) { EncryptValue = true };
+                        }
+                        else
+                        {
+                            value = ValueFromObject(pval, maxDepth, ignoreProperties);
+                        }
+                        if (value.ValueType == JsonValueTypes.Object)
+                        {
+                            ((JsonObject)value).internalAdd("_type", pval.GetType().AssemblyQualifiedName);
                         }
 
-                        this.internalAdd(property.Name, v);
+                        this.internalAdd(property.Name, value);
                     }
                     else
-                        this.internalAdd(property.Name, ValueFromObject(property.GetValue(obj, null), maxDepth, ignoreProperties));
+                    {
+                        JsonValue value;
+                        if (encrypt && pval != null && !(pval is System.Collections.IEnumerable))
+                        {
+                            value = new JsonString(pval?.ToString()) { EncryptValue = true };
+
+                        }
+                        else
+                        {
+                            value = ValueFromObject(pval, maxDepth, ignoreProperties);
+                        }
+                        this.internalAdd(property.Name, value);
+                    }
                     JsonPropertyDefinition pdef = new JsonPropertyDefinition(property);
                     pdef.CreateAttributeEntry(AttributesTable);
                 }
@@ -1142,6 +1262,7 @@
                         case JsonValueTypes.String:
                             if (property.PropertyType == typeof(string))
                                 property.SetValue(obj, (string)value, null);
+
                             else if (property.PropertyType.BaseType == typeof(Enum))
                             {
                                 property.SetValue(obj, Enum.Parse(property.PropertyType, (string)value), null);
@@ -1153,13 +1274,22 @@
                                 DateTime.TryParse((string)value, out dt);
                                 property.SetValue(obj, dt, null);
                             }
-                            else if (property.PropertyType == typeof(Nullable<DateTime>))
+                            else if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
                             {
-                                DateTime dt;
-                                if (DateTime.TryParse((string)value, out dt))
-                                    property.SetValue(obj, dt, null);
-                                else
-                                    property.SetValue(obj, null, null);
+                                var arg = property.PropertyType.GetGenericArguments();
+
+                                object generic = null;
+
+                                try
+                                {
+                                    generic = Convert.ChangeType((string)value, arg[0]);
+                                }
+                                catch (Exception) { }
+                                property.SetValue(obj, generic, null);
+                            }
+                            else
+                            {
+                                property.SetValue(obj, Convert.ChangeType((string)value, property.PropertyType), null);
                             }
                             break;
                         case JsonValueTypes.Object:
@@ -1418,10 +1548,14 @@
                         if (!inString && key != null)
                         {
                             string value = buffer.Dump();
-                            if (value.StartsWith("base64"))
+                            if (value.StartsWith("base64:"))
                                 this.internalAdd(key, new JsonBinary(value));
                             else
-                                this.internalAdd(key, new JsonString(value));
+                            {
+                                JsonString jstring = new JsonString();
+                                this.internalAdd(key, jstring);
+                                jstring.Value = value;
+                            }
                         }
                         break;
                     case ',':
@@ -1969,7 +2103,7 @@
             /// The value of the property.
             /// </summary>
             public JsonValue Value;
-            
+
             /// <summary>
             /// A constructor used to set the parameters.
             /// </summary>

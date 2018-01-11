@@ -55,6 +55,16 @@
         }
 
         /// <summary>
+        /// Initializes an empty <see cref="JsonArray"/>.
+        /// </summary>
+        /// <param name="encryption">The <see cref="EncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonArray(EncryptionHandler encryption)
+        {
+            GlobalEncryptionHandler = encryption;
+            enumerator = _values.GetEnumerator();
+        }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="JsonArray"/> with a range of <see cref="JsonValue"/> values.
         /// </summary>
         /// <param name="range">A range of <see cref="JsonValue"/> values.</param>
@@ -63,6 +73,19 @@
         {
             AddRange(range);
         }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonArray"/> with a range of <see cref="JsonValue"/> values.
+        /// </summary>
+        /// <param name="range">A range of <see cref="JsonValue"/> values.</param>
+        /// <param name="encryption">The <see cref="EncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonArray(IEnumerable<JsonValue> range, EncryptionHandler encryption)
+            : this()
+        {
+            GlobalEncryptionHandler = encryption;
+            AddRange(range);
+        }
+
 
         /// <summary>
         /// Initializes a new instance of <see cref="JsonArray"/> with a range of <see cref="JsonValue"/> values.
@@ -94,6 +117,24 @@
         public JsonArray(string json)
             : this()
         {
+            InternalParse(json);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonArray"/> and parses the json array string provided by parameter json.
+        /// </summary>
+        /// <example>
+        /// <code>
+        ///		JsonArray myArray = new JsonArray("[1,2,3,4, \"Hello\", false]");
+        ///		Console.Write(myArray.ToString());
+        ///	</code>
+        /// </example>
+        /// <param name="json">A json array formatted string. Ex. [ 1, 2, 3, 4]</param>
+        /// <param name="encryption">The <see cref="EncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonArray(string json, EncryptionHandler encryption)
+            : this()
+        {
+            GlobalEncryptionHandler = encryption;
             InternalParse(json);
         }
 

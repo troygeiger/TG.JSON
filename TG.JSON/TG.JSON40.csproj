@@ -60,11 +60,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DynamicObjectHandler.cs" />
+    <Compile Include="EncryptionHandler.cs" />
     <Compile Include="JsonArray.cs" />
     <Compile Include="JsonArrayBindingSource.cs" />
     <Compile Include="Editors\JsonArrayCollectionEditor.cs" />
     <Compile Include="JsonBinary.cs" />
     <Compile Include="JsonBoolean.cs" />
+    <Compile Include="JsonEncryptValueAttribute.cs" />
     <Compile Include="JsonNull.cs" />
     <Compile Include="JsonNumber.cs" />
     <Compile Include="JsonObject.cs" />

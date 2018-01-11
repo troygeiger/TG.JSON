@@ -170,6 +170,52 @@
         }
 
         /// <summary>
+        /// The <see cref="EncryptionHandler"/> to use for encrypting values.
+        /// </summary>
+        public EncryptionHandler GlobalEncryptionHandler { get; set; }
+
+        /// <summary>
+        /// Gets if the <see cref="GlobalEncryptionHandler"/> property is not null.
+        /// </summary>
+        public bool HasGlobalEncryptionHandler
+        {
+            get
+            {
+                return GlobalEncryptionHandler != null;
+            }
+        }
+
+        /// <summary>
+        /// Gets or Sets the encryption key to use for encrypting values.
+        /// </summary>
+        public string GlobalEncryptionKeyString
+        {
+            get
+            {
+                return GlobalEncryptionHandler?.EncryptionKeyAsString();
+            }
+            set
+            {
+                GlobalEncryptionHandler = new EncryptionHandler(value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or Sets the encryption key to use for encrypting values.
+        /// </summary>
+        public byte[] GlobalEncryptionKeyBytes
+        {
+            get
+            {
+                return GlobalEncryptionHandler?.EncryptionKey;
+            }
+            set
+            {
+                GlobalEncryptionHandler = new EncryptionHandler(value);
+            }
+        }
+
+        /// <summary>
         /// States that events, such as ValueChanged, should not be fired.
         /// </summary>
         public bool SuspendEvents
@@ -1030,6 +1076,43 @@
                     p = p.GetParent();
             }
             return p;
+        }
+
+        /// <summary>
+        /// Searches for an available <see cref="EncryptionHandler"/>.
+        /// </summary>
+        /// <returns></returns>
+        internal EncryptionHandler GetAvailableEncryptionHandler()
+        {
+            if (GlobalEncryptionHandler != null)
+            {
+                return GlobalEncryptionHandler;
+            }
+            else
+            {
+                JsonValue p = this.GetParent();
+                while (p != null)
+                {
+                    if (p._parent == null)
+                    {
+                        if (p.HasGlobalEncryptionHandler)
+                        {
+                            return p.GlobalEncryptionHandler;
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        p = p.GetParent();
+                        if (p.HasGlobalEncryptionHandler)
+                        {
+                            return p.GlobalEncryptionHandler;
+                        }
+                    }
+                }
+                
+            }
+            return null;
         }
 
         internal void SetParent(JsonValue parent)
