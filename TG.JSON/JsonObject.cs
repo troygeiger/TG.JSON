@@ -857,7 +857,8 @@
 
             foreach (PropertyInfoEx property in GetTypeProperties(obj.GetType()))
             {
-                if (ignore.Contains(property.Name) || !property.CanRead || (!property.IsPublic && property.JsonProperty == null))
+                if (ignore.Contains(property.Name) || property.IgnoreProperty || !property.CanRead 
+                    || (!property.IsPublic && property.JsonProperty == null))
                     continue;
                 
                 try
@@ -941,9 +942,10 @@
 
             foreach (PropertyInfoEx property in GetTypeProperties(obj.GetType()))
             {
-                if (ignore.Contains(property.Name) || !property.CanRead || (!property.IsPublic && property.JsonProperty == null))
+                if (ignore.Contains(property.Name) || property.IgnoreProperty || !property.CanRead
+                    || (!property.IsPublic && property.JsonProperty == null))
                     continue;
-                
+
                 try
                 {
                     object pval = property.GetValue(obj, null);
