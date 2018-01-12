@@ -25,7 +25,7 @@ namespace TestApp
             {
                 textBox1.DataBindings.Add(new Binding("Text", o, "Hello"));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 
             }

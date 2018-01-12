@@ -55,13 +55,13 @@
 #endif
     [TypeConverter(typeof(ComponentConverter))]
     [Serializable]
-    public sealed class JsonObject : JsonValue, ICustomTypeDescriptor, INotifyPropertyChanged, ISerializable, IXmlSerializable, IEnumerable
+    public sealed partial class JsonObject : JsonValue, ICustomTypeDescriptor, INotifyPropertyChanged, ISerializable, IXmlSerializable, IEnumerable
     {
         #region Fields
 
         //Type myType;
         Dictionary<string, JsonValue> propertyValue = new Dictionary<string, JsonValue>();
-        static Dictionary<Type, PropertyInfo[]> propertyCache = new Dictionary<Type, PropertyInfo[]>();
+        static Dictionary<Type, PropertyInfoEx[]> propertyCache = new Dictionary<Type, PropertyInfoEx[]>();
         static object locker = new object();
 #if NET40
         private DynamicObjectHandler dynObjHandler = null;
@@ -614,16 +614,10 @@
                 }
                 else
                     obj = Activator.CreateInstance(type);
-                foreach (var property in GetTypeProperties(type))
+                foreach (PropertyInfoEx property in GetTypeProperties(type))
                 {
-                    var atts = property.GetCustomAttributes(typeof(JsonPropertyAttribute), true);
-                    string pname;
-                    if (atts.Length == 1)
-                        pname = (atts[0] as JsonPropertyAttribute).JsonPropertyName;
-                    else
-                        pname = property.Name;
-                    if (this.ContainsProperty(pname))
-                        DeserializeJsonValueInto(property, obj, this[pname]);
+                    if (this.ContainsProperty(property.Name))
+                        DeserializeJsonValueInto(property, obj, this[property.Name]);
                 }
             }
             return obj;
@@ -861,24 +855,11 @@
                 return this;
             List<string> ignore = new List<string>(ignoreProperties);
 
-            foreach (var property in GetTypeProperties(obj.GetType()))
+            foreach (PropertyInfoEx property in GetTypeProperties(obj.GetType()))
             {
-                if (ignore.Contains(property.Name) || !property.CanRead)
+                if (ignore.Contains(property.Name) || !property.CanRead || (!property.IsPublic && property.JsonProperty == null))
                     continue;
-
-                bool encrypt = false;
-                foreach (object att in property.GetCustomAttributes(false))
-                {
-                    if (att is JsonIgnorePropertyAttribute)
-                    {
-                        continue;
-                    }
-                    else if (att is JsonEncryptValueAttribute)
-                    {
-                        encrypt = true;
-                    }
-                }
-
+                
                 try
                 {
                     object pval = property.GetValue(obj, null);
@@ -887,7 +868,7 @@
                     {
 
                         JsonValue value;
-                        if (encrypt && pval != null)
+                        if (property.EncryptValue && pval != null)
                         {
                             value = new JsonString(pval?.ToString()) { EncryptValue = true };
                         }
@@ -905,7 +886,7 @@
                     else
                     {
                         JsonValue value;
-                        if (encrypt && pval != null && !(pval is System.Collections.IEnumerable))
+                        if (property.EncryptValue && pval != null && !(pval is System.Collections.IEnumerable))
                         {
                             value = new JsonString(pval?.ToString()) { EncryptValue = true };
 
@@ -958,22 +939,11 @@
                 return this;
             List<string> ignore = new List<string>(ignoreProperties);
 
-            foreach (var property in GetTypeProperties(obj.GetType()))
+            foreach (PropertyInfoEx property in GetTypeProperties(obj.GetType()))
             {
-                if (ignore.Contains(property.Name) || !property.CanRead)
+                if (ignore.Contains(property.Name) || !property.CanRead || (!property.IsPublic && property.JsonProperty == null))
                     continue;
-                bool encrypt = false;
-                foreach (object att in property.GetCustomAttributes(false))
-                {
-                    if (att is JsonIgnorePropertyAttribute)
-                    {
-                        continue;
-                    }
-                    else if (att is JsonEncryptValueAttribute)
-                    {
-                        encrypt = true;
-                    }
-                }
+                
                 try
                 {
                     object pval = property.GetValue(obj, null);
@@ -982,7 +952,7 @@
                     {
 
                         JsonValue value;
-                        if (encrypt && pval != null)
+                        if (property.EncryptValue && pval != null)
                         {
                             value = new JsonString(pval?.ToString()) { EncryptValue = true };
                         }
@@ -1000,7 +970,7 @@
                     else
                     {
                         JsonValue value;
-                        if (encrypt && pval != null && !(pval is System.Collections.IEnumerable))
+                        if (property.EncryptValue && pval != null && !(pval is System.Collections.IEnumerable))
                         {
                             value = new JsonString(pval?.ToString()) { EncryptValue = true };
 
@@ -1011,7 +981,7 @@
                         }
                         this.internalAdd(property.Name, value);
                     }
-                    JsonPropertyDefinition pdef = new JsonPropertyDefinition(property);
+                    JsonPropertyDefinition pdef = new JsonPropertyDefinition(property.Info);
                     pdef.CreateAttributeEntry(AttributesTable);
                 }
                 catch (Exception)
@@ -1246,7 +1216,7 @@
             PropertyChanged(this, eventArgs);
         }
         static Dictionary<Type, PropertyInfo[]> cache = new Dictionary<Type, PropertyInfo[]>();
-        private void DeserializeJsonValueInto(System.Reflection.PropertyInfo property, object obj, JsonValue value)
+        private void DeserializeJsonValueInto(PropertyInfoEx property, object obj, JsonValue value)
         {
             try
             {
@@ -1298,7 +1268,7 @@
                                 object o2 = property.GetValue(obj, null);
                                 JsonObject jo = (JsonObject)value;
 
-                                foreach (PropertyInfo property2 in GetTypeProperties(o2.GetType()))
+                                foreach (PropertyInfoEx property2 in GetTypeProperties(o2.GetType()))
                                     if (jo.ContainsProperty(property2.Name))
                                         DeserializeJsonValueInto(property2, o2, jo[property2.Name]);
                             }
@@ -1625,15 +1595,102 @@
                 return new JsonNull();
         }
 
-        private PropertyInfo[] GetTypeProperties(Type type)
+        private PropertyInfoEx[] GetTypeProperties(Type type)
         {
             lock (locker)
             {
-                //if (propertyCache.ContainsKey(type))
-                //    return propertyCache[type];
-                PropertyInfo[] info = type.GetProperties();
-                //propertyCache.Add(type, info);
-                return info;
+                if (propertyCache.ContainsKey(type))
+                    return propertyCache[type];
+                List<PropertyInfoEx> info = new List<PropertyInfoEx>();
+
+                foreach (PropertyInfo item in type.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance))
+                {
+                    info.Add(new PropertyInfoEx(item, false));
+                }
+
+                foreach (PropertyInfo item in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    info.Add(new PropertyInfoEx(item, true));
+                }
+                PropertyInfoEx[] ex = info.ToArray();
+                propertyCache.Add(type, ex);
+                return ex;
+            }
+        }
+
+        internal class PropertyInfoEx
+        {
+
+            public PropertyInfoEx(PropertyInfo info, bool isPublic)
+            {
+                Info = info;
+                IsPublic = isPublic;
+                ReadAttributes();
+            }
+
+            private void ReadAttributes()
+            {
+                foreach (object att in Info.GetCustomAttributes(false))
+                {
+                    if (JsonProperty == null)
+                    {
+                        JsonProperty = att as JsonPropertyAttribute;
+                    }
+                    if (att is JsonIgnorePropertyAttribute)
+                    {
+                        IgnoreProperty = true;
+                    }
+                    else if (att is JsonEncryptValueAttribute)
+                    {
+                        EncryptValue = true;
+                    }
+                }
+            }
+
+            internal void SetValue(object obj, object value, object[] index)
+            {
+                Info.SetValue(obj, value, index);
+            }
+
+            internal object GetValue(object obj, object[] index)
+            {
+                return Info.GetValue(obj, index);
+            }
+
+            public PropertyInfo Info { get; private set; }
+
+            public bool IsPublic { get; private set; }
+
+            public bool EncryptValue { get; set; }
+
+            public bool IgnoreProperty { get; set; }
+
+            public JsonPropertyAttribute JsonProperty { get; set; }
+
+            public bool HasNameOverride
+            {
+                get
+                {
+                    return JsonProperty != null && JsonProperty.HasNameOverride;
+                }
+            }
+
+            public string Name
+            {
+                get { return HasNameOverride ? JsonProperty.JsonPropertyName : Info.Name; }
+            }
+            public Type PropertyType
+            {
+                get { return Info.PropertyType; }
+            }
+            public bool CanWrite
+            {
+                get { return Info.CanWrite; }
+            }
+
+            public bool CanRead
+            {
+                get { return Info.CanRead; }
             }
         }
 
@@ -1694,428 +1751,5 @@
         }
 
         #endregion Methods
-
-        #region Nested Types
-
-        /// <summary>
-        /// A <see cref="PropertyDescriptor"/> to represent the properties of a <see cref="JsonObject"/>.
-        /// </summary>
-        public class JsonObjectPropertyDescriptor : PropertyDescriptor
-        {
-            #region Fields
-
-            string _category;
-            string _description;
-            string _displayName;
-            Type _propertyType;
-            bool _readOnly = false;
-
-            #endregion Fields
-
-            #region Constructors
-
-            /// <summary>
-            /// Initialized a new instance of <see cref="JsonObjectPropertyDescriptor"/>.
-            /// </summary>
-            /// <param name="name">The name of the property.</param>
-            /// <param name="propertyType">The value type the property gets and sets.</param>
-            /// <param name="category">The category the property belongs.</param>
-            /// <param name="description">A description of the property.</param>
-            /// <param name="readOnly">Determines if the property is read only.</param>
-            /// <param name="browsable">Determines if the property is browsable.</param>
-            public JsonObjectPropertyDescriptor(string name, Type propertyType, string category, string description, bool readOnly, bool browsable)
-                : base(name, new Attribute[] { new BrowsableAttribute(browsable), new ReadOnlyAttribute(readOnly) })
-            {
-                _readOnly = readOnly;
-                _displayName = name.Replace("_", "");
-                var d = this.AttributeArray;
-                CanSetNull = true;
-                _propertyType = propertyType;
-                _category = category;
-                _description = description;
-            }
-
-            #endregion Constructors
-
-            #region Properties
-
-            /// <summary>
-            /// Gets or Sets if the property can be set as null.
-            /// </summary>
-            public bool CanSetNull
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// Gets the name that should be displayed.
-            /// </summary>
-            public override string DisplayName
-            {
-                get
-                {
-                    return _displayName;
-                }
-            }
-
-            /// <summary>
-            /// Gets the category of this property.
-            /// </summary>
-            public override string Category
-            {
-                get
-                {
-                    return _category;
-                }
-            }
-
-            /// <summary>
-            /// Gets the type <see cref="JsonObject"/>.
-            /// </summary>
-            public override Type ComponentType
-            {
-                get { return typeof(JsonObject); }
-            }
-
-            /// <summary>
-            /// Gets or Sets the default value.
-            /// </summary>
-            public JsonValue DefaultValue
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// Gets the property description.
-            /// </summary>
-            public override string Description
-            {
-                get
-                {
-                    return _description;
-                }
-            }
-
-            /// <summary>
-            /// Gets of Sets the property owner.
-            /// </summary>
-            public JsonObject Owner
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// Gets the type this property Gets or Sets.
-            /// </summary>
-            public override Type PropertyType
-            {
-                get { return _propertyType; }
-            }
-
-            /// <summary>
-            /// Gets whether the property is read only.
-            /// </summary>
-            public override bool IsReadOnly
-            {
-                get
-                {
-                    return _readOnly;
-                }
-            }
-
-            #endregion Properties
-
-            #region Methods
-
-            /// <summary>
-            /// If the property contains a default value.
-            /// </summary>
-            /// <param name="component">Not used.</param>
-            /// <returns>Returns true if <see cref="DefaultValue"/> is not null.</returns>
-            public override bool CanResetValue(object component)
-            {
-                return DefaultValue != null;
-            }
-
-            /// <summary>
-            /// Returns the value property of the provided component.
-            /// </summary>
-            /// <param name="component">The <see cref="JsonObject"/> to get the value from.</param>
-            /// <returns>The value of the component.</returns>
-            public override object GetValue(object component)
-            {
-                if (component is JsonObject)
-                {
-                    JsonValue v = (component as JsonObject)[Name];
-                    switch (v.ValueType)
-                    {
-                        case JsonValueTypes.String:
-                            if (_propertyType == typeof(DateTime))
-                                return (DateTime)v;
-                            else
-                                return (string)v;
-                        case JsonValueTypes.Object:
-                        case JsonValueTypes.Array:
-                            return v;
-                        case JsonValueTypes.Number:
-                            return (double)v;
-                        case JsonValueTypes.Boolean:
-                            return (bool)v;
-                        case JsonValueTypes.Binary:
-                            return (byte[])v;
-                        case JsonValueTypes.Null:
-                            return null;
-                        default:
-                            break;
-                    }
-                    return ((JsonObject)component)[Name];
-                }
-                else if (Owner != null)
-                    return Owner[Name];
-                else
-                    return null;
-            }
-
-            /// <summary>
-            /// Resets the value of the property with the value from <see cref="DefaultValue"/>.
-            /// </summary>
-            /// <param name="component">The component who's value should be reset.</param>
-            public override void ResetValue(object component)
-            {
-                if (DefaultValue != null)
-                {
-                    if (component is JsonObject)
-                        SetValue(component, DefaultValue);
-                    else if (Owner != null)
-                        SetValue(Owner, DefaultValue);
-
-                }
-            }
-
-            /// <summary>
-            /// A method used to set the category.
-            /// </summary>
-            /// <param name="category"></param>
-            public void SetCategory(string category)
-            {
-                _category = category;
-            }
-
-            /// <summary>
-            /// Sets the value of the property.
-            /// </summary>
-            /// <param name="component">The properties who's value should be set.</param>
-            /// <param name="value">The value that should be set to the property.</param>
-            public override void SetValue(object component, object value)
-            {
-                if (!(component is JsonObject))
-                    component = Owner;
-                if (component is JsonObject)
-                {
-                    JsonObject obj = (JsonObject)component;
-                    if (value is JsonValue)
-                        obj[Name] = ((JsonValue)value).Clone();
-                    else
-                        obj[Name] = obj.ValueFromObject(value);
-                    /*else if (value is string)
-						obj[Name] = new JsonString((string)value);
-					else if (value is bool)
-						obj[Name] = new JsonBoolean((bool)value);
-					else if (value is decimal)
-						obj[Name] = new JsonNumber((decimal)value);
-					else if (value is int)
-						obj[Name] = new JsonNumber((int)value);
-					else if (value == null && CanSetNull)
-						obj[Name] = new JsonNull();
-					else
-						obj[Name] = new JsonString();*/
-                    OnValueChanged(component, EventArgs.Empty);
-                    if (Owner != null)
-                        Owner.OnPropertyChanged(Name);
-                }
-            }
-
-            /// <summary>
-            /// Determines if the property should be reset.
-            /// </summary>
-            /// <param name="component">The property.</param>
-            /// <returns>Returns true if there is a value for <see cref="DefaultValue"/> and if the value of the property is not the same; otherwise false.</returns>
-            public override bool ShouldSerializeValue(object component)
-            {
-                if (DefaultValue != null)
-                {
-                    JsonValue v = null;
-                    if (component is JsonObject)
-                        v = (JsonValue)GetValue(component);
-                    else if (component is JsonValue)
-                        v = (JsonValue)component;
-                    else if (Owner != null)
-                        v = (JsonValue)GetValue(Owner);
-                    if (v != null && v.GetType() == DefaultValue.GetType())
-                    {
-                        return !v.Equals(DefaultValue);
-                    }
-                }
-                return false;
-            }
-
-            #endregion Methods
-        }
-
-        /// <summary>
-        /// The Enumerator used to step through the properties of a <see cref="JsonObject"/>.
-        /// </summary>
-        public class JsonObjectPropertyEnumerator : IEnumerator
-        {
-            JsonObject thisObj = null;
-            string[] props = null;
-            int propIdx = -1;
-
-            /// <summary>
-            /// Initializes a new instance of <see cref="JsonObjectPropertyEnumerator"/>.
-            /// </summary>
-            /// <param name="obj"></param>
-            public JsonObjectPropertyEnumerator(JsonObject obj)
-            {
-                thisObj = obj;
-                props = obj.PropertyNames;
-            }
-
-            /// <summary>
-            /// The current value.
-            /// </summary>
-            public object Current
-            {
-                get
-                {
-                    if (propIdx > -1 && propIdx < props.Length)
-                        return new JsonObjectPropertyValueEntry(props[propIdx], thisObj[props[propIdx]]);
-                    else
-                        return null;
-                }
-            }
-
-            /// <summary>
-            /// Moves to the next property.
-            /// </summary>
-            /// <returns>Returns true if the next property index is within range; otherwise false.</returns>
-            public bool MoveNext()
-            {
-
-                if (propIdx + 1 < props.Length)
-                {
-                    propIdx++;
-                    return true;
-                }
-                else
-                    return false;
-            }
-
-            /// <summary>
-            /// Resets the property index to 0;
-            /// </summary>
-            public void Reset()
-            {
-                propIdx = -1;
-            }
-        }
-
-        /// <summary>
-        /// A Enumerator used when binding to a <see cref="System.Windows.Forms.Control"/>, using the property <see cref="System.Windows.Forms.Control.DataBindings"/>.
-        /// </summary>
-        public class JsonObjectBindableEnumerator : IEnumerator
-        {
-            JsonObject thisObj = null;
-            bool stepped = false;
-
-            /// <summary>
-            /// Initializes a new instance of <see cref="JsonObjectBindableEnumerator"/>.
-            /// </summary>
-            /// <param name="obj"></param>
-            public JsonObjectBindableEnumerator(JsonObject obj)
-            {
-                thisObj = obj;
-            }
-
-            /// <summary>
-            /// The <see cref="JsonObject"/> set during construction.
-            /// </summary>
-            public object Current
-            {
-                get
-                {
-
-                    return thisObj;
-
-                }
-            }
-
-            /// <summary>
-            /// This does nothing.
-            /// </summary>
-            /// <returns>Always True</returns>
-            public bool MoveNext()
-            {
-                if (stepped)
-                    return false;
-                stepped = true;
-                return true;
-            }
-
-            /// <summary>
-            /// This does nothing.
-            /// </summary>
-            public void Reset()
-            {
-                stepped = false;
-            }
-        }
-
-        /// <summary>
-        /// Determines the type of <see cref="IEnumerator"/> to use when GetEnumerator is called.
-        /// </summary>
-        public enum JsonObjectEnumeratorTypes
-        {
-            /// <summary>
-            /// Indicates that <see cref="JsonObjectBindableEnumerator"/> should be used. 
-            /// </summary>
-            Bindable,
-            /// <summary>
-            /// Indicates that the <see cref="IEnumerator"/> should return a 
-            /// </summary>
-            Property
-        }
-
-        /// <summary>
-        /// A Property/Value structure returned by the <see cref="JsonObjectPropertyEnumerator"/>.
-        /// </summary>
-        public struct JsonObjectPropertyValueEntry
-        {
-            /// <summary>
-            /// The name of the property.
-            /// </summary>
-            public string PropertyName;
-
-            /// <summary>
-            /// The value of the property.
-            /// </summary>
-            public JsonValue Value;
-
-            /// <summary>
-            /// A constructor used to set the parameters.
-            /// </summary>
-            /// <param name="property"></param>
-            /// <param name="value"></param>
-            public JsonObjectPropertyValueEntry(string property, JsonValue value)
-            {
-                PropertyName = property;
-                Value = value;
-            }
-        }
-
-        #endregion Nested Types
     }
 }

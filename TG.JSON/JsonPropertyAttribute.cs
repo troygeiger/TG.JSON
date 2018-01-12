@@ -226,12 +226,35 @@
     }
 
     /// <summary>
-    /// Can be used to match a class's property to a JSON property.
+    /// Indicates that a private property should be serialized. Also used to rename a property when serializing and deserializing.
     /// </summary>
+    /// <example>
+    /// <code>
+    ///		public class TestClass
+    ///		{
+    ///		    // This property will not serialize since it is not decorated with the <see cref="JsonPropertyAttribute"/>.
+    ///		    private string DontShowMe { get; set; }
+    ///         
+    ///		    [JsonProperty]
+    ///			private string SerializeMe { get; set; }
+    ///			
+    ///         [JsonProperty("NewName")]
+    ///         public string OldName { get; set; }
+    ///		}
+    ///	</code>
+    /// </example>
     [System.AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
     public sealed class JsonPropertyAttribute : Attribute
     {
         readonly string _jsonProperty;
+
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonPropertyAttribute"/>.
+        /// </summary>
+        public JsonPropertyAttribute()
+        {
+            this._jsonProperty = null;
+        }
 
         /// <summary>
         /// Creates a new instance of <see cref="JsonPropertyAttribute"/>.
@@ -250,5 +273,12 @@
             get { return _jsonProperty; }
         }
         
+        /// <summary>
+        /// Gets whether there is a property name set.
+        /// </summary>
+        public bool HasNameOverride
+        {
+            get { return !string.IsNullOrEmpty(_jsonProperty); }
+        }
     }
 }

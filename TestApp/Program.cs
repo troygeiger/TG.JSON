@@ -20,18 +20,23 @@ namespace TestApp
             Test test = new Test();
             test.Number = 32;
             test.Numbers.AddRange(new int[] { 3, 2, 1 });
+            test.InitMyObject();
 
             EncryptionHandler encryption = new EncryptionHandler("Hello World");
-            JsonObject obj = new JsonObject(encryption);
-            obj.SerializeObject(test);
+            JsonObject obj = new JsonObject(test, encryption);
+            
             string s = obj.ToString(Formatting.Indented);
             obj = new JsonObject(s, encryption);
 
             Test test2 = obj.DeserializeObject<Test>();
+
+
+            PerformanceTest();
+
             //Application.EnableVisualStyles();
             //Application.SetCompatibleTextRenderingDefault(false);
             //Application.Run(new Form1());
-            PerformanceTest();
+
         }
 
         static void PerformanceTest()
@@ -72,6 +77,19 @@ namespace TestApp
 
     class Test
     {
+        public Test()
+        {
+            
+        }
+
+        public void InitMyObject()
+        {
+            MyObject = new JsonObject("Hello", "World");
+        }
+
+        [JsonProperty]
+        private JsonObject MyObject { get; set; }
+
         [JsonEncryptValue]
         public string Name { get; set; }
 
@@ -85,9 +103,11 @@ namespace TestApp
         [JsonEncryptValue]
         public List<int> Numbers { get; } = new List<int>();
 
+
         public List<string> Strings { get; } = new List<string>();
 
         public List<bool> Bools { get; } = new List<bool>();
+
     }
 
     class Test2Collection : System.Collections.DictionaryBase

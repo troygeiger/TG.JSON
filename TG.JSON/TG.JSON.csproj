@@ -67,7 +67,12 @@
     <Compile Include="JsonNull.cs" />
     <Compile Include="JsonNumber.cs" />
     <Compile Include="JsonObject.cs" />
-    <Compile Include="JsonProperty.cs" />
+    <Compile Include="JsonObjectBindableEnumerator.cs" />
+    <Compile Include="JsonObjectEnumeratorTypes.cs" />
+    <Compile Include="JsonObjectPropertyDescriptor.cs" />
+    <Compile Include="JsonObjectPropertyEnumerator.cs" />
+    <Compile Include="JsonObjectPropertyValueEntry.cs" />
+    <Compile Include="JsonPropertyAttribute.cs" />
     <Compile Include="JsonPropertyIgnoreAttribute.cs" />
     <Compile Include="JsonReader.cs" />
     <Compile Include="JsonString.cs" />

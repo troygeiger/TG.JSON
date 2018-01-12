@@ -1175,7 +1175,7 @@
             if (obj is DateTime)
                 return (DateTime)obj;
             if (obj is JsonValue)
-                return (JsonValue)obj;
+                return ((JsonValue)obj).Clone();
             if (obj is byte[])
                 return (byte[])obj;
             if (obj is System.Collections.IEnumerable && maxDepth > 0)
