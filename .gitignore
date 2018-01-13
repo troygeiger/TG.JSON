@@ -9,8 +9,6 @@
 /.vs/TG.JSON/*
 /TG.JSON/NuGet-Create NuSpec.bat
 /TG.JSON/NuGet-Package.bat
-/TG.JSON/nuget.exe
 *.nupkg
-*.nuspec
 *.suo
 /Documentation/Help/LastBuild.log

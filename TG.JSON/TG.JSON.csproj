@@ -88,9 +88,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>REM if "$(ConfigurationName)" == "Release" (
-REM call cd $(ProjectDir)
-REM call NuGet-Package.bat)
+    <PostBuildEvent>if "$(ConfigurationName)" == "Release" (
+call cd $(ProjectDir)
+nuget pack TG.JSON.csproj -Prop Configuration=Release
+)
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
