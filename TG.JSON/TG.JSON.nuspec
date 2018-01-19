@@ -13,7 +13,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes></releaseNotes>
-    <tags>JSON Parse Serialize .NET C# ASP.NET Encryption</tags>
+    <tags>JSON Parse Serialize .NET C# ASP.NET Encrypt</tags>
   </metadata>
   <files>
 		<file src="..\Documentation\Help\TG.JSON.chm" target="content" />

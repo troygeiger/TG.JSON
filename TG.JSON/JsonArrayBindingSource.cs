@@ -28,8 +28,9 @@
 
         int newPos = -1;
         PropertyDescriptorCollection props = null;
-        Type vtype;
+        //Type vtype;
         JsonArray _array;
+        JsonValue _prototype = null;
 
         #endregion Fields
 
@@ -41,35 +42,37 @@
         /// <param name="sourceArray">The source array containing values.</param>
         /// <param name="valueType">The type of <see cref="JsonValue"/> the <see cref="JsonArray"/> contains.</param>
         /// <remarks>
-        /// If the source <see cref="JsonArray"/> is empty, use the constructor with the constructor <see cref="JsonArrayBindingSource.JsonArrayBindingSource(JsonArray, Type, IEnumerable{JsonObject.JsonObjectPropertyDescriptor})"/> to define the properties that should be available.
+        /// If the source <see cref="JsonArray"/> is empty, use the constructor with the constructor <see cref="JsonArrayBindingSource.JsonArrayBindingSource(JsonArray, Type, IEnumerable{JsonObjectPropertyDescriptor})"/> to define the properties that should be available.
         /// </remarks>
+        [Obsolete("Depreciated! Use JsonArrayBindingSource(JsonArray sourceArray, JsonValue prototype).")]
         public JsonArrayBindingSource(JsonArray sourceArray, Type valueType)
         {
-            _array = sourceArray;
-            vtype = valueType;
+            throw new NotImplementedException("This constructor is obsolete. Use JsonArrayBindingSource(JsonArray sourceArray, JsonValue prototype).");
+            //_array = sourceArray;
+            //vtype = valueType;
 
-            if (sourceArray.Count > 0)
-                ReadProperties();
-            else
-            {
+            //if (sourceArray.Count > 0)
+            //    ReadProperties();
+            //else
+            //{
 
-                if (valueType == typeof(JsonString) || valueType == typeof(JsonNumber) || valueType == typeof(JsonBoolean))
-                {
-                    PropertyDescriptorCollection c = TypeDescriptor.GetProperties(valueType);
-                    PropertyDescriptor[] ca = new PropertyDescriptor[1];
-                    foreach (PropertyDescriptor item in c)
-                    {
-                        if (item.Name == "Value")
-                        {
-                            ca[0] = item;
-                            props = new PropertyDescriptorCollection(ca);
-                            break;
-                        }
-                    }
-                }
-                else
-                    props = TypeDescriptor.GetProperties(valueType);
-            }
+            //    if (valueType == typeof(JsonString) || valueType == typeof(JsonNumber) || valueType == typeof(JsonBoolean))
+            //    {
+            //        PropertyDescriptorCollection c = TypeDescriptor.GetProperties(valueType);
+            //        PropertyDescriptor[] ca = new PropertyDescriptor[1];
+            //        foreach (PropertyDescriptor item in c)
+            //        {
+            //            if (item.Name == "Value")
+            //            {
+            //                ca[0] = item;
+            //                props = new PropertyDescriptorCollection(ca);
+            //                break;
+            //            }
+            //        }
+            //    }
+            //    else
+            //        props = TypeDescriptor.GetProperties(valueType);
+            //}
         }
 
         /// <summary>
@@ -78,21 +81,67 @@
         /// <param name="sourceArray">The source array containing values.</param>
         /// <param name="valueType">The type of <see cref="JsonValue"/> the <see cref="JsonArray"/> contains.</param>
         /// <param name="properties">A list of properties that should be used or available.</param>
-        public JsonArrayBindingSource(JsonArray sourceArray, Type valueType, IEnumerable<JsonObject.JsonObjectPropertyDescriptor> properties)
+        [Obsolete("Depreciated! Use JsonArrayBindingSource(JsonArray sourceArray, JsonValue prototype).")]
+        public JsonArrayBindingSource(JsonArray sourceArray, Type valueType, IEnumerable<JsonObjectPropertyDescriptor> properties)
         {
-            List<JsonObject.JsonObjectPropertyDescriptor> p = new List<JsonObject.JsonObjectPropertyDescriptor>();
-            if (properties != null)
-            {
-                foreach (JsonObject.JsonObjectPropertyDescriptor item in properties)
-                {
-                    item.CanSetNull = false;
-                    p.Add(item);
-                }
-            }
-            props = new PropertyDescriptorCollection(p.ToArray());
-            _array = sourceArray;
-            vtype = valueType;
+            throw new NotImplementedException("This constructor is obsolete. Use JsonArrayBindingSource(JsonArray sourceArray, JsonValue prototype).");
+            //List<JsonObjectPropertyDescriptor> p = new List<JsonObjectPropertyDescriptor>();
+            //if (properties != null)
+            //{
+            //    foreach (JsonObjectPropertyDescriptor item in properties)
+            //    {
+            //        item.CanSetNull = false;
+            //        p.Add(item);
+            //    }
+            //}
+            //props = new PropertyDescriptorCollection(p.ToArray());
+            //_array = sourceArray;
+            //vtype = valueType;
         }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonArrayBindingSource"/> with a source <see cref="JsonArray"/>, the type of <see cref="JsonValue"/> that is contained in the array and the properties that should be used or available.
+        /// </summary>
+        /// <param name="sourceArray">The source array containing values.</param>
+        /// <param name="prototype">The <see cref="JsonValue"/> used as a prototype for new values.</param>
+        public JsonArrayBindingSource(JsonArray sourceArray, JsonValue prototype)
+        {
+
+            _array = sourceArray ?? throw new ArgumentNullException("sourceArray");
+            _prototype = prototype ?? throw new ArgumentNullException("prototype");
+
+            switch (prototype.ValueType)
+            {
+                case JsonValueTypes.Object:
+                    props = TypeDescriptor.GetProperties(prototype);
+                    break;
+                case JsonValueTypes.Array:
+                    throw new NotImplementedException("JsonArray types have not been implemented.");
+                case JsonValueTypes.String:
+                    props = new PropertyDescriptorCollection(new PropertyDescriptor[]
+                    { new JsonObjectPropertyDescriptor("Value", typeof(JsonString), "Values", null, false, true) });
+                    break;
+                case JsonValueTypes.Number:
+                    props = new PropertyDescriptorCollection(new PropertyDescriptor[]
+                    { new JsonObjectPropertyDescriptor("Value", typeof(double), "Values", null, false, true) });
+                    break;
+                case JsonValueTypes.Boolean:
+                    props = new PropertyDescriptorCollection(new PropertyDescriptor[]
+                    { new JsonObjectPropertyDescriptor("Value",typeof(bool), "Values", null, false, true) });
+                    break;
+                case JsonValueTypes.Binary:
+                    props = new PropertyDescriptorCollection(new PropertyDescriptor[]
+                    { new JsonObjectPropertyDescriptor("Value", typeof(JsonBinary), "Values", null, false, true) });
+                    break;
+                case JsonValueTypes.Null:
+                    props = new PropertyDescriptorCollection(new PropertyDescriptor[]
+                    { new JsonObjectPropertyDescriptor("Value", typeof(JsonNull), "Values", null, false, true) });
+                    break;
+                default:
+                    break;
+            }
+        }
+
 
         #endregion Constructors
 
@@ -301,29 +350,37 @@
         /// <returns>Returns the newly created instance.</returns>
         public object AddNew()
         {
+            
+
+            JsonValue newValue = _prototype.Clone();
+            newPos = List.Add(newValue);
+            this.Position = newPos;
             if (newPos != -1)
                 this.OnListChanged(ListChangedType.ItemAdded, newPos);
 
-            JsonValue newValue = null;
 
-            if (vtype == typeof(JsonString))
-                newValue = new JsonString();
-            else if (vtype == typeof(JsonNumber))
-                newValue = new JsonNumber();
-            else if (vtype == typeof(JsonBoolean))
-                newValue = new JsonBoolean();
-            else if (vtype == typeof(JsonObject))
-            {
-                JsonObject obj = new JsonObject();
-                foreach (PropertyDescriptor prop in props)
-                    obj.Add(prop.Name, (JsonValue)Activator.CreateInstance(prop.PropertyType));
-                newValue = obj;
-            }
-            if (newValue != null)
-            {
-                newPos = List.Add(newValue);
-                this.Position = newPos;
-            }
+            //if (vtype == typeof(JsonString))
+            //    newValue = new JsonString();
+            //else if (vtype == typeof(JsonNumber))
+            //    newValue = new JsonNumber();
+            //else if (vtype == typeof(JsonBoolean))
+            //    newValue = new JsonBoolean();
+            //else if (vtype == typeof(JsonObject))
+            //{
+            //    JsonObject obj = new JsonObject();
+            //    foreach (PropertyDescriptor prop in props)
+            //    {
+            //        var constr = prop.PropertyType.GetConstructors();
+            //        obj.Add(prop.Name, (JsonValue)Activator.CreateInstance(prop.PropertyType));
+            //    }
+
+            //    newValue = obj;
+            //}
+            //if (newValue != null)
+            //{
+            //    newPos = List.Add(newValue);
+            //    this.Position = newPos;
+            //}
             return newValue;
         }
 
@@ -475,7 +532,7 @@
             if (ListChanged != null)
                 ListChanged(this, new ListChangedEventArgs(listChangeType, newIndex));
         }
-        
+
         /// <summary>
         /// Removes a value from the list.
         /// </summary>
@@ -514,48 +571,48 @@
         {
         }
 
-        private void ReadProperties()
-        {
-            bool propsSet = false;
-            foreach (JsonValue item in _array)
-            {
-                if (item.GetType() != vtype)
-                    throw new Exception("A value is not of the specified type.");
-                if (!propsSet)
-                {
-                    props = TypeDescriptor.GetProperties(item);
-                    propsSet = true;
-                }
-                else
-                {
-                    PropertyDescriptorCollection thisProps = TypeDescriptor.GetProperties(item);
-                    if (thisProps.Count != props.Count)
-                        throw new Exception("Properties Mismatch");
-                    List<string> names = new List<string>();
-                    foreach (PropertyDescriptor prop in thisProps)
-                        names.Add(prop.Name);
-                    foreach (PropertyDescriptor prop in props)
-                    {
-                        names.Remove(prop.Name);
-                    }
-                    if (names.Count > 0)
-                        throw new Exception("Properties Mismatch");
-                }
+        //private void ReadProperties()
+        //{
+        //    bool propsSet = false;
+        //    foreach (JsonValue item in _array)
+        //    {
+        //        if (item.GetType() != vtype)
+        //            throw new Exception("A value is not of the specified type.");
+        //        if (!propsSet)
+        //        {
+        //            props = TypeDescriptor.GetProperties(item);
+        //            propsSet = true;
+        //        }
+        //        else
+        //        {
+        //            PropertyDescriptorCollection thisProps = TypeDescriptor.GetProperties(item);
+        //            if (thisProps.Count != props.Count)
+        //                throw new Exception("Properties Mismatch");
+        //            List<string> names = new List<string>();
+        //            foreach (PropertyDescriptor prop in thisProps)
+        //                names.Add(prop.Name);
+        //            foreach (PropertyDescriptor prop in props)
+        //            {
+        //                names.Remove(prop.Name);
+        //            }
+        //            if (names.Count > 0)
+        //                throw new Exception("Properties Mismatch");
+        //        }
 
-            }
+        //    }
 
-            if (props != null)
-            {
-                foreach (PropertyDescriptor prop in props)
-                {
-                    if (prop is JsonObject.JsonObjectPropertyDescriptor)
-                    {
-                        JsonObject.JsonObjectPropertyDescriptor jpd = (JsonObject.JsonObjectPropertyDescriptor)prop;
-                        jpd.CanSetNull = false;
-                    }
-                }
-            }
-        }
+        //    if (props != null)
+        //    {
+        //        foreach (PropertyDescriptor prop in props)
+        //        {
+        //            if (prop is JsonObjectPropertyDescriptor)
+        //            {
+        //                JsonObjectPropertyDescriptor jpd = (JsonObjectPropertyDescriptor)prop;
+        //                jpd.CanSetNull = false;
+        //            }
+        //        }
+        //    }
+        //}
 
         #endregion Methods
     }

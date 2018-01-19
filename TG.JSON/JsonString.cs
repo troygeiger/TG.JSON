@@ -106,7 +106,10 @@
         /// </summary>
         public override JsonValue Clone()
         {
-            return new JsonString(this.Value);
+            return new JsonString(this.Value) {
+                EncryptValue = this.EncryptValue,
+                GlobalEncryptionHandler = this.GlobalEncryptionHandler
+            };
         }
 
         /// <summary>
@@ -185,7 +188,7 @@
                     return string.Concat("crypto:", handler.EncryptBase64(value));
                 }
             }
-            return value;
+            return "crypto:";
         }
 
         internal string DecryptString(string value)

@@ -1093,15 +1093,11 @@
                 JsonValue p = this.GetParent();
                 while (p != null)
                 {
-                    if (p._parent == null)
+                    if (p.HasGlobalEncryptionHandler)
                     {
-                        if (p.HasGlobalEncryptionHandler)
-                        {
-                            return p.GlobalEncryptionHandler;
-                        }
-                        break;
+                        return p.GlobalEncryptionHandler;
                     }
-                    else
+                    else if (p._parent != null)
                     {
                         p = p.GetParent();
                         if (p.HasGlobalEncryptionHandler)

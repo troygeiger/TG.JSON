@@ -572,7 +572,7 @@
         /// <returns>The copy of the <see cref="JsonObject"/>.</returns>
 		public override JsonValue Clone()
         {
-            return new JsonObject(this.ToString());
+            return new JsonObject(this.ToString(), GlobalEncryptionHandler);
         }
 
         /// <summary>

@@ -17,26 +17,38 @@ namespace TestApp
         [STAThread]
         static void Main(string[] args)
         {
-            Test test = new Test();
-            test.Number = 32;
-            test.Numbers.AddRange(new int[] { 3, 2, 1 });
-            test.InitMyObject();
-
-            EncryptionHandler encryption = new EncryptionHandler("Hello World");
-            JsonObject obj = new JsonObject(test, encryption);
             
-            string s = obj.ToString(Formatting.Indented);
-            obj = new JsonObject(s, encryption);
+            switch (3)
+            {
+                case 1:
 
-            Test test2 = obj.DeserializeObject<Test>();
+                    Test test = new Test();
+                    test.Number = 32;
+                    test.Numbers.AddRange(new int[] { 3, 2, 1 });
+                    test.InitMyObject();
 
+                    EncryptionHandler encryption = new EncryptionHandler("Hello World");
+                    JsonObject obj = new JsonObject(test, encryption);
 
-            PerformanceTest();
+                    string s = obj.ToString(Formatting.Indented);
+                    obj = new JsonObject(s, encryption);
 
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new Form1());
+                    Test test2 = obj.DeserializeObject<Test>();
 
+                    break;
+                case 2:
+                    PerformanceTest();
+                    break;
+                case 3:
+                    
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    Application.Run(new Form1());
+                    break;
+                default:
+                    break;
+            }
+            
         }
 
         static void PerformanceTest()
