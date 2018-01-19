@@ -170,9 +170,9 @@
         }
 
         /// <summary>
-        /// The <see cref="EncryptionHandler"/> to use for encrypting values.
+        /// The <see cref="IEncryptionHandler"/> to use for encrypting values.
         /// </summary>
-        public EncryptionHandler GlobalEncryptionHandler { get; set; }
+        public IEncryptionHandler GlobalEncryptionHandler { get; set; }
 
         /// <summary>
         /// Gets if the <see cref="GlobalEncryptionHandler"/> property is not null.
@@ -188,6 +188,7 @@
         /// <summary>
         /// Gets or Sets the encryption key to use for encrypting values.
         /// </summary>
+        [Obsolete("To enable custom IEncryptionHandler, this property is being obsoleted.")]
         public string GlobalEncryptionKeyString
         {
             get
@@ -203,6 +204,7 @@
         /// <summary>
         /// Gets or Sets the encryption key to use for encrypting values.
         /// </summary>
+        [Obsolete("To enable custom IEncryptionHandler, this property is being obsoleted.")]
         public byte[] GlobalEncryptionKeyBytes
         {
             get
@@ -1079,10 +1081,10 @@
         }
 
         /// <summary>
-        /// Searches for an available <see cref="EncryptionHandler"/>.
+        /// Searches for an available <see cref="IEncryptionHandler"/>.
         /// </summary>
         /// <returns></returns>
-        internal EncryptionHandler GetAvailableEncryptionHandler()
+        internal IEncryptionHandler GetAvailableEncryptionHandler()
         {
             if (GlobalEncryptionHandler != null)
             {

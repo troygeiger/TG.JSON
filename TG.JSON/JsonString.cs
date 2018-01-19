@@ -182,7 +182,7 @@
         {
             if (!string.IsNullOrEmpty(value))
             {
-                EncryptionHandler handler = this.GetAvailableEncryptionHandler();
+                IEncryptionHandler handler = this.GetAvailableEncryptionHandler();
                 if (handler != null)
                 {
                     return string.Concat("crypto:", handler.EncryptBase64(value));
@@ -195,7 +195,7 @@
         {
             if (!string.IsNullOrEmpty(value))
             {
-                EncryptionHandler handler = this.GetAvailableEncryptionHandler();
+                IEncryptionHandler handler = this.GetAvailableEncryptionHandler();
                 if (handler != null)
                 {
                     if (value.StartsWith("crypto:"))

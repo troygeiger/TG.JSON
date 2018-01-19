@@ -57,8 +57,8 @@
         /// <summary>
         /// Initializes an empty <see cref="JsonArray"/>.
         /// </summary>
-        /// <param name="encryption">The <see cref="EncryptionHandler"/> used to encrypt and decrypt values.</param>
-        public JsonArray(EncryptionHandler encryption)
+        /// <param name="encryption">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonArray(IEncryptionHandler encryption)
         {
             GlobalEncryptionHandler = encryption;
             enumerator = _values.GetEnumerator();
@@ -78,8 +78,8 @@
         /// Initializes a new instance of <see cref="JsonArray"/> with a range of <see cref="JsonValue"/> values.
         /// </summary>
         /// <param name="range">A range of <see cref="JsonValue"/> values.</param>
-        /// <param name="encryption">The <see cref="EncryptionHandler"/> used to encrypt and decrypt values.</param>
-        public JsonArray(IEnumerable<JsonValue> range, EncryptionHandler encryption)
+        /// <param name="encryption">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonArray(IEnumerable<JsonValue> range, IEncryptionHandler encryption)
             : this()
         {
             GlobalEncryptionHandler = encryption;
@@ -130,8 +130,8 @@
         ///	</code>
         /// </example>
         /// <param name="json">A json array formatted string. Ex. [ 1, 2, 3, 4]</param>
-        /// <param name="encryption">The <see cref="EncryptionHandler"/> used to encrypt and decrypt values.</param>
-        public JsonArray(string json, EncryptionHandler encryption)
+        /// <param name="encryption">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonArray(string json, IEncryptionHandler encryption)
             : this()
         {
             GlobalEncryptionHandler = encryption;

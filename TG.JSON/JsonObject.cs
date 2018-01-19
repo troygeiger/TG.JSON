@@ -80,10 +80,10 @@
         }
 
         /// <summary>
-        /// Initialize a new instance of <see cref="JsonObject"/> with an <see cref="EncryptionHandler"/>.
+        /// Initialize a new instance of <see cref="JsonObject"/> with an <see cref="IEncryptionHandler"/>.
         /// </summary>
-        /// <param name="encryption">The <see cref="EncryptionHandler"/> to use for encryption.</param>
-        public JsonObject(EncryptionHandler encryption)
+        /// <param name="encryption">The <see cref="IEncryptionHandler"/> to use for encryption.</param>
+        public JsonObject(IEncryptionHandler encryption)
         {
             this.GlobalEncryptionHandler = encryption;
         }
@@ -107,8 +107,8 @@
         /// Initializes a new instance of <see cref="JsonObject"/> that parses the specified JSON string.
         /// </summary>
         /// <param name="json">JSON Object formatted string. Ex. { "Hello" : "World" } </param>
-        /// <param name="encryption">The <see cref="EncryptionHandler"/> to use for encryption.</param>
-        public JsonObject(string json, EncryptionHandler encryption) : this()
+        /// <param name="encryption">The <see cref="IEncryptionHandler"/> to use for encryption.</param>
+        public JsonObject(string json, IEncryptionHandler encryption) : this()
         {
             this.GlobalEncryptionHandler = encryption;
             this.InternalParser(json);
@@ -162,8 +162,8 @@
         /// Initializes a new instance of <see cref="JsonObject"/> that serializes the specified object.
         /// </summary>
         /// <param name="obj">The object to serialize.</param>
-        /// <param name="encryption">The <see cref="EncryptionHandler"/> used to encrypt and decrypt values.</param>
-        public JsonObject(object obj, EncryptionHandler encryption)
+        /// <param name="encryption">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonObject(object obj, IEncryptionHandler encryption)
             : this()
         {
             GlobalEncryptionHandler = encryption;
@@ -441,7 +441,7 @@
         /// A static method for creating a JsonObject using provided JSON object string.
         /// </summary>
         /// <param name="json">A JSON object string</param>
-        /// <param name="encryption">The <see cref="EncryptionHandler"/> used to encrypt and decrypt values.</param>
+        /// <param name="encryption">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
         /// <returns>A new instance of <see cref="JsonObject"/> based on the parsed JSON string.</returns>
         /// <example>
         /// <code>
@@ -456,7 +456,7 @@
         /// }
         /// </code>
         /// </example>
-        public static JsonObject Parse(string json, EncryptionHandler encryption)
+        public static JsonObject Parse(string json, IEncryptionHandler encryption)
         {
             return new JsonObject(json, encryption);
         }

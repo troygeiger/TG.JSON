@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="DynamicObjectHandler.cs" />
     <Compile Include="EncryptionHandler.cs" />
+    <Compile Include="IEncryptionHandler.cs" />
     <Compile Include="JsonArray.cs" />
     <Compile Include="JsonArrayBindingSource.cs" />
     <Compile Include="Editors\JsonArrayCollectionEditor.cs" />

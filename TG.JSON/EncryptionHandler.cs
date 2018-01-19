@@ -8,7 +8,7 @@ namespace TG.JSON
     /// <summary>
     /// Provides AES Encryption.
     /// </summary>
-    public class EncryptionHandler : IDisposable
+    public class EncryptionHandler : IDisposable, IEncryptionHandler
     {
         byte[] cryptKey,
             iv = new byte[] { 68, 65, 43, 114, 98, 118, 120, 103, 101, 79, 102, 107, 100, 111, 51, 33 };
