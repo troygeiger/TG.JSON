@@ -1032,6 +1032,32 @@
         /// <summary>
         /// Sets the property details for the given property to the _attributesTable <see cref="JsonObject"/>.
         /// </summary>
+        /// <param name="property">The name of the property that should have its details set.</param>
+        /// <param name="category">The Category of the property.</param>
+        /// <param name="description">The Description of the property.</param>
+        /// <param name="defaultValue">The DefaultValue of the property.</param>
+        /// <param name="browsable">Should the property be visible?</param>
+        /// <param name="readOnly">Is the property read only.</param>
+        /// <param name="displayName">Sets the display name.</param>
+        public void SetPropertyAttributes(string property, string category, string description, JsonValue defaultValue, bool browsable, bool readOnly, string displayName)
+        {
+            if (string.IsNullOrEmpty(property))
+                return;
+            JsonObject table = AttributesTable;
+            JsonObject details = table[property] as JsonObject ?? new JsonObject();
+
+            details["Category"] = category;
+            details["Description"] = description;
+            details["DefaultValue"] = defaultValue;
+            details["Browsable"] = browsable;
+            details["ReadOnly"] = readOnly;
+            details["DisplayName"] = displayName;
+            table[property] = details;
+        }
+
+        /// <summary>
+        /// Sets the property details for the given property to the _attributesTable <see cref="JsonObject"/>.
+        /// </summary>
         /// <param name="propertyDefinition">The definition to add to the <see cref="JsonObject.AttributesTable"/>.</param>
         public void SetPropertyAttributes(JsonPropertyDefinition propertyDefinition)
         {

@@ -34,6 +34,28 @@
         /// <param name="description">A description of the property.</param>
         /// <param name="readOnly">Determines if the property is read only.</param>
         /// <param name="browsable">Determines if the property is browsable.</param>
+        /// <param name="displayName">Sets the display name attribute.</param>
+        public JsonObjectPropertyDescriptor(string name, Type propertyType, string category, string description, bool readOnly, bool browsable, string displayName)
+            : base(name, new Attribute[] { new BrowsableAttribute(browsable), new ReadOnlyAttribute(readOnly) })
+        {
+            _readOnly = readOnly;
+            _displayName = string.IsNullOrEmpty(displayName) ? name.Replace("_", "") : displayName;
+            var d = this.AttributeArray;
+            CanSetNull = true;
+            _propertyType = propertyType;
+            _category = category;
+            _description = description;
+        }
+
+        /// <summary>
+        /// Initialized a new instance of <see cref="JsonObjectPropertyDescriptor"/>.
+        /// </summary>
+        /// <param name="name">The name of the property.</param>
+        /// <param name="propertyType">The value type the property gets and sets.</param>
+        /// <param name="category">The category the property belongs.</param>
+        /// <param name="description">A description of the property.</param>
+        /// <param name="readOnly">Determines if the property is read only.</param>
+        /// <param name="browsable">Determines if the property is browsable.</param>
         public JsonObjectPropertyDescriptor(string name, Type propertyType, string category, string description, bool readOnly, bool browsable)
             : base(name, new Attribute[] { new BrowsableAttribute(browsable), new ReadOnlyAttribute(readOnly) })
         {

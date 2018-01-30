@@ -47,6 +47,21 @@
         /// <param name="browsable">Can the property be viewed in a control such as PropertyGrid.</param>
         /// <param name="readOnly">Can the property be edited?</param>
         public JsonPropertyDefinition(string propertyName, string category, string description, JsonValue defaultValue, bool browsable, bool readOnly)
+            : this(propertyName, category, description, defaultValue, browsable, readOnly, null)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonPropertyDefinition"/>.
+        /// </summary>
+        /// <param name="propertyName">The name of the property.</param>
+        /// <param name="category">A category the property belongs.</param>
+        /// <param name="description">A description of the property.</param>
+        /// <param name="defaultValue">The default value if the property.</param>
+        /// <param name="browsable">Can the property be viewed in a control such as PropertyGrid.</param>
+        /// <param name="readOnly">Can the property be edited?</param>
+        /// <param name="displayName">The display name of the property.</param>
+        public JsonPropertyDefinition(string propertyName, string category, string description, JsonValue defaultValue, bool browsable, bool readOnly, string displayName)
         {
             PropertyName = propertyName;
             Category = category;
@@ -54,6 +69,7 @@
             DefaultValue = defaultValue;
             Browsable = browsable;
             ReadOnly = readOnly;
+            DisplayName = displayName;
         }
 
         /// <summary>
@@ -80,7 +96,8 @@
                     Browsable = (att as BrowsableAttribute).Browsable;
                 else if (t == typeof(ReadOnlyAttribute))
                     ReadOnly = (att as ReadOnlyAttribute).IsReadOnly;
-
+                else if (t == typeof(DisplayNameAttribute))
+                    DisplayName = (att as DisplayNameAttribute).DisplayName;
             }
         }
 
@@ -151,6 +168,12 @@
             get; set;
         }
 
+        /// <summary>
+        /// The display name for the property.
+        /// </summary>
+        public string DisplayName
+        { get; set; }
+
         #endregion Properties
 
         #region Methods
@@ -206,6 +229,8 @@
                 e.Add("Browsable", false);
             if (ReadOnly)
                 e.Add("ReadOnly", true);
+            if (!string.IsNullOrEmpty(DisplayName))
+                e.Add("DisplayName", DisplayName);
             return e;
         }
 

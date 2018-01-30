@@ -18,7 +18,7 @@ namespace TestApp
         static void Main(string[] args)
         {
             
-            switch (3)
+            switch (1)
             {
                 case 1:
 
@@ -28,7 +28,9 @@ namespace TestApp
                     test.InitMyObject();
 
                     EncryptionHandler encryption = new EncryptionHandler("Hello World");
-                    JsonObject obj = new JsonObject(test, encryption);
+                    JsonObject obj = new JsonObject();// (test, encryption);
+                    obj.GlobalEncryptionHandler = encryption;
+                    obj.SerializeObjectWithAttributes(test);
 
                     string s = obj.ToString(Formatting.Indented);
                     obj = new JsonObject(s, encryption);
@@ -108,7 +110,7 @@ namespace TestApp
         [JsonEncryptValue]
         public DateTime? Date { get; set; }
 
-        [JsonEncryptValue]
+        [JsonEncryptValue, DisplayName("Some Number")]
         public int Number { get; set; }
         //public Test2Collection Tests { get; } = new Test2Collection();
 
