@@ -171,6 +171,34 @@
         }
 
         /// <summary>
+        /// Initializes a new instance of <see cref="JsonObject"/> that serializes the specified object.
+        /// </summary>
+        /// <param name="obj">The object to serialize.</param>
+        /// <param name="maxDepth">The maximum property depth that should be serialized.</param>
+        /// <param name="ignoreProperties">Property names that should be ignored when serializing.</param>
+        /// <param name="includeAttributes">If True, the AttributeTable will be populated with the object's attributes.</param>
+        /// <param name="includeTypeInformation">If True, a _type property will be added with the full Type.AssemblyQualifiedName.</param>
+        public JsonObject(object obj, int maxDepth, bool includeAttributes, bool includeTypeInformation, params string[] ignoreProperties)
+        {
+            SerializeObject(obj, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonObject"/> that serializes the specified object.
+        /// </summary>
+        /// <param name="obj">The object to serialize.</param>
+        /// <param name="maxDepth">The maximum property depth that should be serialized.</param>
+        /// <param name="ignoreProperties">Property names that should be ignored when serializing.</param>
+        /// <param name="includeAttributes">If True, the AttributeTable will be populated with the object's attributes.</param>
+        /// <param name="includeTypeInformation">If True, a _type property will be added with the full Type.AssemblyQualifiedName.</param>
+        /// <param name="encryption">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonObject(object obj, int maxDepth, bool includeAttributes, bool includeTypeInformation, IEncryptionHandler encryption, params string[] ignoreProperties)
+        {
+            GlobalEncryptionHandler = encryption;
+            SerializeObject(obj, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties);
+        }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> using the specified <see cref="JsonReader"/> to parse a JSON string.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> that will be used to parse a JSON string.</param>
@@ -846,10 +874,63 @@
         /// j.Remove("hello").Add("quote", "Everything is Awesome!");
         /// </example>
         /// <param name="obj">The object to serialize.</param>
+        /// <param name="includeAttributes">If True, the AttributeTable will be populated with the object's attributes.</param>
+        /// <returns>The current instance of <see cref="JsonObject"/>. (Returns itself)</returns>
+		public JsonObject SerializeObject(object obj, bool includeAttributes)
+        {
+            return SerializeObject(obj, int.MaxValue, includeAttributes);
+        }
+
+        /// <summary>
+        /// Serializes the properties, of the specified object, into this <see cref="JsonObject"/>.
+        /// </summary>
+        /// <example>
+        /// //This method returns itself. This makes possible in-line calling.
+        /// JsonObject j = new JsonObject("hello", "world");
+        /// j.Remove("hello").Add("quote", "Everything is Awesome!");
+        /// </example>
+        /// <param name="obj">The object to serialize.</param>
         /// <param name="maxDepth">The maximum property depth that should be serialized.</param>
         /// <param name="ignoreProperties">Property names that should be ignored when serializing.</param>
         /// <returns>The current instance of <see cref="JsonObject"/>. (Returns itself)</returns>
 		public JsonObject SerializeObject(object obj, int maxDepth, params string[] ignoreProperties)
+        {
+            return SerializeObject(obj, maxDepth, false, false, ignoreProperties);
+        }
+
+        /// <summary>
+        /// Serializes the properties, of the specified object, into this <see cref="JsonObject"/>.
+        /// </summary>
+        /// <example>
+        /// //This method returns itself. This makes possible in-line calling.
+        /// JsonObject j = new JsonObject("hello", "world");
+        /// j.Remove("hello").Add("quote", "Everything is Awesome!");
+        /// </example>
+        /// <param name="obj">The object to serialize.</param>
+        /// <param name="maxDepth">The maximum property depth that should be serialized.</param>
+        /// <param name="includeAttributes">If True, the AttributeTable will be populated with the object's attributes.</param>
+        /// <param name="ignoreProperties">Property names that should be ignored when serializing.</param>
+        /// <returns>The current instance of <see cref="JsonObject"/>. (Returns itself)</returns>
+		public JsonObject SerializeObject(object obj, int maxDepth, bool includeAttributes, params string[] ignoreProperties)
+        {
+            return SerializeObject(obj, maxDepth, includeAttributes, false, ignoreProperties);
+        }
+
+        /// <summary>
+        /// Serializes the properties, of the specified object, into this <see cref="JsonObject"/>.
+        /// </summary>
+        /// <example>
+        /// //This method returns itself. This makes possible in-line calling.
+        /// JsonObject j = new JsonObject("hello", "world");
+        /// j.Remove("hello").Add("quote", "Everything is Awesome!");
+        /// </example>
+        /// <param name="obj">The object to serialize.</param>
+        /// <param name="maxDepth">The maximum property depth that should be serialized.</param>
+        /// <param name="ignoreProperties">Property names that should be ignored when serializing.</param>
+        /// <param name="includeAttributes">If True, the AttributeTable will be populated with the object's attributes.</param>
+        /// <param name="includeTypeInformation">If True, a _type property will be added with the full Type.AssemblyQualifiedName.</param>
+        /// <returns>The current instance of <see cref="JsonObject"/>. (Returns itself)</returns>
+		public JsonObject SerializeObject(object obj, int maxDepth, bool includeAttributes, bool includeTypeInformation, params string[] ignoreProperties)
         {
             if (obj == null)
                 return this;
@@ -898,7 +979,27 @@
                         }
                         this.internalAdd(property.Name, value);
                     }
-
+                    if (includeTypeInformation)
+                    {
+                        this.internalAdd("_type", obj.GetType().AssemblyQualifiedName);
+                    }
+                    if (includeAttributes)
+                    {
+                        JsonObject table = new JsonObject();
+                        foreach (Attribute att in property.Info.GetCustomAttributes(true))
+                        {
+                            Type t = att.GetType();
+                            if (t.Namespace == "TG.JSON") continue;
+                            table[t.Name.Replace("Attribute", "")] = ValueFromObject(att, 1, "TypeId");
+                            
+                        }
+                        if (table.Count > 0)
+                        {
+                            AttributesTable[property.Name] = table;
+                        }
+                        //JsonPropertyDefinition pdef = new JsonPropertyDefinition(property.Info);
+                        //pdef.CreateAttributeEntry(AttributesTable);
+                    }
                 }
                 catch (Exception)
                 {
@@ -917,6 +1018,7 @@
         /// </example>
         /// <param name="obj">The object to serialize.</param>
         /// <returns>The current instance of <see cref="JsonObject"/>. (Returns itself)</returns>
+        [Obsolete("Use SerializeObject(object obj, bool includeAttributes) instead.")]
 		public JsonObject SerializeObjectWithAttributes(object obj)
         {
             return SerializeObjectWithAttributes(obj, int.MaxValue);
@@ -934,7 +1036,8 @@
         /// <param name="maxDepth">The maximum property depth that should be serialized.</param>
         /// <param name="ignoreProperties">Property names that should be ignored when serializing.</param>
         /// <returns>The current instance of <see cref="JsonObject"/>. (Returns itself)</returns>
-		public JsonObject SerializeObjectWithAttributes(object obj, int maxDepth, params string[] ignoreProperties)
+        [Obsolete("Use SerializeObject(object obj, int maxDepth, bool includeAttributes, params string[] ignoreProperties) instead.")]
+        public JsonObject SerializeObjectWithAttributes(object obj, int maxDepth, params string[] ignoreProperties)
         {
             if (obj == null)
                 return this;
@@ -1396,13 +1499,25 @@
 
                 if (pd != null)
                 {
-                    category = (string)pd["Category"];
-                    desc = (string)pd["Description"];
-                    defaultValue = pd["DefaultValue"];
+                    JsonValue att = pd["Category"];
+                    category = att.ValueType == JsonValueTypes.Object ? (string)(att as JsonObject)["Category"] : (string)pd["Category"];
+
+                    att = pd["Description"];
+                    desc = att.ValueType == JsonValueTypes.Object ? (string)(att as JsonObject)["Description"] : (string)pd["Description"];
+
+                    att = pd["DefaultValue"];
+                    defaultValue = att.ValueType == JsonValueTypes.Object ? (att as JsonObject)["Value"] :  pd["DefaultValue"];
                     if (pd.ContainsProperty("Browsable"))
-                        browsable = (bool)pd["Browsable"];
+                    {
+                        att = pd["Browsable"];
+                        browsable = att.ValueType == JsonValueTypes.Object ? (bool)(att as JsonObject)["Browsable"] : (bool)pd["Browsable"];
+                    }
+
                     if (pd.ContainsProperty("ReadOnly"))
-                        readOnly = (bool)pd["ReadOnly"];
+                    {
+                        att = pd["ReadOnly"];
+                        readOnly = att.ValueType == JsonValueTypes.Object ? (bool)(att as JsonObject)["IsReadOnly"] : (bool)pd["ReadOnly"];
+                    }
                 }
 
                 if (key.StartsWith("_"))

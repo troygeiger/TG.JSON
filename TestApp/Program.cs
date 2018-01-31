@@ -18,7 +18,7 @@ namespace TestApp
         static void Main(string[] args)
         {
             
-            switch (1)
+            switch (3)
             {
                 case 1:
 
@@ -30,7 +30,7 @@ namespace TestApp
                     EncryptionHandler encryption = new EncryptionHandler("Hello World");
                     JsonObject obj = new JsonObject();// (test, encryption);
                     obj.GlobalEncryptionHandler = encryption;
-                    obj.SerializeObjectWithAttributes(test);
+                    obj.SerializeObject(test, true);
 
                     string s = obj.ToString(Formatting.Indented);
                     obj = new JsonObject(s, encryption);
@@ -116,7 +116,6 @@ namespace TestApp
 
         [JsonEncryptValue]
         public List<int> Numbers { get; } = new List<int>();
-
 
         public List<string> Strings { get; } = new List<string>();
 

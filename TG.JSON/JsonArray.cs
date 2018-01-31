@@ -20,7 +20,7 @@
     /// </code>
     /// </example>
 #if !DEBUG
-	[System.Diagnostics.DebuggerStepThrough()]
+    [System.Diagnostics.DebuggerStepThrough()]
 #endif
     [Serializable]
     [Editor(typeof(TG.JSON.Editors.JsonArrayCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))]
@@ -795,11 +795,27 @@
         /// <returns>The current instance of <see cref="JsonArray"/> populated with the serialized values of <paramref name="obj"/>. A new instance of <see cref="JsonArray"/> is not created.</returns>
         public JsonArray SerializeObject(object obj, int maxDepth, params string[] ignoreProperties)
         {
+            return SerializeObject(obj, maxDepth, false, false, ignoreProperties);
+        }
+
+
+        /// <summary>
+        /// Converts (Serializes) an <see cref="IEnumerable"/> object and all contained objects' properties to this <see cref="JsonArray"/>. Properties are converted to an <see cref="JsonValue"/> of a compatible type.
+        /// NOTE: A new instance of <see cref="JsonArray"/> is not created.
+        /// </summary>
+        /// <param name="obj">The object to serialize.</param>
+        /// <param name="maxDepth">The maximum property dept to drill down to. This also prevents an endless loop if a property references to a point that could return to itself.</param>
+        /// <param name="includeAttributes">If True, the AttributeTable will be populated with the object's attributes.</param>
+        /// <param name="includeTypeInformation">If True, a _type property will be added with the full Type.AssemblyQualifiedName.</param>
+        /// <param name="ignoreProperties">A params string array of property names that should be ignored.</param>
+        /// <returns>The current instance of <see cref="JsonArray"/> populated with the serialized values of <paramref name="obj"/>. A new instance of <see cref="JsonArray"/> is not created.</returns>
+        public JsonArray SerializeObject(object obj, int maxDepth, bool includeAttributes, bool includeTypeInformation, params string[] ignoreProperties)
+        {
             if (!typeof(System.Collections.IEnumerable).IsAssignableFrom(obj.GetType()))
                 return this;
             System.Collections.IEnumerator enumer = ((System.Collections.IEnumerable)obj).GetEnumerator();
             while (enumer.MoveNext())
-                this.Add(base.ValueFromObject(enumer.Current, maxDepth, ignoreProperties));
+                this.Add(base.ValueFromObject(enumer.Current, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties));
             return this;
         }
 

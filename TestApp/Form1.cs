@@ -19,7 +19,7 @@ namespace TestApp
         {
             InitializeComponent();
             o = new JsonObject();
-            o.SerializeObjectWithAttributes(new Obj() { Name = "Jon", Hello = "World", YesNo = true });
+            o.SerializeObject(new Obj() { Name = "Jon", Hello = "World", YesNo = true }, true);
             propertyGrid1.SelectedObject = o;
             try
             {
@@ -44,12 +44,15 @@ namespace TestApp
 
         public class Obj
         {
-            [Category("Bla")]
+            [Category("Bla"), Description("Hello World")]
             public string Hello { get; set; }
 
             public string Name { get; set; }
 
             public bool YesNo { get; set; }
+
+            [ReadOnly(true)]
+            public bool ReadOnlyProperty { get; set; }
         }
 
         private void button1_Click(object sender, EventArgs e)
