@@ -18,7 +18,7 @@ namespace TestApp
         static void Main(string[] args)
         {
             
-            switch (3)
+            switch (1)
             {
                 case 1:
 
@@ -26,11 +26,10 @@ namespace TestApp
                     test.Number = 32;
                     test.Numbers.AddRange(new int[] { 3, 2, 1 });
                     test.InitMyObject();
+                    test.SubTest.Add(new Test2() { Name = "Sub Test" });
 
                     EncryptionHandler encryption = new EncryptionHandler("Hello World");
-                    JsonObject obj = new JsonObject();// (test, encryption);
-                    obj.GlobalEncryptionHandler = encryption;
-                    obj.SerializeObject(test, true);
+                    JsonObject obj = new JsonObject(test, 4, true, false, encryption);// (test, encryption);
 
                     string s = obj.ToString(Formatting.Indented);
                     obj = new JsonObject(s, encryption);
@@ -121,6 +120,8 @@ namespace TestApp
 
         public List<bool> Bools { get; } = new List<bool>();
 
+        public List<Test2> SubTest { get; } = new List<Test2>();
+
     }
 
     class Test2Collection : System.Collections.DictionaryBase
@@ -138,6 +139,7 @@ namespace TestApp
 
     class Test2
     {
+        [Category("Test")]
         public string Name { get; set; }
     }
 }

@@ -956,7 +956,7 @@
                         }
                         else
                         {
-                            value = ValueFromObject(pval, maxDepth, ignoreProperties);
+                            value = ValueFromObject(pval, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties);
                         }
                         if (value.ValueType == JsonValueTypes.Object)
                         {
@@ -975,7 +975,7 @@
                         }
                         else
                         {
-                            value = ValueFromObject(pval, maxDepth, ignoreProperties);
+                            value = ValueFromObject(pval, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties);
                         }
                         this.internalAdd(property.Name, value);
                     }
