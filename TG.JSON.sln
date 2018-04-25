@@ -1,9 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TG.JSON", "TG.JSON\TG.JSON.csproj", "{E30F0802-609B-4F4D-AED8-658F9CCAB86B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4926BADB-F98A-4894-908E-4E4F8CFFC006} = {4926BADB-F98A-4894-908E-4E4F8CFFC006}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{B499DE14-1459-4122-ABFA-E1AA7D730F45}"
 EndProject
@@ -30,5 +33,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {836731E7-8FFB-42F6-8885-80CABD7C2742}
 	EndGlobalSection
 EndGlobal
