@@ -4,13 +4,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TG.JSON", "TG.JSON\TG.JSON.csproj", "{E30F0802-609B-4F4D-AED8-658F9CCAB86B}"
-	ProjectSection(ProjectDependencies) = postProject
-		{4926BADB-F98A-4894-908E-4E4F8CFFC006} = {4926BADB-F98A-4894-908E-4E4F8CFFC006}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{B499DE14-1459-4122-ABFA-E1AA7D730F45}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TG.JSON40", "TG.JSON\TG.JSON40.csproj", "{4926BADB-F98A-4894-908E-4E4F8CFFC006}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E30F0802-609B-4F4D-AED8-658F9CCAB86B} = {E30F0802-609B-4F4D-AED8-658F9CCAB86B}
+	EndProjectSection
+EndProject
+Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "Documentation", "Documentation\Documentation.shfbproj", "{42F70DDB-1F1F-477F-AE9B-E05FEB8E9735}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E30F0802-609B-4F4D-AED8-658F9CCAB86B} = {E30F0802-609B-4F4D-AED8-658F9CCAB86B}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +35,9 @@ Global
 		{4926BADB-F98A-4894-908E-4E4F8CFFC006}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4926BADB-F98A-4894-908E-4E4F8CFFC006}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4926BADB-F98A-4894-908E-4E4F8CFFC006}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42F70DDB-1F1F-477F-AE9B-E05FEB8E9735}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42F70DDB-1F1F-477F-AE9B-E05FEB8E9735}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42F70DDB-1F1F-477F-AE9B-E05FEB8E9735}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

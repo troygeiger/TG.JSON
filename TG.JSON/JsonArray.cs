@@ -517,7 +517,6 @@
                             break;
                         case JsonValueTypes.Array:
                             throw new NotImplementedException("Deserializing array values has not been implemented.");
-                            break;
                         case JsonValueTypes.String:
                         case JsonValueTypes.Number:
                         case JsonValueTypes.Boolean:
@@ -525,7 +524,6 @@
                             break;
                         case JsonValueTypes.Binary:
                             throw new NotImplementedException("Deserializing Binary values has not been implemented.");
-                            break;
                         case JsonValueTypes.Null:
                             break;
                         default:
@@ -819,7 +817,7 @@
         /// NOTE: A new instance of <see cref="JsonArray"/> is not created.
         /// </summary>
         /// <param name="obj">The object to serialize.</param>
-
+        /// <param name="serializationOptions">The options to use for serialization.</param>
         /// <returns>The current instance of <see cref="JsonArray"/> populated with the serialized values of <paramref name="obj"/>. A new instance of <see cref="JsonArray"/> is not created.</returns>
         public JsonArray SerializeObject(object obj, Serialization.JsonSerializationOptions serializationOptions)
         {

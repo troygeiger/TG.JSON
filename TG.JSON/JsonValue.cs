@@ -1193,14 +1193,14 @@
         /// <see cref="JsonNumber"/> or a <see cref="JsonString"/>; the <seealso cref="JsonObject.SerializeObject(object)"/> method is called.
         /// </remarks>
         /// <param name="obj">The object to be converted to a <see cref="JsonValue"/>.</param>
-        /// <param name="maxDepth">The maximum depth to serialize if method <see cref="JsonObject.SerializeObject(object, int, string[])"/> needs to be called.</param>
-        /// <param name="includeAttributes">If True, the AttributeTable will be populated with the object's attributes.</param>
-        /// <param name="includeTypeInformation">If True, a _type property will be added with the full Type.AssemblyQualifiedName.</param>
-        /// <param name="ignoreProperties">Property names that should be ignored if method <see cref="JsonObject.SerializeObject(object, int, string[])"/> needs to be called.</param>
+        /// <param name="serializationOptions">The options to use when serializing.</param>
         /// <returns>A new <see cref="JsonValue"/> based on <paramref name="obj"/>.</returns>
         public JsonValue ValueFromObject(object obj, Serialization.JsonSerializationOptions serializationOptions)
         {
-            if (serializationOptions == null) throw new ArgumentNullException("serializationOptions");
+            if (serializationOptions == null)
+            {
+                serializationOptions = new Serialization.JsonSerializationOptions();
+            }
 
             if (obj is string)
                 return (string)obj;

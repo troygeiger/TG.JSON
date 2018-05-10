@@ -4,15 +4,27 @@ using System.Text;
 
 namespace TG.JSON.Serialization
 {
+    /// <summary>
+    /// Represents the options that will be used during serialization.
+    /// </summary>
     public class JsonSerializationOptions
     {
         int _maxDepth = int.MaxValue;
 
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonSerializationOptions"/>.
+        /// </summary>
         public JsonSerializationOptions()
         {
 
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonSerializationOptions"/>.
+        /// </summary>
+        /// <param name="maxDepth">The maximum depth to drill down when serializing.</param>
+        /// <param name="includeAttributes">Include property attributes when serializing.</param>
+        /// <param name="includeTypeInformation">If True, a property of "_type" will be added containing the fully qualified name of the object.</param>
         public JsonSerializationOptions(int maxDepth, bool includeAttributes, bool includeTypeInformation)
         {
             MaxDepth = maxDepth;
@@ -20,6 +32,14 @@ namespace TG.JSON.Serialization
             IncludeTypeInformation = includeTypeInformation;
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonSerializationOptions"/>.
+        /// </summary>
+        /// <param name="maxDepth">The maximum depth to drill down when serializing.</param>
+        /// <param name="includeAttributes">Include property attributes when serializing.</param>
+        /// <param name="includeTypeInformation">If True, a property of "_type" will be added containing the fully qualified name of the object.</param>
+        /// <param name="ignoreProperties">The properties that should be ignored when serializing.</param>
+        /// <param name="selectedProperties">Property names added to this list will be the only properties to be serialized; unless specified in the <see cref="IgnoreProperties"/> list.</param>
         public JsonSerializationOptions(int maxDepth, bool includeAttributes, bool includeTypeInformation, string[] ignoreProperties, string[] selectedProperties)
         {
             MaxDepth = maxDepth;
