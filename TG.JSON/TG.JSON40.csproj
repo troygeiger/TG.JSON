@@ -83,6 +83,7 @@
     <Compile Include="JsonStringTypeConverter.cs" />
     <Compile Include="JsonValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\JsonSerializationOptions.cs" />
     <Compile Include="StringBuffer.cs" />
   </ItemGroup>
   <ItemGroup>

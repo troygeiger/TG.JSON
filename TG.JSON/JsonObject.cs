@@ -932,16 +932,21 @@
         /// <returns>The current instance of <see cref="JsonObject"/>. (Returns itself)</returns>
 		public JsonObject SerializeObject(object obj, int maxDepth, bool includeAttributes, bool includeTypeInformation, params string[] ignoreProperties)
         {
-            if (obj == null)
+            return SerializeObject(obj, new Serialization.JsonSerializationOptions(maxDepth, includeAttributes, includeTypeInformation, ignoreProperties, null));
+        }
+
+        public JsonObject SerializeObject(object obj, Serialization.JsonSerializationOptions serializationOptions)
+        {
+            if (obj == null || serializationOptions == null)
                 return this;
-            List<string> ignore = new List<string>(ignoreProperties);
 
             foreach (PropertyInfoEx property in GetTypeProperties(obj.GetType()))
             {
-                if (ignore.Contains(property.Name) || property.IgnoreProperty || !property.CanRead 
+                if (serializationOptions.IgnoreProperties.Contains(property.Name) || property.IgnoreProperty || !property.CanRead
                     || (!property.IsPublic && property.JsonProperty == null))
                     continue;
-                
+                if (serializationOptions.SelectedProperties.Count > 0 && !serializationOptions.SelectedProperties.Contains(property.Name))
+                    continue;
                 try
                 {
                     object pval = property.GetValue(obj, null);
@@ -956,7 +961,7 @@
                         }
                         else
                         {
-                            value = ValueFromObject(pval, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties);
+                            value = ValueFromObject(pval, serializationOptions);
                         }
                         if (value.ValueType == JsonValueTypes.Object)
                         {
@@ -975,15 +980,15 @@
                         }
                         else
                         {
-                            value = ValueFromObject(pval, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties);
+                            value = ValueFromObject(pval, serializationOptions);
                         }
                         this.internalAdd(property.Name, value);
                     }
-                    if (includeTypeInformation)
+                    if (serializationOptions.IncludeTypeInformation)
                     {
                         this.internalAdd("_type", obj.GetType().AssemblyQualifiedName);
                     }
-                    if (includeAttributes)
+                    if (serializationOptions.IncludeAttributes)
                     {
                         JsonObject table = new JsonObject();
                         foreach (Attribute att in property.Info.GetCustomAttributes(true))
@@ -991,7 +996,7 @@
                             Type t = att.GetType();
                             if (t.Namespace == "TG.JSON") continue;
                             table[t.Name.Replace("Attribute", "")] = ValueFromObject(att, 1, "TypeId");
-                            
+
                         }
                         if (table.Count > 0)
                         {

@@ -76,6 +76,7 @@
     <Compile Include="JsonPropertyAttribute.cs" />
     <Compile Include="JsonPropertyIgnoreAttribute.cs" />
     <Compile Include="JsonReader.cs" />
+    <Compile Include="Serialization\JsonSerializationOptions.cs" />
     <Compile Include="JsonString.cs" />
     <Compile Include="JsonStringTypeConverter.cs" />
     <Compile Include="JsonValue.cs" />

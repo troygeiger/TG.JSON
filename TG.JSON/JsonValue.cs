@@ -1182,6 +1182,26 @@
         /// <returns>A new <see cref="JsonValue"/> based on <paramref name="obj"/>.</returns>
         public JsonValue ValueFromObject(object obj, int maxDepth, bool includeAttributes, bool includeTypeInformation, params string[] ignoreProperties)
         {
+            return ValueFromObject(obj, new Serialization.JsonSerializationOptions(maxDepth, includeAttributes, includeTypeInformation, ignoreProperties, null));
+        }
+
+        /// <summary>
+        /// Returns the equivalent <see cref="JsonValue"/> from the specified object <paramref name="obj"/>.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="obj"/> cannot be matched with a <see cref="JsonNull"/>, <see cref="JsonBoolean"/>,
+        /// <see cref="JsonNumber"/> or a <see cref="JsonString"/>; the <seealso cref="JsonObject.SerializeObject(object)"/> method is called.
+        /// </remarks>
+        /// <param name="obj">The object to be converted to a <see cref="JsonValue"/>.</param>
+        /// <param name="maxDepth">The maximum depth to serialize if method <see cref="JsonObject.SerializeObject(object, int, string[])"/> needs to be called.</param>
+        /// <param name="includeAttributes">If True, the AttributeTable will be populated with the object's attributes.</param>
+        /// <param name="includeTypeInformation">If True, a _type property will be added with the full Type.AssemblyQualifiedName.</param>
+        /// <param name="ignoreProperties">Property names that should be ignored if method <see cref="JsonObject.SerializeObject(object, int, string[])"/> needs to be called.</param>
+        /// <returns>A new <see cref="JsonValue"/> based on <paramref name="obj"/>.</returns>
+        public JsonValue ValueFromObject(object obj, Serialization.JsonSerializationOptions serializationOptions)
+        {
+            if (serializationOptions == null) throw new ArgumentNullException("serializationOptions");
+
             if (obj is string)
                 return (string)obj;
             if (obj is bool)
@@ -1194,8 +1214,16 @@
                 return ((JsonValue)obj).Clone();
             if (obj is byte[])
                 return (byte[])obj;
-            if (obj is System.Collections.IEnumerable && maxDepth > 0)
-                return new JsonArray().SerializeObject(obj, maxDepth - 1, includeAttributes, includeTypeInformation, ignoreProperties);
+            if (obj is System.Collections.IEnumerable && serializationOptions.CurrentDepth > 0)
+            {
+                serializationOptions.CurrentDepth--;
+                //return new JsonArray().SerializeObject(obj, maxDepth - 1, includeAttributes, includeTypeInformation, ignoreProperties);
+                JsonArray array = new JsonArray();
+                array.SerializeObject(obj, serializationOptions);
+                serializationOptions.CurrentDepth++;
+                return array;
+            }
+
             if (obj is short)
                 return (short)obj;
             if (obj is int)
@@ -1220,8 +1248,14 @@
                 return obj.ToString();
             if (obj is System.Drawing.Color)
                 return new JsonObject("color", System.Drawing.ColorTranslator.ToHtml((System.Drawing.Color)obj));
-            if (obj != null && maxDepth > 0)
-                return new JsonObject().SerializeObject(obj, maxDepth - 1, includeAttributes, includeTypeInformation, ignoreProperties);
+            if (obj != null && serializationOptions.CurrentDepth > 0)
+            {
+                serializationOptions.CurrentDepth--;
+                JsonObject jo = new JsonObject();
+                jo.SerializeObject(obj, serializationOptions);
+                serializationOptions.CurrentDepth++;
+                return jo;
+            }
 
             return new JsonNull();
         }

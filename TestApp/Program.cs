@@ -7,6 +7,7 @@ using TG.JSON;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Diagnostics;
+using TG.JSON.Serialization;
 
 namespace TestApp
 {
@@ -18,7 +19,7 @@ namespace TestApp
         static void Main(string[] args)
         {
             
-            switch (1)
+            switch (2)
             {
                 case 1:
 
@@ -29,7 +30,8 @@ namespace TestApp
                     test.SubTest.Add(new Test2() { Name = "Sub Test" });
 
                     EncryptionHandler encryption = new EncryptionHandler("Hello World");
-                    JsonObject obj = new JsonObject(test, 4, true, false, encryption);// (test, encryption);
+                    JsonObject obj = new JsonObject(encryption);
+                    obj.SerializeObject(test, new JsonSerializationOptions(5, false, false, null, new string[] { "Number" }));
 
                     string s = obj.ToString(Formatting.Indented);
                     obj = new JsonObject(s, encryption);
