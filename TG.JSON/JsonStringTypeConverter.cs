@@ -1,4 +1,5 @@
-﻿namespace TG.JSON
+﻿#if !NETSTANDARD1_X
+namespace TG.JSON
 {
     using System;
     using System.Collections.Generic;
@@ -6,7 +7,7 @@
 
     internal class JsonStringTypeConverter : System.ComponentModel.TypeConverter
     {
-        #region Methods
+#region Methods
 
         public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext context, Type sourceType)
         {
@@ -53,6 +54,8 @@
                 return base.ConvertTo(context, culture, value, destinationType);
         }
 
-        #endregion Methods
+#endregion Methods
     }
 }
+
+#endif

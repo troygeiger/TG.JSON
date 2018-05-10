@@ -1,9 +1,10 @@
-﻿namespace TG.JSON
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Text;
+
+namespace TG.JSON
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Text;
 
     /// <summary>
     /// TG.JSON is an easy to use library for interacting with JSON in .NET. TG.JSON was developed
@@ -169,6 +170,8 @@
             set;
         }
 
+#if !NETSTANDARD1_0
+
         /// <summary>
         /// The <see cref="IEncryptionHandler"/> to use for encrypting values.
         /// </summary>
@@ -216,10 +219,11 @@
                 GlobalEncryptionHandler = new EncryptionHandler(value);
             }
         }
+#endif
 
-        /// <summary>
-        /// States that events, such as ValueChanged, should not be fired.
-        /// </summary>
+            /// <summary>
+            /// States that events, such as ValueChanged, should not be fired.
+            /// </summary>
         public bool SuspendEvents
         {
             get;
@@ -771,6 +775,7 @@
             return new JsonString(value);
         }
 
+#if !NETSTANDARD1_X
         /// <summary>
         /// Implicitly returns a <see cref="JsonNull"/> if the value is a <see cref="DBNull"/>.
         /// </summary>
@@ -778,7 +783,8 @@
         public static implicit operator JsonValue(DBNull value)
         {
             return new JsonNull();
-        }
+        } 
+#endif
 
         /// <summary>
         /// Implicitly converts a <see cref="short"/> to <see cref="JsonNumber"/>.
@@ -1080,6 +1086,7 @@
             return p;
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Searches for an available <see cref="IEncryptionHandler"/>.
         /// </summary>
@@ -1108,10 +1115,11 @@
                         }
                     }
                 }
-                
+
             }
             return null;
-        }
+        } 
+#endif
 
         internal void SetParent(JsonValue parent)
         {
@@ -1128,6 +1136,7 @@
             return this.InternalToString(format, 0);
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Generates a JSON formatted array string. Ex. [ \"Hello\" , 1 ]
         /// </summary>
@@ -1135,7 +1144,8 @@
         public override string ToString()
         {
             return this.ToString(Formatting.Compressed);
-        }
+        } 
+#endif
 
         /// <summary>
         /// Returns the equivalent <see cref="JsonValue"/> from the specified object <paramref name="obj"/>.
@@ -1186,8 +1196,10 @@
                 return (string)obj;
             if (obj is bool)
                 return new JsonBoolean((bool)obj);
+#if !NETSTANDARD1_X
             if (obj == null || obj is DBNull)
-                return new JsonNull();
+                return new JsonNull(); 
+#endif
             if (obj is DateTime)
                 return (DateTime)obj;
             if (obj is JsonValue)
@@ -1218,8 +1230,10 @@
                 return (byte)obj;
             if (obj is Enum)
                 return obj.ToString();
+#if !NETSTANDARD1_X
             if (obj is System.Drawing.Color)
-                return new JsonObject("color", System.Drawing.ColorTranslator.ToHtml((System.Drawing.Color)obj));
+                return new JsonObject("color", ((System.Drawing.Color)obj).Name); 
+#endif
             if (obj != null && maxDepth > 0)
                 return new JsonObject().SerializeObject(obj, maxDepth - 1, includeAttributes, includeTypeInformation, ignoreProperties);
 
@@ -1298,6 +1312,7 @@
 
         #endregion Methods
 
+#if !NETSTANDARD1_0
         #region IConvertable Implementation
 
         /// <summary>
@@ -1306,6 +1321,7 @@
         /// <returns><see cref="TypeCode"/></returns>
         TypeCode IConvertible.GetTypeCode()
         {
+
             switch (ValueType)
             {
                 case JsonValueTypes.String:
@@ -1471,7 +1487,8 @@
             return null;
         }
 
-        #endregion IConvertable Implementation
+        #endregion IConvertable Implementation  
+#endif
 
     }
 }

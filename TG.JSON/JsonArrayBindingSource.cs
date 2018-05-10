@@ -1,9 +1,10 @@
-﻿namespace TG.JSON
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Text;
+
+namespace TG.JSON
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Text;
 
     /// <summary>
     /// Allows a <see cref="JsonArray"/> to be bound to controls, such as a <see cref="System.Windows.Forms.DataGridView"/> or <see cref="System.Windows.Forms.BindingNavigator"/>.

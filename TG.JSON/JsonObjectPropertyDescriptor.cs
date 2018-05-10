@@ -1,7 +1,9 @@
-﻿namespace TG.JSON
+﻿//#if !NETSTANDARD1_X
+using System;
+using System.ComponentModel;
+
+namespace TG.JSON
 {
-    using System;
-    using System.ComponentModel;
 
     //public sealed partial class JsonObject
     //{
@@ -40,7 +42,6 @@
         {
             _readOnly = readOnly;
             _displayName = string.IsNullOrEmpty(displayName) ? name.Replace("_", "") : displayName;
-            var d = this.AttributeArray;
             CanSetNull = true;
             _propertyType = propertyType;
             _category = category;
@@ -61,7 +62,6 @@
         {
             _readOnly = readOnly;
             _displayName = name.Replace("_", "");
-            var d = this.AttributeArray;
             CanSetNull = true;
             _propertyType = propertyType;
             _category = category;
@@ -199,7 +199,7 @@
                             default:
                                 return value;
                         }
-                    
+
                     default:
                         return component;
                 }
@@ -364,3 +364,5 @@
     #endregion Nested Types
     //}
 }
+
+#endif

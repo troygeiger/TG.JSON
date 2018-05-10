@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if FULLNET || NETSTANDARD2_0
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
@@ -7,8 +8,8 @@ namespace TG.JSON.Editors
 {
     internal class JsonArrayCollectionEditor : System.ComponentModel.Design.CollectionEditor
     {
-        
-        public JsonArrayCollectionEditor(Type type): base(type)
+
+        public JsonArrayCollectionEditor(Type type) : base(type)
         { }
 
         protected override Type[] CreateNewItemTypes()
@@ -36,8 +37,10 @@ namespace TG.JSON.Editors
             //    return o;
             //}
             //else
-                return base.CreateInstance(itemType);
+            return base.CreateInstance(itemType);
         }
 
     }
 }
+
+#endif

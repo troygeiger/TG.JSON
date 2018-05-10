@@ -1,9 +1,10 @@
-﻿namespace TG.JSON
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.ComponentModel;
+
+namespace TG.JSON
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-    using System.ComponentModel;
 
     /// <summary>
     /// Defines a property when adding a <see cref="JsonValue"/> to a <see cref="JsonObject"/>.
@@ -78,9 +79,25 @@
         /// <param name="property"></param>
         internal JsonPropertyDefinition(System.Reflection.PropertyInfo property) : this(property.Name)
         {
+            
+#if NETSTANDARD1_X
+            foreach (System.Reflection.CustomAttributeData attData in property.CustomAttributes)
+            {
+                Type t = attData.AttributeType;
+                object[] args = new object[attData.ConstructorArguments.Count];
+                for (int i = 0; i < attData.ConstructorArguments.Count; i++)
+                {
+                    args[i] = attData.ConstructorArguments[i].Value;
+                }
+                object att = Activator.CreateInstance(t, args);
+#else
             foreach (var att in property.GetCustomAttributes(true))
             {
                 Type t = att.GetType();
+#endif
+            
+
+
                 if (t == typeof(CategoryAttribute))
                     Category = (att as CategoryAttribute).Category;
                 else if (t == typeof(DescriptionAttribute))

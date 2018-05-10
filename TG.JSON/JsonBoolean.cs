@@ -1,25 +1,26 @@
-﻿namespace TG.JSON
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-    #if !DEBUG
+namespace TG.JSON
+{
+
+#if !DEBUG
     [System.Diagnostics.DebuggerStepThrough()]
-    #endif
-    /// <summary>
-    /// Represents a json boolean value.
-    /// </summary>
+#endif
+/// <summary>
+/// Represents a json boolean value.
+/// </summary>
     [System.ComponentModel.TypeConverter(typeof(System.ComponentModel.BooleanConverter))]
     public class JsonBoolean : JsonValue
     {
-        #region Fields
+#region Fields
 
         bool _value = false;
 
-        #endregion Fields
+#endregion Fields
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Initializes a new instance of <see cref="JsonBoolean"/> with a value of false.
@@ -37,9 +38,9 @@
             this.Value = value;
         }
 
-        #endregion Constructors
+#endregion Constructors
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Gets or Sets the bool value of this <see cref="TG.JSON.JsonBoolean"/>
@@ -62,9 +63,9 @@
             get { return JsonValueTypes.Boolean; }
         }
 
-        #endregion Properties
+#endregion Properties
 
-        #region Methods
+#region Methods
 
         /// <summary>
         /// Returns the bool value from <see cref="JsonBoolean.Value"/>
@@ -156,6 +157,6 @@
             return this.ToString();
         }
 
-        #endregion Methods
+#endregion Methods
     }
 }

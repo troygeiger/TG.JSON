@@ -1,9 +1,10 @@
-﻿namespace TG.JSON
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+
+namespace TG.JSON
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Text;
 
     /// <summary>
     /// Represents a json number value.
@@ -21,7 +22,7 @@
 #if !DEBUG
     [System.Diagnostics.DebuggerStepThrough()]
 #endif
-    [System.ComponentModel.TypeConverter(typeof(System.ComponentModel.DecimalConverter))]
+    [System.ComponentModel.TypeConverter(typeof(System.ComponentModel.DecimalConverter))] 
     public class JsonNumber : JsonValue
     {
         #region Fields

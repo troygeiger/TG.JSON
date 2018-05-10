@@ -1,4 +1,5 @@
-﻿namespace TG.JSON
+﻿#if !NETSTANDARD1_0
+namespace TG.JSON
 {
     /// <summary>
     /// An interface for handling encryption.
@@ -77,4 +78,5 @@
         /// <returns>string</returns>
         string EncryptionKeyAsString();
     }
-}
+} 
+#endif

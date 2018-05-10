@@ -1,14 +1,15 @@
-﻿namespace TG.JSON
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml.Serialization;
+using System.Reflection;
+
+namespace TG.JSON
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Runtime.Serialization;
-    using System.Text;
-    using System.Text.RegularExpressions;
-    using System.Xml.Serialization;
-    using System.Reflection;
 
     /// <summary>
     /// Represents a JSON Object. Ex. { "Hello" : "World" }
@@ -53,9 +54,19 @@
 #if !DEBUG
     [System.Diagnostics.DebuggerStepThrough()]
 #endif
-    [TypeConverter(typeof(ComponentConverter))]
-    [Serializable]
-    public sealed partial class JsonObject : JsonValue, ICustomTypeDescriptor, INotifyPropertyChanged, ISerializable, IXmlSerializable, IEnumerable
+#if !NETSTANDARD1_X
+    [TypeConverter(typeof(ComponentConverter))] 
+#endif
+#if !NETSTANDARD1_0
+    [Serializable] 
+#endif
+    public sealed partial class JsonObject : JsonValue, INotifyPropertyChanged, IXmlSerializable, IEnumerable
+#if !NETSTANDARD1_0
+        , ISerializable
+#endif
+#if !NETSTANDARD1_X
+        , ICustomTypeDescriptor 
+#endif
     {
         #region Fields
 
@@ -63,7 +74,7 @@
         Dictionary<string, JsonValue> propertyValue = new Dictionary<string, JsonValue>();
         static Dictionary<Type, PropertyInfoEx[]> propertyCache = new Dictionary<Type, PropertyInfoEx[]>();
         static object locker = new object();
-#if NET40
+#if CAN_DYNAMIC
         private DynamicObjectHandler dynObjHandler = null;
 #endif
 
@@ -79,6 +90,7 @@
             //myType = GetType();
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Initialize a new instance of <see cref="JsonObject"/> with an <see cref="IEncryptionHandler"/>.
         /// </summary>
@@ -86,7 +98,8 @@
         public JsonObject(IEncryptionHandler encryption)
         {
             this.GlobalEncryptionHandler = encryption;
-        }
+        } 
+#endif
 
         /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> that parses the specified JSON string.
@@ -103,6 +116,7 @@
             this.InternalParser(json);
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> that parses the specified JSON string.
         /// </summary>
@@ -112,7 +126,8 @@
         {
             this.GlobalEncryptionHandler = encryption;
             this.InternalParser(json);
-        }
+        } 
+#endif
 
         /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> that is populated with an initial property name and string value.
@@ -158,6 +173,7 @@
             SerializeObject(obj);
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> that serializes the specified object.
         /// </summary>
@@ -168,7 +184,8 @@
         {
             GlobalEncryptionHandler = encryption;
             SerializeObject(obj);
-        }
+        } 
+#endif
 
         /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> that serializes the specified object.
@@ -183,6 +200,7 @@
             SerializeObject(obj, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties);
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> that serializes the specified object.
         /// </summary>
@@ -196,17 +214,19 @@
         {
             GlobalEncryptionHandler = encryption;
             SerializeObject(obj, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties);
-        }
+        } 
+#endif
 
         /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> using the specified <see cref="JsonReader"/> to parse a JSON string.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> that will be used to parse a JSON string.</param>
-		public JsonObject(JsonReader reader)
+        public JsonObject(JsonReader reader)
         {
             InternalParser(reader);
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> using for deserialization.
         /// </summary>
@@ -216,7 +236,8 @@
             : this()
         {
             InternalParser(info.GetString("Value"));
-        }
+        } 
+#endif
 
         #endregion Constructors
 
@@ -363,7 +384,7 @@
             }
         }
 
-#if NET40
+#if CAN_DYNAMIC
 
         /// <summary>
         /// Dynamic representation of the properties.
@@ -600,7 +621,11 @@
         /// <returns>The copy of the <see cref="JsonObject"/>.</returns>
 		public override JsonValue Clone()
         {
-            return new JsonObject(this.ToString(), GlobalEncryptionHandler);
+            return new JsonObject(this.ToString()
+#if !NETSTANDARD1_0 
+                , GlobalEncryptionHandler 
+#endif
+                );
         }
 
         /// <summary>
@@ -623,21 +648,27 @@
 		public object DeserializeObject(Type type)
         {
             object obj = null;
+#if !NETSTANDARD1_X
             if (type == typeof(System.Drawing.Color))
             {
                 if (this.ContainsProperty("color"))
-                    obj = System.Drawing.ColorTranslator.FromHtml((string)this["color"]);
+                    obj = System.Drawing.Color.FromName((string)this["color"]);
                 else
                     obj = System.Drawing.Color.Black;
-            }
+            } 
             else
+#endif
             {
                 if (type == typeof(object) && this.ContainsProperty("_type"))
                 {
                     Regex rex = new Regex(@"^([^,]+),\s([^,]+),\sVersion=(\d{1,}\.\d{1,}\.\d{1,}\.\d{1,}),\sCulture=(\w+),\sPublicKeyToken=(\w+)");
                     Match m = rex.Match((string)this["_type"]);
                     if (m.Success)
-                        obj = Activator.CreateInstance(m.Groups[2].Value, m.Groups[1].Value).Unwrap();
+#if FULLNET
+                        obj = Activator.CreateInstance(m.Groups[2].Value, m.Groups[1].Value).Unwrap(); 
+#else
+                        obj = Activator.CreateInstance(Type.GetType(m.Groups[2].Value));
+#endif
 
                 }
                 else
@@ -754,6 +785,7 @@
             return default(T);
         }
 
+#if !NETSTANDARD1_X
         AttributeCollection ICustomTypeDescriptor.GetAttributes()
         {
             return new AttributeCollection(new Attribute[0]);
@@ -814,10 +846,13 @@
             return this;
         }
 
+#endif
+#if !NETSTANDARD1_0
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("Value", this.ToString());
-        }
+        } 
+#endif
 
         System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema()
         {
@@ -826,7 +861,7 @@
 
         void IXmlSerializable.ReadXml(System.Xml.XmlReader reader)
         {
-            InternalParser(reader.ReadString());
+            InternalParser(reader.ReadContentAsString());
         }
 
         void IXmlSerializable.WriteXml(System.Xml.XmlWriter writer)
@@ -1197,7 +1232,11 @@
         /// <summary>
         /// Returns the JSON string generated by all key/values associated with this <see cref="TG.JSON.JsonObject"/>.
         /// </summary>
-        public override string ToString()
+#if !NETSTANDARD1_0
+        public override string ToString() 
+#else
+        public string ToString()
+#endif
         {
             return this.ToString(Formatting.Compressed);
         }
@@ -1364,7 +1403,11 @@
                             if (property.PropertyType == typeof(string))
                                 property.SetValue(obj, (string)value, null);
 
-                            else if (property.PropertyType.BaseType == typeof(Enum))
+#if !NETSTANDARD1_X
+                            else if (property.PropertyType.BaseType == typeof(Enum)) 
+#else
+                            else if (property.PropertyType.GetTypeInfo().BaseType == typeof(Enum))
+#endif
                             {
                                 property.SetValue(obj, Enum.Parse(property.PropertyType, (string)value), null);
 
@@ -1375,9 +1418,15 @@
                                 DateTime.TryParse((string)value, out dt);
                                 property.SetValue(obj, dt, null);
                             }
+#if !NETSTANDARD1_X
                             else if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
                             {
-                                var arg = property.PropertyType.GetGenericArguments();
+                                Type[] arg = property.PropertyType.GetGenericArguments(); 
+#else
+                            else if (property.PropertyType.GetTypeInfo().IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                            {
+                                Type[] arg = property.PropertyType.GetTypeInfo().GenericTypeArguments;
+#endif
 
                                 object generic = null;
 
@@ -1409,10 +1458,17 @@
                         case JsonValueTypes.Array:
                             if (!property.CanWrite)
                             {
+#if NETSTANDARD1_X
+                                if (typeof(System.Collections.IList).GetTypeInfo().IsAssignableFrom(property.PropertyType.GetTypeInfo()))
+                                    ((JsonArray)value).DeserializeInto((IList)property.GetValue(obj, null));
+                                else if (typeof(System.Collections.IDictionary).GetTypeInfo().IsAssignableFrom(property.PropertyType.GetTypeInfo()))
+                                    ((JsonArray)value).DeserializeInto((IDictionary)property.GetValue(obj, null));
+#else
                                 if (typeof(System.Collections.IList).IsAssignableFrom(property.PropertyType))
                                     ((JsonArray)value).DeserializeInto((IList)property.GetValue(obj, null));
                                 else if (typeof(System.Collections.IDictionary).IsAssignableFrom(property.PropertyType))
                                     ((JsonArray)value).DeserializeInto((IDictionary)property.GetValue(obj, null));
+#endif
                             }
                             else
                                 property.SetValue(obj, ((JsonArray)value).Deserialize(property.PropertyType), null);
@@ -1588,7 +1644,7 @@
                 chr = reader.Read();
                 if (inEsc)
                 {
-                    #region Escape
+            #region Escape
                     char echr;
                     switch (chr)
                     {
@@ -1614,7 +1670,7 @@
                     buffer.Add(echr);
                     inEsc = false;
                     continue;
-                    #endregion //Escape
+            #endregion //Escape
                 }
                 switch (chr)
                 {
@@ -1740,6 +1796,7 @@
 
         private PropertyInfoEx[] GetTypeProperties(Type type)
         {
+#if !NETSTANDARD1_X
             lock (locker)
             {
                 if (propertyCache.ContainsKey(type))
@@ -1758,7 +1815,10 @@
                 PropertyInfoEx[] ex = info.ToArray();
                 propertyCache.Add(type, ex);
                 return ex;
-            }
+            } 
+#else
+            return new PropertyInfoEx[0];
+#endif
         }
 
         internal class PropertyInfoEx
@@ -1893,6 +1953,6 @@
             return result;
         }
 
-        #endregion Methods
+#endregion Methods
     }
 }

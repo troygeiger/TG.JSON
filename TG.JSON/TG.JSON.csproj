@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -9,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TG.JSON</RootNamespace>
     <AssemblyName>TG.JSON</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworks>net45;net40;net35;net20;netstandard1.0;netstandard1.3;netstandard2.0</TargetFrameworks>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NoWin32Manifest>False</NoWin32Manifest>
@@ -19,35 +18,12 @@
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>PdbOnly</DebugType>
-    <Optimize>True</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
-    <BaseAddress>4194304</BaseAddress>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <RegisterForComInterop>False</RegisterForComInterop>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-  </PropertyGroup>
   <ItemGroup>
+    <None Remove="NuGet-Create NuSpec.bat" />
+    <None Remove="NuGet-Package.bat" />
+    <None Remove="nuget.exe" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='net20' or '$(TargetFramework)'=='net35' or '$(TargetFramework)'=='net40' or '$(TargetFramework)'=='net45'">
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
@@ -57,53 +33,107 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EncryptionHandler.cs" />
-    <Compile Include="IEncryptionHandler.cs" />
-    <Compile Include="JsonArray.cs" />
-    <Compile Include="JsonArrayBindingSource.cs" />
-    <Compile Include="Editors\JsonArrayCollectionEditor.cs" />
-    <Compile Include="JsonBinary.cs" />
-    <Compile Include="JsonBoolean.cs" />
-    <Compile Include="JsonEncryptValueAttribute.cs" />
-    <Compile Include="JsonNull.cs" />
-    <Compile Include="JsonNumber.cs" />
-    <Compile Include="JsonObject.cs" />
-    <Compile Include="JsonObjectBindableEnumerator.cs" />
-    <Compile Include="JsonObjectEnumeratorTypes.cs" />
-    <Compile Include="JsonObjectPropertyDescriptor.cs" />
-    <Compile Include="JsonObjectPropertyEnumerator.cs" />
-    <Compile Include="JsonObjectPropertyValueEntry.cs" />
-    <Compile Include="JsonPropertyAttribute.cs" />
-    <Compile Include="JsonPropertyIgnoreAttribute.cs" />
-    <Compile Include="JsonReader.cs" />
-    <Compile Include="JsonString.cs" />
-    <Compile Include="JsonStringTypeConverter.cs" />
-    <Compile Include="JsonValue.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StringBuffer.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="LICENCE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
+    <PackageReference Include="System.Dynamic.Runtime">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Runtime.Serialization.Formatters">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Runtime.Serialization.Xml" Version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms">
+      <Version>4.3.1</Version>
+    </PackageReference>
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XmlSerializer">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Dynamic.Runtime">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Runtime.Serialization.Formatters">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Runtime.Serialization.Xml">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Security.Cryptography.Algorithms">
+      <Version>4.3.1</Version>
+    </PackageReference>
+    <PackageReference Include="System.Xml.XmlSerializer">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
+    <PackageReference Include="System.Dynamic.Runtime">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Runtime.Serialization.Primitives">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Runtime.Serialization.Xml">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XmlSerializer">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
+    <PackageReference Include="System.Runtime.Serialization.Primitives">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Runtime.Serialization.Xml">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Xml.XmlSerializer">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
   <PropertyGroup>
-    <PostBuildEvent>if "$(ConfigurationName)" == "Release" (
-msbuild $(SolutionDir)\Documentation\Documentation.shfbproj
-if EXIST $(ProjectDir)nuget.exe (
-cd $(ProjectDir)
-nuget.exe pack $(ProjectFileName) -Prop Configuration=Release
-nuget.exe push -verbosity detailed -source https://api.nuget.org/v3/index.json $(TargetName).*.nupkg
-del $(TargetName).*.nupkg
-)
-)</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+    <PackageLicenseUrl>https://github.com/troygeiger/TG.JSON/blob/master/TG.JSON/LICENCE.txt</PackageLicenseUrl>
+    <Version>1.3.6.0</Version>
+    <Authors>Troy Geiger</Authors>
+    <Description>TG.JSON is a versatile library for creating, parsing, encrypting values, binding, serializing and deserializing JSON. It's compact, fast and very easy to use.</Description>
+    <Copyright>Copyright © Troy Geiger 2018</Copyright>
+    <PackageProjectUrl>https://github.com/troygeiger/TG.JSON</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/troygeiger/TG.INI/master/TG.INI/TG.png</PackageIconUrl>
+    <PackageTags>JSON Parse Serialize .NET C# ASP.NET Encrypt</PackageTags>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <PropertyGroup Condition="'$(TargetFramework)'=='net45'">
+    <AssemblyTitle>TG.JSON</AssemblyTitle>
+    <DefineConstants>NET45;FULLNET;CAN_DYNAMIC;$(AdditionalConstants)</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='net40'">
+    <AssemblyTitle>TG.JSON .NET 4.0</AssemblyTitle>
+    <DefineConstants>NET40;FULLNET;CAN_DYNAMIC;$(AdditionalConstants)</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='net35'">
+    <AssemblyTitle>TG.JSON .NET 3.5</AssemblyTitle>
+    <DefineConstants>NET35;FULLNET;$(AdditionalConstants)</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='net20'">
+    <AssemblyTitle>TG.JSON .NET 2.0</AssemblyTitle>
+    <DefineConstants>NET20;FULLNET;$(AdditionalConstants)</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
+    <AssemblyTitle>TG.JSON .NET Standard 1.0</AssemblyTitle>
+    <DefineConstants>NETSTANDARD1_0;NETSTANDARD1_X;NOCONVERTER;CAN_DYNAMIC;$(AdditionalConstants)</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
+    <AssemblyTitle>TG.JSON .NET Standard 1.3</AssemblyTitle>
+    <DefineConstants>NETSTANDARD1_3;NETSTANDARD1_X;NOCONVERTER;CAN_DYNAMIC;$(AdditionalConstants)</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <AssemblyTitle>TG.JSON .NET Standard 2.0</AssemblyTitle>
+    <DefineConstants>NETSTANDARD2_0;CAN_DYNAMIC;$(AdditionalConstants)</DefineConstants>
+  </PropertyGroup>
 </Project>

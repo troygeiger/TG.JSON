@@ -22,20 +22,26 @@
 #if !DEBUG
     [System.Diagnostics.DebuggerStepThrough()]
 #endif
+#if FULLNET
     [Serializable]
-    [Editor(typeof(TG.JSON.Editors.JsonArrayCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))]
+    [Editor(typeof(TG.JSON.Editors.JsonArrayCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))] 
+#endif
     public class JsonArray : JsonValue,
     IEnumerable<JsonValue>,
     ICollection,
     System.Collections.IList,
+#if !NETSTANDARD1_0
     System.Runtime.Serialization.ISerializable,
-    System.Xml.Serialization.IXmlSerializable,
+    System.Xml.Serialization.IXmlSerializable, 
+#endif
     INotifyPropertyChanged
     {
         #region Fields
 
         List<JsonValue>.Enumerator enumerator;
         List<JsonValue> _values = new List<JsonValue>();
+        static Dictionary<Type, Type> iListParamTypeCache = new Dictionary<Type, Type>();
+        static Dictionary<Type, Type[]> dictionaryParamTypeCache = new Dictionary<Type, Type[]>();
 
         /// <summary>
         /// <inheritdoc/>
@@ -160,6 +166,7 @@
         }
 
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Implementation for <see cref="System.Runtime.Serialization.ISerializable"/>.
         /// </summary>
@@ -171,7 +178,8 @@
             //info.AddValue("Value", this.ToString());
             if (info.MemberCount > 0)
                 InternalParse(info.GetString("Value"));
-        }
+        } 
+#endif
 
         #endregion Constructors
 
@@ -196,7 +204,9 @@
         /// <summary>
         /// Gets the <see cref="List{JsonValue}"/> collection associated with this array.
         /// </summary>
-        [Editor(typeof(TG.JSON.Editors.JsonArrayCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))]
+#if FULLNET
+        [Editor(typeof(TG.JSON.Editors.JsonArrayCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))] 
+#endif
         public List<JsonValue> Values
         {
             get { return _values; }
@@ -481,6 +491,66 @@
             return a;
         }
 
+        private Type GetListAddType(Type iListType)
+        {
+            if (iListParamTypeCache.ContainsKey(iListType))
+            {
+                return iListParamTypeCache[iListType];
+            }
+            MethodInfo addMethod = null;
+#if FULLNET
+            addMethod = lstType.GetMethod("Add");
+#else
+            foreach (MethodInfo item in iListType.GetRuntimeMethods())
+            {
+                if (item.Name == "Add")
+                {
+                    addMethod = item;
+                    break;
+                }
+            }
+#endif
+            if (addMethod == null) return null;
+
+            ParameterInfo[] parameters = addMethod.GetParameters();
+            if (parameters.Length < 1)
+                return null;
+            Type paramType = parameters[0].ParameterType;
+            iListParamTypeCache.Add(iListType, paramType);
+            return paramType;
+        }
+
+        private Type[] GetDictionaryAddType(Type dictType)
+        {
+            if (dictionaryParamTypeCache.ContainsKey(dictType))
+            {
+                return dictionaryParamTypeCache[dictType];
+            }
+            MethodInfo addMethod = null;
+#if FULLNET
+            addMethod = lstType.GetMethod("Add");
+#else
+            foreach (MethodInfo item in dictType.GetRuntimeMethods())
+            {
+                if (item.Name == "Add")
+                {
+                    addMethod = item;
+                    break;
+                }
+            }
+#endif
+            if (addMethod == null) return null;
+
+            ParameterInfo[] parameters = addMethod.GetParameters();
+            if (parameters.Length != 2)
+                return null;
+            Type[] types = new Type[2];
+            types[0] = parameters[0].ParameterType;
+            types[1] = parameters[1].ParameterType;
+            dictionaryParamTypeCache.Add(dictType, types);
+            return types;
+        }
+
         /// <summary>
         /// Initializes a new instance of the <typeparamref name="T"/> and populates with the values of this <see cref="JsonArray"/>.
         /// </summary>
@@ -499,12 +569,10 @@
         {
             if (lst == null)
                 return;
-            Type t = lst.GetType();
-            MethodInfo addMethod = t.GetMethod("Add");
-            ParameterInfo[] parameters = addMethod.GetParameters();
-            if (parameters.Length < 1)
-                return;
-            ParameterInfo addParam = parameters[0];
+            
+            Type paramType = GetListAddType(lst.GetType());
+            
+
             for (int i = 0; i < Count; i++)
             {
                 JsonValue v = this[i];
@@ -513,7 +581,7 @@
                     switch (v.ValueType)
                     {
                         case JsonValueTypes.Object:
-                            lst.Add(((JsonObject)v).DeserializeObject(addParam.ParameterType));
+                            lst.Add(((JsonObject)v).DeserializeObject(paramType));
                             break;
                         case JsonValueTypes.Array:
                             throw new NotImplementedException("Deserializing array values has not been implemented.");
@@ -521,7 +589,7 @@
                         case JsonValueTypes.String:
                         case JsonValueTypes.Number:
                         case JsonValueTypes.Boolean:
-                            lst.Add(Convert.ChangeType(v, addParam.ParameterType));
+                            lst.Add(Convert.ChangeType(v, paramType));
                             break;
                         case JsonValueTypes.Binary:
                             throw new NotImplementedException("Deserializing Binary values has not been implemented.");
@@ -547,15 +615,13 @@
         {
             if (dictionary == null)
                 return;
-            Type dType = dictionary.GetType();
-            MethodInfo addMethod = dType.GetMethod("Add");
-            if (addMethod == null)
-                return;
-            ParameterInfo[] addParams = addMethod.GetParameters();
-            if (addParams.Length != 2)
-                return;
-            Type keyType = addParams[0].ParameterType;
-            Type valueType = addParams[1].ParameterType;
+
+            Type[] types = GetDictionaryAddType(dictionary.GetType());
+            if (types == null) return;
+            Type keyType = types[0];
+            Type valueType = types[1];
+
+            
 
             for (int i = 0; i < Count; i++)
             {
@@ -811,8 +877,13 @@
         /// <returns>The current instance of <see cref="JsonArray"/> populated with the serialized values of <paramref name="obj"/>. A new instance of <see cref="JsonArray"/> is not created.</returns>
         public JsonArray SerializeObject(object obj, int maxDepth, bool includeAttributes, bool includeTypeInformation, params string[] ignoreProperties)
         {
+#if FULLNET
             if (!typeof(System.Collections.IEnumerable).IsAssignableFrom(obj.GetType()))
+                return this; 
+#else
+            if (!typeof(System.Collections.IEnumerable).GetTypeInfo().IsAssignableFrom(obj.GetType().GetTypeInfo()))
                 return this;
+#endif
             System.Collections.IEnumerator enumer = ((System.Collections.IEnumerable)obj).GetEnumerator();
             while (enumer.MoveNext())
                 this.Add(base.ValueFromObject(enumer.Current, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties));
@@ -902,7 +973,7 @@
 
         void System.Xml.Serialization.IXmlSerializable.ReadXml(System.Xml.XmlReader reader)
         {
-            InternalParse(reader.ReadString());
+            InternalParse(reader.ReadContentAsString());
         }
 
         void System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter writer)
@@ -1044,7 +1115,7 @@
                 chr = reader.Read();
                 if (inEsc)
                 {
-                    #region Handle Escape Char
+#region Handle Escape Char
                     char echr;
                     switch (chr)
                     {
@@ -1070,7 +1141,7 @@
                     buffer.Add(echr);
                     inEsc = false;
                     continue;
-                    #endregion Handle Escape Char
+#endregion Handle Escape Char
                 }
                 switch (chr)
                 {
@@ -1148,6 +1219,6 @@
             return false;
         }
 
-        #endregion Methods
+#endregion Methods
     }
 }

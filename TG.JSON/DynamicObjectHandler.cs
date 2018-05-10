@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if CAN_DYNAMIC
+
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -62,3 +64,4 @@ namespace TG.JSON
         
     }
 }
+#endif

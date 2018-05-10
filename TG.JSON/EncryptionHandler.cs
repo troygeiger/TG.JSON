@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NETSTANDARD1_0
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Security.Cryptography;
@@ -12,7 +13,11 @@ namespace TG.JSON
     {
         byte[] cryptKey,
             iv = new byte[] { 68, 65, 43, 114, 98, 118, 120, 103, 101, 79, 102, 107, 100, 111, 51, 33 };
+#if NETSTANDARD1_3
+        Aes aes;
+#else
         Rijndael aes;
+#endif
         Random randomizer = new Random();
 
         /// <summary>
@@ -23,8 +28,12 @@ namespace TG.JSON
         {
             if (key == null || (key != null && key.Length == 0))
                 throw new ArgumentNullException("key");
-
+#if NETSTANDARD1_3
+            aes = Aes.Create();
+#else
             aes = Rijndael.Create();
+#endif
+
             if (key.Length > 32)
                 throw new CryptographicException("Key size too large.");
             cryptKey = new byte[32];
@@ -183,10 +192,18 @@ namespace TG.JSON
         /// </summary>
         public void Dispose()
         {
-            aes.Clear();
+#if FULLNET || NETSTANDARD2_0
+            aes.Clear(); 
+#else
+            aes.Dispose();
+#endif
+
             aes = null;
             cryptKey = null;
             iv = null;
         }
     }
 }
+
+
+#endif

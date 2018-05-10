@@ -1,8 +1,9 @@
-﻿namespace TG.JSON
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace TG.JSON
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Text;
 
 #if !DEBUG
     [System.Diagnostics.DebuggerStepThrough()]
