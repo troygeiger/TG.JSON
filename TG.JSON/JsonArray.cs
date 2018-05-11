@@ -585,7 +585,6 @@
                             break;
                         case JsonValueTypes.Array:
                             throw new NotImplementedException("Deserializing array values has not been implemented.");
-                            break;
                         case JsonValueTypes.String:
                         case JsonValueTypes.Number:
                         case JsonValueTypes.Boolean:
@@ -593,7 +592,6 @@
                             break;
                         case JsonValueTypes.Binary:
                             throw new NotImplementedException("Deserializing Binary values has not been implemented.");
-                            break;
                         case JsonValueTypes.Null:
                             break;
                         default:
@@ -877,7 +875,18 @@
         /// <returns>The current instance of <see cref="JsonArray"/> populated with the serialized values of <paramref name="obj"/>. A new instance of <see cref="JsonArray"/> is not created.</returns>
         public JsonArray SerializeObject(object obj, int maxDepth, bool includeAttributes, bool includeTypeInformation, params string[] ignoreProperties)
         {
-#if FULLNET
+            return SerializeObject(obj, new Serialization.JsonSerializationOptions(maxDepth, includeAttributes, includeTypeInformation, ignoreProperties, null));
+        }
+
+        /// <summary>
+        /// Converts (Serializes) an <see cref="IEnumerable"/> object and all contained objects' properties to this <see cref="JsonArray"/>. Properties are converted to an <see cref="JsonValue"/> of a compatible type.
+        /// NOTE: A new instance of <see cref="JsonArray"/> is not created.
+        /// </summary>
+        /// <param name="obj">The object to serialize.</param>
+        /// <param name="serializationOptions">The options to use for serialization.</param>
+        /// <returns>The current instance of <see cref="JsonArray"/> populated with the serialized values of <paramref name="obj"/>. A new instance of <see cref="JsonArray"/> is not created.</returns>
+        public JsonArray SerializeObject(object obj, Serialization.JsonSerializationOptions serializationOptions)
+        {
             if (!typeof(System.Collections.IEnumerable).IsAssignableFrom(obj.GetType()))
                 return this; 
 #else
@@ -886,7 +895,7 @@
 #endif
             System.Collections.IEnumerator enumer = ((System.Collections.IEnumerable)obj).GetEnumerator();
             while (enumer.MoveNext())
-                this.Add(base.ValueFromObject(enumer.Current, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties));
+                this.Add(base.ValueFromObject(enumer.Current, serializationOptions));
             return this;
         }
 

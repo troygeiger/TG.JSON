@@ -218,6 +218,18 @@ namespace TG.JSON
 #endif
 
         /// <summary>
+        /// Initializes a new instance of <see cref="JsonObject"/> that serializes the specified object.
+        /// </summary>
+        /// <param name="obj">The object to serialize.</param>
+        /// <param name="encryption">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
+        /// <param name="serializationOptions">The options to use for serialization.</param>
+        public JsonObject(object obj, IEncryptionHandler encryption, Serialization.JsonSerializationOptions serializationOptions)
+        {
+            GlobalEncryptionHandler = encryption;
+            SerializeObject(obj, serializationOptions);
+        }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> using the specified <see cref="JsonReader"/> to parse a JSON string.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> that will be used to parse a JSON string.</param>
@@ -967,16 +979,32 @@ namespace TG.JSON
         /// <returns>The current instance of <see cref="JsonObject"/>. (Returns itself)</returns>
 		public JsonObject SerializeObject(object obj, int maxDepth, bool includeAttributes, bool includeTypeInformation, params string[] ignoreProperties)
         {
-            if (obj == null)
+            return SerializeObject(obj, new Serialization.JsonSerializationOptions(maxDepth, includeAttributes, includeTypeInformation, ignoreProperties, null));
+        }
+
+        /// <summary>
+        /// Serializes the properties, of the specified object, into this <see cref="JsonObject"/>.
+        /// </summary>
+        /// <example>
+        /// //This method returns itself. This makes possible in-line calling.
+        /// JsonObject j = new JsonObject("hello", "world");
+        /// j.Remove("hello").Add("quote", "Everything is Awesome!");
+        /// </example>
+        /// <param name="obj">The object to serialize.</param>
+        /// <param name="serializationOptions">The options to user when serializing.</param>
+        /// <returns>The current instance of <see cref="JsonObject"/>. (Returns itself)</returns>
+        public JsonObject SerializeObject(object obj, Serialization.JsonSerializationOptions serializationOptions)
+        {
+            if (obj == null || serializationOptions == null)
                 return this;
-            List<string> ignore = new List<string>(ignoreProperties);
 
             foreach (PropertyInfoEx property in GetTypeProperties(obj.GetType()))
             {
-                if (ignore.Contains(property.Name) || property.IgnoreProperty || !property.CanRead 
+                if (serializationOptions.IgnoreProperties.Contains(property.Name) || property.IgnoreProperty || !property.CanRead
                     || (!property.IsPublic && property.JsonProperty == null))
                     continue;
-                
+                if (serializationOptions.SelectedProperties.Count > 0 && !serializationOptions.SelectedProperties.Contains(property.Name))
+                    continue;
                 try
                 {
                     object pval = property.GetValue(obj, null);
@@ -991,7 +1019,7 @@ namespace TG.JSON
                         }
                         else
                         {
-                            value = ValueFromObject(pval, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties);
+                            value = ValueFromObject(pval, serializationOptions);
                         }
                         if (value.ValueType == JsonValueTypes.Object)
                         {
@@ -1010,15 +1038,15 @@ namespace TG.JSON
                         }
                         else
                         {
-                            value = ValueFromObject(pval, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties);
+                            value = ValueFromObject(pval, serializationOptions);
                         }
                         this.internalAdd(property.Name, value);
                     }
-                    if (includeTypeInformation)
+                    if (serializationOptions.IncludeTypeInformation)
                     {
                         this.internalAdd("_type", obj.GetType().AssemblyQualifiedName);
                     }
-                    if (includeAttributes)
+                    if (serializationOptions.IncludeAttributes)
                     {
                         JsonObject table = new JsonObject();
                         foreach (Attribute att in property.Info.GetCustomAttributes(true))
@@ -1026,7 +1054,7 @@ namespace TG.JSON
                             Type t = att.GetType();
                             if (t.Namespace == "TG.JSON") continue;
                             table[t.Name.Replace("Attribute", "")] = ValueFromObject(att, 1, "TypeId");
-                            
+
                         }
                         if (table.Count > 0)
                         {

@@ -12,7 +12,7 @@
 	<iconUrl>https://raw.githubusercontent.com/troygeiger/TG.INI/master/TG.INI/TG.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes></releaseNotes>
+    <releaseNotes>Added TG.JSON.Serialization.JsonSerializationOptions class and added the option SelectedProperties.</releaseNotes>
     <tags>JSON Parse Serialize .NET C# ASP.NET Encrypt</tags>
   </metadata>
   <files>
