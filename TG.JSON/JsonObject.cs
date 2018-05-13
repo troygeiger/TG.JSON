@@ -233,7 +233,7 @@ namespace TG.JSON
         /// Initializes a new instance of <see cref="JsonObject"/> using the specified <see cref="JsonReader"/> to parse a JSON string.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> that will be used to parse a JSON string.</param>
-        public JsonObject(JsonReader reader)
+		public JsonObject(JsonReader reader)
         {
             InternalParser(reader);
         }
@@ -248,7 +248,7 @@ namespace TG.JSON
             : this()
         {
             InternalParser(info.GetString("Value"));
-        } 
+        }
 #endif
 
         #endregion Constructors
@@ -1003,7 +1003,8 @@ namespace TG.JSON
                 if (serializationOptions.IgnoreProperties.Contains(property.Name) || property.IgnoreProperty || !property.CanRead
                     || (!property.IsPublic && property.JsonProperty == null))
                     continue;
-                if (serializationOptions.SelectedProperties.Count > 0 && !serializationOptions.SelectedProperties.Contains(property.Name))
+                if ((serializationOptions.CurrentDepth == serializationOptions.MaxDepth || serializationOptions.ApplySelectedPropertiesOnChildren) 
+                    && serializationOptions.SelectedProperties.Count > 0 && !serializationOptions.SelectedProperties.Contains(property.Name))
                     continue;
                 try
                 {
@@ -1427,49 +1428,6 @@ namespace TG.JSON
                 {
                     switch (value.ValueType)
                     {
-                        case JsonValueTypes.String:
-                            if (property.PropertyType == typeof(string))
-                                property.SetValue(obj, (string)value, null);
-
-#if !NETSTANDARD1_X
-                            else if (property.PropertyType.BaseType == typeof(Enum)) 
-#else
-                            else if (property.PropertyType.GetTypeInfo().BaseType == typeof(Enum))
-#endif
-                            {
-                                property.SetValue(obj, Enum.Parse(property.PropertyType, (string)value), null);
-
-                            }
-                            else if (property.PropertyType == typeof(DateTime))
-                            {
-                                DateTime dt;
-                                DateTime.TryParse((string)value, out dt);
-                                property.SetValue(obj, dt, null);
-                            }
-#if !NETSTANDARD1_X
-                            else if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                            {
-                                Type[] arg = property.PropertyType.GetGenericArguments(); 
-#else
-                            else if (property.PropertyType.GetTypeInfo().IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                            {
-                                Type[] arg = property.PropertyType.GetTypeInfo().GenericTypeArguments;
-#endif
-
-                                object generic = null;
-
-                                try
-                                {
-                                    generic = Convert.ChangeType((string)value, arg[0]);
-                                }
-                                catch (Exception) { }
-                                property.SetValue(obj, generic, null);
-                            }
-                            else
-                            {
-                                property.SetValue(obj, Convert.ChangeType((string)value, property.PropertyType), null);
-                            }
-                            break;
                         case JsonValueTypes.Object:
                             if (!property.CanWrite)
                             {
@@ -1501,40 +1459,8 @@ namespace TG.JSON
                             else
                                 property.SetValue(obj, ((JsonArray)value).Deserialize(property.PropertyType), null);
                             break;
-                        case JsonValueTypes.Number:
-                            if (property.PropertyType == typeof(short))
-                                property.SetValue(obj, (short)value, null);
-                            else if (property.PropertyType == typeof(int))
-                                property.SetValue(obj, (int)value, null);
-                            else if (property.PropertyType == typeof(long))
-                                property.SetValue(obj, (long)value, null);
-                            else if (property.PropertyType == typeof(ushort))
-                                property.SetValue(obj, (ushort)value, null);
-                            else if (property.PropertyType == typeof(uint))
-                                property.SetValue(obj, (uint)value, null);
-                            else if (property.PropertyType == typeof(ulong))
-                                property.SetValue(obj, (ulong)value, null);
-                            else if (property.PropertyType == typeof(float))
-                                property.SetValue(obj, (float)value, null);
-                            else if (property.PropertyType == typeof(double))
-                                property.SetValue(obj, (double)value, null);
-                            else if (property.PropertyType == typeof(decimal))
-                                property.SetValue(obj, (decimal)value, null);
-                            else if (property.PropertyType == typeof(byte))
-                                property.SetValue(obj, (byte)value, null);
-                            break;
-                        case JsonValueTypes.Boolean:
-                            if (property.PropertyType == typeof(bool))
-                                property.SetValue(obj, (bool)value, null);
-                            break;
-                        case JsonValueTypes.Binary:
-                            if (property.PropertyType == typeof(byte[]))
-                                property.SetValue(obj, (byte[])value, null);
-                            break;
-                        case JsonValueTypes.Null:
-                            property.SetValue(obj, null, null);
-                            break;
                         default:
+                            property.SetValue(obj, Convert.ChangeType(value, property.PropertyType), null);
                             break;
                     }
                 }

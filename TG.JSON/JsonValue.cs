@@ -221,9 +221,9 @@ namespace TG.JSON
         }
 #endif
 
-            /// <summary>
-            /// States that events, such as ValueChanged, should not be fired.
-            /// </summary>
+        /// <summary>
+        /// States that events, such as ValueChanged, should not be fired.
+        /// </summary>
         public bool SuspendEvents
         {
             get;
@@ -783,7 +783,7 @@ namespace TG.JSON
         public static implicit operator JsonValue(DBNull value)
         {
             return new JsonNull();
-        } 
+        }
 #endif
 
         /// <summary>
@@ -1118,7 +1118,7 @@ namespace TG.JSON
 
             }
             return null;
-        } 
+        }
 #endif
 
         internal void SetParent(JsonValue parent)
@@ -1144,7 +1144,7 @@ namespace TG.JSON
         public override string ToString()
         {
             return this.ToString(Formatting.Compressed);
-        } 
+        }
 #endif
 
         /// <summary>
@@ -1218,7 +1218,7 @@ namespace TG.JSON
                 return new JsonBoolean((bool)obj);
 #if !NETSTANDARD1_X
             if (obj == null || obj is DBNull)
-                return new JsonNull(); 
+                return new JsonNull();
 #endif
             if (obj is DateTime)
                 return (DateTime)obj;
@@ -1518,10 +1518,19 @@ namespace TG.JSON
         /// <returns><see cref="System.Object"/></returns>
         object IConvertible.ToType(Type conversionType, IFormatProvider provider)
         {
+            var ntype = Nullable.GetUnderlyingType(conversionType);
+            if (ntype != null && this.ValueType != JsonValueTypes.Null)
+            {
+                return Convert.ChangeType(this, ntype);
+            }
+            else if (conversionType.IsEnum)
+            {
+                return Enum.Parse(conversionType, (string)this);
+            }
             return null;
         }
 
-        #endregion IConvertable Implementation  
+        #endregion IConvertable Implementation
 #endif
 
     }

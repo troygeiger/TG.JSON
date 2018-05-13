@@ -41,10 +41,8 @@ namespace TG.JSON.Serialization
         /// <param name="ignoreProperties">The properties that should be ignored when serializing.</param>
         /// <param name="selectedProperties">Property names added to this list will be the only properties to be serialized; unless specified in the <see cref="IgnoreProperties"/> list.</param>
         public JsonSerializationOptions(int maxDepth, bool includeAttributes, bool includeTypeInformation, string[] ignoreProperties, string[] selectedProperties)
+            : this(maxDepth, includeAttributes, includeTypeInformation)
         {
-            MaxDepth = maxDepth;
-            IncludeAttributes = includeAttributes;
-            IncludeTypeInformation = includeTypeInformation;
             if (ignoreProperties != null)
             {
                 IgnoreProperties.AddRange(ignoreProperties);
@@ -55,6 +53,37 @@ namespace TG.JSON.Serialization
                 SelectedProperties.AddRange(selectedProperties); 
             }
         }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonSerializationOptions"/>.
+        /// </summary>
+        /// <param name="maxDepth">The maximum depth to drill down when serializing.</param>
+        /// <param name="applySelectedPropertiesOnChildren">Get or Set whether child objects will be evaluated against the <see cref="SelectedProperties"/> and <see cref="IgnoreProperties"/> when serializing.</param>
+        /// <param name="includeAttributes">Include property attributes when serializing.</param>
+        /// <param name="includeTypeInformation">If True, a property of "_type" will be added containing the fully qualified name of the object.</param>
+        public JsonSerializationOptions(int maxDepth, bool applySelectedPropertiesOnChildren, bool includeAttributes, bool includeTypeInformation)
+            : this(maxDepth, includeAttributes, includeTypeInformation)
+        {
+            ApplySelectedPropertiesOnChildren = applySelectedPropertiesOnChildren;
+        }
+
+
+        /// <summary>
+        /// Creates a new instance of <see cref="JsonSerializationOptions"/>.
+        /// </summary>
+        /// <param name="maxDepth">The maximum depth to drill down when serializing.</param>
+        /// <param name="applySelectedPropertiesOnChildren">Get or Set whether child objects will be evaluated against the <see cref="SelectedProperties"/> and <see cref="IgnoreProperties"/> when serializing.</param>
+        /// <param name="includeAttributes">Include property attributes when serializing.</param>
+        /// <param name="includeTypeInformation">If True, a property of "_type" will be added containing the fully qualified name of the object.</param>
+        /// <param name="ignoreProperties">The properties that should be ignored when serializing.</param>
+        /// <param name="selectedProperties">Property names added to this list will be the only properties to be serialized; unless specified in the <see cref="IgnoreProperties"/> list.</param>
+        public JsonSerializationOptions(int maxDepth, bool applySelectedPropertiesOnChildren, bool includeAttributes, bool includeTypeInformation, string[] ignoreProperties, string[] selectedProperties)
+            : this(maxDepth, includeAttributes, includeTypeInformation, ignoreProperties, selectedProperties)
+        {
+            ApplySelectedPropertiesOnChildren = applySelectedPropertiesOnChildren;
+        }
+
+
 
         /// <summary>
         /// The maximum depth to drill down when serializing.
@@ -71,6 +100,11 @@ namespace TG.JSON.Serialization
 
 
         internal int CurrentDepth { get; set; }
+
+        /// <summary>
+        /// Get or Set whether child objects will be evaluated against the <see cref="SelectedProperties"/> when serializing.
+        /// </summary>
+        public bool ApplySelectedPropertiesOnChildren { get; set; } = false;
 
         /// <summary>
         /// Include property attributes when serializing.
