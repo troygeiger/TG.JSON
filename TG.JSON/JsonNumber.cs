@@ -360,7 +360,11 @@ namespace TG.JSON
         /// <param name="obj">
         /// The <see cref="System.Object" /> to compare with the current <see cref="JsonNumber" />.
         /// </param>
-        public override bool Equals(object obj)
+#if NETSTANDARD1_0
+        public bool Equals(object obj)
+#else
+        public override bool Equals(object obj) 
+#endif
         {
             if (obj is JsonNumber)
                 return this.Value == ((JsonNumber)obj).Value;
@@ -373,14 +377,22 @@ namespace TG.JSON
 
         /// <summary>Serves as a hash function for a particular type. </summary>
         /// <returns>A hash code for the current <see cref="JsonNumber" />.</returns>
-        public override int GetHashCode()
+#if NETSTANDARD1_0
+        public int GetHashCode()
+#else
+        public override int GetHashCode() 
+#endif
         {
             return base.GetHashCode();
         }
 
         /// <summary>Converts the numeric value of this instance to its equivalent string representation.</summary>
         /// <returns>The string representation of the value of this instance.</returns>
-        public override string ToString()
+#if NETSTANDARD1_0
+        public string ToString()
+#else
+        public override string ToString() 
+#endif
         {
             return this.Value.ToString(en_US);
         }

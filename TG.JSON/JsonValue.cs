@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 
 namespace TG.JSON
@@ -125,7 +126,10 @@ namespace TG.JSON
 #if !DEBUG
 	[System.Diagnostics.DebuggerStepThrough()]
 #endif
-    public abstract class JsonValue : IConvertible
+    public abstract class JsonValue
+#if !NETSTANDARD1_0
+        : IConvertible 
+#endif
     {
         #region Fields
 
@@ -1523,7 +1527,11 @@ namespace TG.JSON
             {
                 return Convert.ChangeType(this, ntype);
             }
-            else if (conversionType.IsEnum)
+#if NETSTANDARD1_3
+            else if (conversionType.GetTypeInfo().IsEnum)
+#else
+            else if (conversionType.IsEnum) 
+#endif
             {
                 return Enum.Parse(conversionType, (string)this);
             }

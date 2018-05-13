@@ -217,6 +217,7 @@ namespace TG.JSON
         } 
 #endif
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> that serializes the specified object.
         /// </summary>
@@ -227,13 +228,14 @@ namespace TG.JSON
         {
             GlobalEncryptionHandler = encryption;
             SerializeObject(obj, serializationOptions);
-        }
+        } 
+#endif
 
         /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> using the specified <see cref="JsonReader"/> to parse a JSON string.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> that will be used to parse a JSON string.</param>
-		public JsonObject(JsonReader reader)
+        public JsonObject(JsonReader reader)
         {
             InternalParser(reader);
         }
@@ -498,6 +500,7 @@ namespace TG.JSON
             return new JsonObject(json);
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// A static method for creating a JsonObject using provided JSON object string.
         /// </summary>
@@ -520,7 +523,8 @@ namespace TG.JSON
         public static JsonObject Parse(string json, IEncryptionHandler encryption)
         {
             return new JsonObject(json, encryption);
-        }
+        } 
+#endif
 
         /// <summary>
         /// Adds a new entry to the current JsonObject's collection.
@@ -1485,6 +1489,8 @@ namespace TG.JSON
             return value;
         }
 
+        #if !NETSTANDARD1_X
+
         private PropertyDescriptor[] getProperties()
         {
             List<PropertyDescriptor> props = new List<PropertyDescriptor>();
@@ -1573,6 +1579,8 @@ namespace TG.JSON
             return props.ToArray();
         }
 
+#endif
+
         private void InternalParser(string json)
         {
             if (string.IsNullOrEmpty(json))
@@ -1598,7 +1606,7 @@ namespace TG.JSON
                 chr = reader.Read();
                 if (inEsc)
                 {
-            #region Escape
+#region Escape
                     char echr;
                     switch (chr)
                     {
@@ -1624,7 +1632,7 @@ namespace TG.JSON
                     buffer.Add(echr);
                     inEsc = false;
                     continue;
-            #endregion //Escape
+#endregion //Escape
                 }
                 switch (chr)
                 {

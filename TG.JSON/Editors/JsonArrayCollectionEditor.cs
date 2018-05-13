@@ -1,4 +1,4 @@
-﻿#if FULLNET || NETSTANDARD2_0
+﻿#if FULLNET
 using System;
 using System.Collections.Generic;
 using System.Text;

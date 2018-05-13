@@ -44,12 +44,16 @@
 			return new JsonNull();
 		}
 
-		/// <summary>
-		/// Returns string "null".
-		/// </summary>
-		/// <returns>"null"</returns>
-		public override string ToString()
-		{
+        /// <summary>
+        /// Returns string "null".
+        /// </summary>
+        /// <returns>"null"</returns>
+#if NETSTANDARD1_0
+        public string ToString()
+#else
+        public override string ToString() 
+#endif
+        {
 			return "null";
 		}
 

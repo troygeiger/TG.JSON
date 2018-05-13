@@ -8,19 +8,19 @@ namespace TG.JSON
 #if !DEBUG
     [System.Diagnostics.DebuggerStepThrough()]
 #endif
-/// <summary>
-/// Represents a json boolean value.
-/// </summary>
+    /// <summary>
+    /// Represents a json boolean value.
+    /// </summary>
     [System.ComponentModel.TypeConverter(typeof(System.ComponentModel.BooleanConverter))]
     public class JsonBoolean : JsonValue
     {
-#region Fields
+        #region Fields
 
         bool _value = false;
 
-#endregion Fields
+        #endregion Fields
 
-#region Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of <see cref="JsonBoolean"/> with a value of false.
@@ -38,9 +38,9 @@ namespace TG.JSON
             this.Value = value;
         }
 
-#endregion Constructors
+        #endregion Constructors
 
-#region Properties
+        #region Properties
 
         /// <summary>
         /// Gets or Sets the bool value of this <see cref="TG.JSON.JsonBoolean"/>
@@ -63,9 +63,9 @@ namespace TG.JSON
             get { return JsonValueTypes.Boolean; }
         }
 
-#endregion Properties
+        #endregion Properties
 
-#region Methods
+        #region Methods
 
         /// <summary>
         /// Returns the bool value from <see cref="JsonBoolean.Value"/>
@@ -115,7 +115,7 @@ namespace TG.JSON
             return left.Value == right.Value;
         }
 
-         /// <summary>
+        /// <summary>
         /// Creates a new instance of <see cref="JsonBoolean"/> with an exact copy of it's value.
         /// </summary>
         public override JsonValue Clone()
@@ -128,7 +128,11 @@ namespace TG.JSON
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
+#if NETSTANDARD1_0
+        public bool Equals(object obj)
+#else
         public override bool Equals(object obj)
+#endif
         {
             if (obj is bool)
                 return this.Value == (bool)obj;
@@ -139,15 +143,23 @@ namespace TG.JSON
 
         /// <summary>Serves as a hash function for a particular type. </summary>
         /// <returns>A hash code for the current <see cref="JsonBoolean" />.</returns>
+#if NETSTANDARD1_0
+        public int GetHashCode()
+#else
         public override int GetHashCode()
-		{
-			return base.GetHashCode();
-		}
+#endif
+        {
+            return base.GetHashCode();
+        }
 
         /// <summary>
         /// Converts the value of this instance to its equivalent string representation (either "true" or "false").
         /// </summary>
-        public override string ToString()
+#if NETSTANDARD1_0
+        public string ToString()
+#else
+        public override string ToString() 
+#endif
         {
             return this.Value.ToString().ToLower();
         }
@@ -157,6 +169,6 @@ namespace TG.JSON
             return this.ToString();
         }
 
-#endregion Methods
+        #endregion Methods
     }
 }

@@ -108,7 +108,9 @@
         {
             return new JsonString(this.Value) {
                 EncryptValue = this.EncryptValue,
-                GlobalEncryptionHandler = this.GlobalEncryptionHandler
+#if !NETSTANDARD1_0
+                GlobalEncryptionHandler = this.GlobalEncryptionHandler 
+#endif
             };
         }
 
@@ -121,7 +123,11 @@
         /// <param name="obj">
         /// The <see cref="System.Object" /> to compare with the current <see cref="JsonString" />.
         /// </param>
-		public override bool Equals(object obj)
+#if NETSTANDARD1_0
+        public bool Equals(object obj)
+#else
+        public override bool Equals(object obj) 
+#endif
         {
             if (obj is JsonString)
                 return this.Value == ((JsonString)obj).Value;
@@ -132,7 +138,11 @@
 
         /// <summary>Serves as a hash function for a particular type. </summary>
         /// <returns>A hash code for the current <see cref="JsonString" />.</returns>
-		public override int GetHashCode()
+#if NETSTANDARD1_0
+        public int GetHashCode()
+#else
+        public override int GetHashCode() 
+#endif
         {
             return base.GetHashCode();
         }
@@ -140,7 +150,11 @@
         /// <summary>
         /// Returns the <see cref="string"/> value.
         /// </summary>
-        public override string ToString()
+#if NETSTANDARD1_0
+        public string ToString()
+#else
+        public override string ToString() 
+#endif
         {
             return _value;
         }
@@ -180,6 +194,7 @@
 
         internal string EncryptString(string value)
         {
+#if !NETSTANDARD1_0
             if (!string.IsNullOrEmpty(value))
             {
                 IEncryptionHandler handler = this.GetAvailableEncryptionHandler();
@@ -187,12 +202,14 @@
                 {
                     return string.Concat("crypto:", handler.EncryptBase64(value));
                 }
-            }
+            } 
+#endif
             return "crypto:";
         }
 
         internal string DecryptString(string value)
         {
+#if !NETSTANDARD1_0
             if (!string.IsNullOrEmpty(value))
             {
                 IEncryptionHandler handler = this.GetAvailableEncryptionHandler();
@@ -207,7 +224,8 @@
                         return handler.DecryptBase64(value);
                     }
                 }
-            }
+            } 
+#endif
             return value;
         }
 
