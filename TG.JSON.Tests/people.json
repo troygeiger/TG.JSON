@@ -1,0 +1,26 @@
+[
+	{
+		"FirstName": "John",
+		"LastName": "Doe",
+		"Age": 45,
+		"Works": true,
+		"Spouse": {
+			"FirstName": "Jayne",
+			"LastName": "Doe",
+			"Age":44,
+			"Works": true,
+			"Spouse": null,
+			"Children": []
+		},
+		"Children":[
+			{
+				"FirstName": "Joey",
+				"LastName": "Doe",
+				"Age": 17,
+				"Works": false,
+				"Spouse": null,
+        "Children": []
+			}
+		]
+	}
+]

@@ -10,6 +10,10 @@ Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "Documentation", "Documentat
 		{E30F0802-609B-4F4D-AED8-658F9CCAB86B} = {E30F0802-609B-4F4D-AED8-658F9CCAB86B}
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TG.JSON.Tests", "TG.JSON.Tests\TG.JSON.Tests.csproj", "{29D13818-D71E-49BE-8526-7A5B21D50062}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{B499DE14-1459-4122-ABFA-E1AA7D730F45}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +27,14 @@ Global
 		{42F70DDB-1F1F-477F-AE9B-E05FEB8E9735}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{42F70DDB-1F1F-477F-AE9B-E05FEB8E9735}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42F70DDB-1F1F-477F-AE9B-E05FEB8E9735}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29D13818-D71E-49BE-8526-7A5B21D50062}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29D13818-D71E-49BE-8526-7A5B21D50062}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29D13818-D71E-49BE-8526-7A5B21D50062}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29D13818-D71E-49BE-8526-7A5B21D50062}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B499DE14-1459-4122-ABFA-E1AA7D730F45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B499DE14-1459-4122-ABFA-E1AA7D730F45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B499DE14-1459-4122-ABFA-E1AA7D730F45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B499DE14-1459-4122-ABFA-E1AA7D730F45}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
