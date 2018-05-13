@@ -60,6 +60,7 @@
             enumerator = _values.GetEnumerator();
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Initializes an empty <see cref="JsonArray"/>.
         /// </summary>
@@ -68,7 +69,8 @@
         {
             GlobalEncryptionHandler = encryption;
             enumerator = _values.GetEnumerator();
-        }
+        } 
+#endif
 
         /// <summary>
         /// Initializes a new instance of <see cref="JsonArray"/> with a range of <see cref="JsonValue"/> values.
@@ -80,6 +82,7 @@
             AddRange(range);
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Initializes a new instance of <see cref="JsonArray"/> with a range of <see cref="JsonValue"/> values.
         /// </summary>
@@ -90,7 +93,8 @@
         {
             GlobalEncryptionHandler = encryption;
             AddRange(range);
-        }
+        } 
+#endif
 
 
         /// <summary>
@@ -126,6 +130,7 @@
             InternalParse(json);
         }
 
+#if !NETSTANDARD1_0
         /// <summary>
         /// Initializes a new instance of <see cref="JsonArray"/> and parses the json array string provided by parameter json.
         /// </summary>
@@ -142,7 +147,8 @@
         {
             GlobalEncryptionHandler = encryption;
             InternalParse(json);
-        }
+        } 
+#endif
 
         /// <summary>
         /// Initializes a new instance of <see cref="JsonArray"/> and parses using the provided <see cref="JsonReader"/>.
@@ -499,7 +505,7 @@
             }
             MethodInfo addMethod = null;
 #if FULLNET
-            addMethod = lstType.GetMethod("Add");
+            addMethod = iListType.GetMethod("Add");
 #else
             foreach (MethodInfo item in iListType.GetRuntimeMethods())
             {
@@ -528,7 +534,7 @@
             }
             MethodInfo addMethod = null;
 #if FULLNET
-            addMethod = lstType.GetMethod("Add");
+            addMethod = dictType.GetMethod("Add");
 #else
             foreach (MethodInfo item in dictType.GetRuntimeMethods())
             {
@@ -887,6 +893,7 @@
         /// <returns>The current instance of <see cref="JsonArray"/> populated with the serialized values of <paramref name="obj"/>. A new instance of <see cref="JsonArray"/> is not created.</returns>
         public JsonArray SerializeObject(object obj, Serialization.JsonSerializationOptions serializationOptions)
         {
+#if FULLNET || NETSTANDARD2_0
             if (!typeof(System.Collections.IEnumerable).IsAssignableFrom(obj.GetType()))
                 return this; 
 #else
@@ -968,6 +975,7 @@
             OnValueChanged();
         }
 
+#if !NETSTANDARD1_0
         void System.Runtime.Serialization.ISerializable.GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             info.AddValue("Value", ToString());
@@ -988,13 +996,19 @@
         void System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter writer)
         {
             writer.WriteCData(this.ToString());
-        }
+        } 
+#endif
 
         /// <summary>
         /// Generates a JSON formatted array string. Ex. [ \"Hello\" , 1 ]
         /// </summary>
         /// <returns>JSON formatted array string.</returns>
-        public override string ToString()
+#if !NETSTANDARD1_0
+
+        public override string ToString() 
+#else
+        public string ToString()
+#endif
         {
             return this.ToString(Formatting.Compressed);
         }
@@ -1223,9 +1237,7 @@
 
         private bool IsNullable(Type type)
         {
-            if (!type.IsValueType) return true;
-            if (Nullable.GetUnderlyingType(type) != null) return true;
-            return false;
+            return Nullable.GetUnderlyingType(type) != null;
         }
 
 #endregion Methods

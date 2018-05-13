@@ -107,6 +107,7 @@
     <PackageProjectUrl>https://github.com/troygeiger/TG.JSON</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/troygeiger/TG.INI/master/TG.INI/TG.png</PackageIconUrl>
     <PackageTags>JSON Parse Serialize .NET C# ASP.NET Encrypt</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)'=='net45'">
     <AssemblyTitle>TG.JSON</AssemblyTitle>
@@ -135,5 +136,8 @@
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <AssemblyTitle>TG.JSON .NET Standard 2.0</AssemblyTitle>
     <DefineConstants>NETSTANDARD2_0;CAN_DYNAMIC;$(AdditionalConstants)</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
   </PropertyGroup>
 </Project>

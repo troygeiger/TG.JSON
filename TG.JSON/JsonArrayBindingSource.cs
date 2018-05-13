@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if FULLNET || NETSTANDARD2_0
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
@@ -351,7 +352,7 @@ namespace TG.JSON
         /// <returns>Returns the newly created instance.</returns>
         public object AddNew()
         {
-            
+
 
             JsonValue newValue = _prototype.Clone();
             newPos = List.Add(newValue);
@@ -617,4 +618,5 @@ namespace TG.JSON
 
         #endregion Methods
     }
-}
+} 
+#endif

@@ -1,4 +1,4 @@
-﻿//#if !NETSTANDARD1_X
+﻿#if !NETSTANDARD1_X
 using System;
 using System.ComponentModel;
 
