@@ -1502,6 +1502,15 @@
         /// <returns><see cref="System.Object"/></returns>
         object IConvertible.ToType(Type conversionType, IFormatProvider provider)
         {
+            var ntype = Nullable.GetUnderlyingType(conversionType);
+            if (ntype != null && this.ValueType != JsonValueTypes.Null)
+            {
+                return Convert.ChangeType(this, ntype);
+            }
+            else if (conversionType.IsEnum)
+            {
+                return Enum.Parse(conversionType, (string)this);
+            }
             return null;
         }
 

@@ -968,7 +968,8 @@
                 if (serializationOptions.IgnoreProperties.Contains(property.Name) || property.IgnoreProperty || !property.CanRead
                     || (!property.IsPublic && property.JsonProperty == null))
                     continue;
-                if (serializationOptions.SelectedProperties.Count > 0 && !serializationOptions.SelectedProperties.Contains(property.Name))
+                if ((serializationOptions.CurrentDepth == serializationOptions.MaxDepth || serializationOptions.ApplySelectedPropertiesOnChildren) 
+                    && serializationOptions.SelectedProperties.Count > 0 && !serializationOptions.SelectedProperties.Contains(property.Name))
                     continue;
                 try
                 {
@@ -1388,39 +1389,6 @@
                 {
                     switch (value.ValueType)
                     {
-                        case JsonValueTypes.String:
-                            if (property.PropertyType == typeof(string))
-                                property.SetValue(obj, (string)value, null);
-
-                            else if (property.PropertyType.BaseType == typeof(Enum))
-                            {
-                                property.SetValue(obj, Enum.Parse(property.PropertyType, (string)value), null);
-
-                            }
-                            else if (property.PropertyType == typeof(DateTime))
-                            {
-                                DateTime dt;
-                                DateTime.TryParse((string)value, out dt);
-                                property.SetValue(obj, dt, null);
-                            }
-                            else if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                            {
-                                var arg = property.PropertyType.GetGenericArguments();
-
-                                object generic = null;
-
-                                try
-                                {
-                                    generic = Convert.ChangeType((string)value, arg[0]);
-                                }
-                                catch (Exception) { }
-                                property.SetValue(obj, generic, null);
-                            }
-                            else
-                            {
-                                property.SetValue(obj, Convert.ChangeType((string)value, property.PropertyType), null);
-                            }
-                            break;
                         case JsonValueTypes.Object:
                             if (!property.CanWrite)
                             {
@@ -1445,40 +1413,8 @@
                             else
                                 property.SetValue(obj, ((JsonArray)value).Deserialize(property.PropertyType), null);
                             break;
-                        case JsonValueTypes.Number:
-                            if (property.PropertyType == typeof(short))
-                                property.SetValue(obj, (short)value, null);
-                            else if (property.PropertyType == typeof(int))
-                                property.SetValue(obj, (int)value, null);
-                            else if (property.PropertyType == typeof(long))
-                                property.SetValue(obj, (long)value, null);
-                            else if (property.PropertyType == typeof(ushort))
-                                property.SetValue(obj, (ushort)value, null);
-                            else if (property.PropertyType == typeof(uint))
-                                property.SetValue(obj, (uint)value, null);
-                            else if (property.PropertyType == typeof(ulong))
-                                property.SetValue(obj, (ulong)value, null);
-                            else if (property.PropertyType == typeof(float))
-                                property.SetValue(obj, (float)value, null);
-                            else if (property.PropertyType == typeof(double))
-                                property.SetValue(obj, (double)value, null);
-                            else if (property.PropertyType == typeof(decimal))
-                                property.SetValue(obj, (decimal)value, null);
-                            else if (property.PropertyType == typeof(byte))
-                                property.SetValue(obj, (byte)value, null);
-                            break;
-                        case JsonValueTypes.Boolean:
-                            if (property.PropertyType == typeof(bool))
-                                property.SetValue(obj, (bool)value, null);
-                            break;
-                        case JsonValueTypes.Binary:
-                            if (property.PropertyType == typeof(byte[]))
-                                property.SetValue(obj, (byte[])value, null);
-                            break;
-                        case JsonValueTypes.Null:
-                            property.SetValue(obj, null, null);
-                            break;
                         default:
+                            property.SetValue(obj, Convert.ChangeType(value, property.PropertyType), null);
                             break;
                     }
                 }

@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.ComponentModel;
 using System.Diagnostics;
 using TG.JSON.Serialization;
+using System.Drawing;
 
 namespace TestApp
 {
@@ -16,10 +17,10 @@ namespace TestApp
 
 
         [STAThread]
-        static void Main(string[] args)
+        static void Main(string[] args)  
         {
             
-            switch (2)
+            switch (1)
             {
                 case 1:
 
@@ -28,15 +29,18 @@ namespace TestApp
                     test.Numbers.AddRange(new int[] { 3, 2, 1 });
                     test.InitMyObject();
                     test.SubTest.Add(new Test2() { Name = "Sub Test" });
+                    //test.Date = DateTime.Now;
+                    test.MySize = new Size(5, 6);
 
                     EncryptionHandler encryption = new EncryptionHandler("Hello World");
                     JsonObject obj = new JsonObject(encryption);
-                    obj.SerializeObject(test, new JsonSerializationOptions(5, false, false, null, new string[] { "Number" }));
+                    obj.SerializeObject(test);
 
                     string s = obj.ToString(Formatting.Indented);
                     obj = new JsonObject(s, encryption);
 
                     Test test2 = obj.DeserializeObject<Test>();
+                   
 
                     break;
                 case 2:
@@ -105,6 +109,8 @@ namespace TestApp
         [JsonProperty]
         private JsonObject MyObject { get; set; }
 
+        public Size MySize { get; set; }
+
         [JsonEncryptValue]
         public string Name { get; set; }
 
@@ -123,6 +129,8 @@ namespace TestApp
         public List<bool> Bools { get; } = new List<bool>();
 
         public List<Test2> SubTest { get; } = new List<Test2>();
+
+        public FormWindowState WindowState { get; set; }
 
     }
 
