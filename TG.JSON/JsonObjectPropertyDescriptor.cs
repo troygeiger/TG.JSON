@@ -292,7 +292,7 @@
 
                     break;
                 case JsonValueTypes.Number:
-                    (jsonComponent as JsonNumber).Value = Convert.ToDouble(value);
+                    (jsonComponent as JsonNumber).Value = Convert.ToDecimal(value);
                     break;
                 case JsonValueTypes.Boolean:
                     (jsonComponent as JsonBoolean).Value = Convert.ToBoolean(value);

@@ -26,7 +26,7 @@
     {
         #region Fields
         static CultureInfo en_US = new CultureInfo("en-US");
-        double _value = 0;
+        decimal _value = 0;
 
         #endregion Fields
 
@@ -46,7 +46,7 @@
         /// <param name="value">The decimal value to set the new instance. This get converted to a double.</param>
         public JsonNumber(decimal value)
         {
-            this.Value = Convert.ToDouble(value);
+            this.Value = value;
         }
 
         /// <summary>
@@ -55,7 +55,7 @@
         /// <param name="value">The short value to set the new instance. This get converted to a double.</param>
         public JsonNumber(short value)
         {
-            this.Value = Convert.ToDouble(value);
+            this.Value = Convert.ToDecimal(value);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@
         /// <param name="value">The int value to set the new instance. This get converted to a double.</param>
         public JsonNumber(int value)
         {
-            this.Value = Convert.ToDouble(value);
+            this.Value = Convert.ToDecimal(value);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@
         /// <param name="value">The long value to set the new instance. This get converted to a double.</param>
         public JsonNumber(long value)
         {
-            this.Value = Convert.ToDouble(value);
+            this.Value = Convert.ToDecimal(value);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@
         /// <param name="value">The float value to set the new instance. This get converted to a double.</param>
         public JsonNumber(float value)
         {
-            this.Value = Convert.ToDouble(value);
+            this.Value = Convert.ToDecimal(value);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@
         /// <param name="value">The double value to set the new instance.</param>
         public JsonNumber(double value)
         {
-            this.Value = value;
+            this.Value = Convert.ToDecimal(value);
         }
 
         #endregion Constructors
@@ -101,7 +101,7 @@
         /// <summary>
         /// Gets or Sets the double value associated with this <see cref="JsonNumber"/>.
         /// </summary>
-        public double Value
+        public decimal Value
         {
             get { return _value; }
             set
@@ -133,7 +133,7 @@
         /// <param name="value">The value to be cast.</param>
         public static implicit operator decimal (JsonNumber value)
         {
-            return Convert.ToDecimal(value.Value);
+            return value.Value;
         }
 
         /// <summary>
@@ -173,6 +173,20 @@
         public static implicit operator float (JsonNumber value)
         {
             return Convert.ToSingle(value.Value);
+        }
+
+        /// <summary>
+        /// Implicitly casts a <see cref="JsonNumber"/> to a <see cref="double" value.
+        /// </summary>
+        /// <example><code>
+        /// JsonNumber n = new JsonNumber(5.3M);
+        /// double d = n;
+        /// </code>
+        /// </example>
+        /// <param name="value">The value to be cast.</param>
+        public static implicit operator double (JsonNumber value)
+        {
+            return Convert.ToDouble(value.Value);
         }
 
         /// <summary>
@@ -363,10 +377,8 @@
         {
             if (obj is JsonNumber)
                 return this.Value == ((JsonNumber)obj).Value;
-            else if (obj is decimal)
-                return this.Value == (double)obj;
-            else if (obj is int)
-                return this.Value == (int)obj;
+            else if (!(obj is decimal))
+                return this.Value == (decimal)obj;
             return base.Equals(obj);
         }
 
