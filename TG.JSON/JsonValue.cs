@@ -372,7 +372,7 @@ namespace TG.JSON
                     double.TryParse((value as JsonString).Value, out v);
                     return v;
                 case JsonValueTypes.Number:
-                    return (value as JsonNumber).Value;
+                    return Convert.ToDouble((value as JsonNumber).Value);
                 case JsonValueTypes.Boolean:
                     return (value as JsonBoolean).Value ? 1 : 0;
                 default:
@@ -412,7 +412,7 @@ namespace TG.JSON
                     decimal.TryParse((value as JsonString).Value, out v);
                     return v;
                 case JsonValueTypes.Number:
-                    return Convert.ToDecimal((value as JsonNumber).Value);
+                    return (value as JsonNumber).Value;
                 case JsonValueTypes.Boolean:
                     return (value as JsonBoolean).Value ? 1 : 0;
                 default:
