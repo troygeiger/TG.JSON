@@ -12,7 +12,10 @@
 	<iconUrl>https://raw.githubusercontent.com/troygeiger/TG.INI/master/TG.INI/TG.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Added TG.JSON.Serialization.JsonSerializationOptions class and added the option SelectedProperties.</releaseNotes>
+    <releaseNotes>Added TG.JSON.Serialization.JsonSerializationOptions class and added the option SelectedProperties.
+Changed JsonNumber to use decimal values rather then double.
+Allow properties to be blank (but not null).
+</releaseNotes>
     <tags>JSON Parse Serialize .NET C# ASP.NET Encrypt</tags>
   </metadata>
   <files>
