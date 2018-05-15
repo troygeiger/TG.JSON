@@ -1046,7 +1046,9 @@
             bool inArray = false;
             bool inString = false;
             bool inEsc = false;
+            bool inUnicode = false;
             char chr;
+            StringBuffer unicodeBuffer = new StringBuffer();
             StringBuffer buffer = new StringBuffer();
 
             while (!reader.EndOfJson)
@@ -1073,6 +1075,10 @@
                         case 't':
                             echr = '\t';
                             break;
+                        case 'u':
+                            inUnicode = true;
+                            inEsc = false;
+                            continue;
                         default:
                             echr = chr;
                             break;
@@ -1145,7 +1151,20 @@
                         break;
                     default:
                         //if (inString)
-                        buffer.Add(chr);
+                        if (inUnicode)
+                        {
+                            unicodeBuffer.Add(chr);
+                            if (unicodeBuffer.Length == 4)
+                            {
+                                buffer.Add((char)int.Parse(unicodeBuffer.Dump(), System.Globalization.NumberStyles.HexNumber));
+                                inUnicode = false;
+                            }
+                        }
+                        else
+                        {
+                            buffer.Add(chr);
+                        }
+
                         break;
                 }
             }

@@ -147,38 +147,49 @@
 
         internal string Escape(string value)
         {
-            if (!string.IsNullOrEmpty(value))
+            StringBuilder escahpay = new StringBuilder();
+            foreach (char c in value?.ToCharArray())
             {
-                value = value.Replace("\\", "\\\\");
-                value = value.Replace("\r", "\\r");
-                value = value.Replace("\n", "\\n");
-                value = value.Replace("\"", "\\\"");
-                value = value.Replace("\t", "\\t");
-                //value = value.Replace("/", "\\/");
+                switch (c)
+                {
+                    case '\\':
+                        escahpay.Append("\\\\");
+                        break;
+                    case '\r':
+                        escahpay.Append("\\r");
+                        break;
+                    case '\n':
+                        escahpay.Append("\\n");
+                        break;
+                    case '\"':
+                        escahpay.Append("\\\"");
+                        break;
+                    case '\t':
+                        escahpay.Append("\\t");
+                        break;
+                    default:
+                        if (char.IsSurrogate(c))
+                        {
+                            escahpay.Append("\\u");
+                            escahpay.Append(((int)c).ToString("X4"));
+                        }
+                        else
+                        {
+                            escahpay.Append(c);
+                        }
+
+                        break;
+                }
             }
-            return value;
+            return escahpay.ToString();
         }
 
         internal override string InternalToString(Formatting format, int depth)
         {
-            return string.Format("\"{0}\"", Escape(EncryptValue ? EncryptString(_value) : _value));
+            return string.Format("\"{0}\"", EncryptValue ? EncryptString(_value) : Escape(_value));
         }
 
-        internal string Unescape(string value)
-        {
-            if (!string.IsNullOrEmpty(value))
-            {
-                value = value.Replace("\\r", "\r");
-                value = value.Replace("\\n", "\n");
-                value = value.Replace("\\\"", "\"");
-                value = value.Replace("\\t", "\t");
-                value = value.Replace("\\\\", "\\");
-                //value = value.Replace("\\/", "/");
-            }
-            return value;
-        }
-
-        internal string EncryptString(string value)
+         internal string EncryptString(string value)
         {
             if (!string.IsNullOrEmpty(value))
             {

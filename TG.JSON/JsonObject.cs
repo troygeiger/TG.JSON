@@ -1544,7 +1544,9 @@ namespace TG.JSON
             bool inKey = false;
             bool inString = false;
             bool inEsc = false;
+            bool inUnicode = false;
             char chr;
+            StringBuffer unicodeBuffer = new StringBuffer();
             StringBuffer buffer = new StringBuffer();
 
             while (!reader.EndOfJson)
@@ -1571,6 +1573,10 @@ namespace TG.JSON
                         case 't':
                             echr = '\t';
                             break;
+                        case 'u':
+                            inUnicode = true;
+                            inEsc = false;
+                            continue;
                         default:
                             echr = chr;
                             break;
@@ -1667,7 +1673,19 @@ namespace TG.JSON
                         }
                         break;
                     default:
-                        buffer.Add(chr);
+                        if (inUnicode)
+                        {
+                            unicodeBuffer.Add(chr);
+                            if (unicodeBuffer.Length == 4)
+                            {
+                                buffer.Add((char)int.Parse(unicodeBuffer.Dump(), System.Globalization.NumberStyles.HexNumber));
+                                inUnicode = false;
+                            }
+                        }
+                        else
+                        {
+                            buffer.Add(chr);
+                        }
                         break;
                 }
             }
