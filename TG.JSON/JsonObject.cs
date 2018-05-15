@@ -1647,7 +1647,7 @@ namespace TG.JSON
                             inKey = inObj = true;
                         else
                         {
-                            if (!string.IsNullOrEmpty(key))
+                            if (key != null)
                             {
                                 reader.Position--;
                                 this.internalAdd(key, new JsonObject(reader));
@@ -1659,8 +1659,10 @@ namespace TG.JSON
                             buffer.Add(chr);
                         else
                         {
-                            if (!string.IsNullOrEmpty(key) && buffer.Length > 0)
+                            if (key != null && buffer.Length > 0)
+                            {
                                 this.internalAdd(key, ValueFromString(buffer.Dump()));
+                            }
                             return;
                         }
                         break;
@@ -1668,8 +1670,10 @@ namespace TG.JSON
                         if (!inString)
                         {
                             key = buffer.Dump();
-                            if (string.IsNullOrEmpty(key))
-                                throw new Exception("Bad JSON Format.");
+                            if (key == null)
+                            {
+                                throw new Exception($"Unexpected property key at character index {reader.Position}.");
+                            }
                         }
                         else
                             buffer.Add(chr);
@@ -1694,7 +1698,7 @@ namespace TG.JSON
                             buffer.Add(chr);
                         else
                         {
-                            if (!string.IsNullOrEmpty(key) && buffer.Length > 0)
+                            if (key != null && buffer.Length > 0)
                                 this.internalAdd(key, ValueFromString(buffer.Dump()));
                             key = null;
                         }
