@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -1714,7 +1714,7 @@ namespace TG.JSON
                     case '[':
                         if (inString)
                             buffer.Add(chr);
-                        else if (!string.IsNullOrEmpty(key))
+                        else if (key != null)
                         {
                             reader.Position--;
                             this.internalAdd(key, new JsonArray(reader));
