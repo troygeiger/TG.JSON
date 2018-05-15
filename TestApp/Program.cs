@@ -24,6 +24,8 @@ namespace TestApp
             {
                 case 1:
 
+                    JsonObject t = new JsonObject("{\"matches\": [\"\\u003Call_urls>\\uD900\"]}");
+                    string st = t.ToString();
                     Test test = new Test();
                     test.Number = 32;
                     test.Numbers.AddRange(new int[] { 3, 2, 1 });
