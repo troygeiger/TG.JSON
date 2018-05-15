@@ -92,27 +92,32 @@
             return new JsonBoolean(value);
         }
 
-        /// <summary>
-        /// Performs a not equals operation on argument "left" <see cref="JsonBoolean.Value"/> and argument "right" <see cref="JsonBoolean.Value"/>.
-        /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <returns>Returns true if the <see cref="JsonBoolean.Value"/>s are not equal; otherwise false.</returns>
-        public static bool operator !=(JsonBoolean left, JsonBoolean right)
-        {
-            return left.Value != right.Value;
-        }
+        ///// <summary>
+        ///// Performs a not equals operation on argument "left" <see cref="JsonBoolean.Value"/> and argument "right" <see cref="JsonBoolean.Value"/>.
+        ///// </summary>
+        ///// <param name="left"></param>
+        ///// <param name="right"></param>
+        ///// <returns>Returns true if the <see cref="JsonBoolean.Value"/>s are not equal; otherwise false.</returns>
+        //public static bool operator !=(JsonBoolean left, JsonBoolean right)
+        //{
+        //    return !(left == right);
+        //}
 
-        /// <summary>
-        /// Performs a equals operation on argument "left" <see cref="JsonBoolean.Value"/> and argument "right" <see cref="JsonBoolean.Value"/>.
-        /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <returns>Returns true if the <see cref="JsonBoolean.Value"/>s are equal; otherwise false.</returns>
-        public static bool operator ==(JsonBoolean left, JsonBoolean right)
-        {
-            return left.Value == right.Value;
-        }
+        ///// <summary>
+        ///// Performs a equals operation on argument "left" <see cref="JsonBoolean.Value"/> and argument "right" <see cref="JsonBoolean.Value"/>.
+        ///// </summary>
+        ///// <param name="left"></param>
+        ///// <param name="right"></param>
+        ///// <returns>Returns true if the <see cref="JsonBoolean.Value"/>s are equal; otherwise false.</returns>
+        //public static bool operator ==(JsonBoolean left, JsonBoolean right)
+        //{
+        //    bool l = JsonNull.IsNull(left), r = JsonNull.IsNull(right);
+        //    if (l && r)
+        //        return true;
+        //    if ((l && !r) || (r && !l))
+        //        return false;
+        //    return left.Value == right.Value;
+        //}
 
          /// <summary>
         /// Creates a new instance of <see cref="JsonBoolean"/> with an exact copy of it's value.

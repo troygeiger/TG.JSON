@@ -254,39 +254,39 @@
             return new JsonNumber(Convert.ToDecimal(value));
         }
 
-        /// <summary>
-        /// Performs a equals operation between to <see cref="JsonNumber"/>.
-        /// </summary>
-        /// <param name="left">The left side of the operation.</param>
-        /// <param name="right">The right side of the operation</param>
-        /// <example><code>
-        /// JsonNumber l = 2;
-        /// JsonNumber r = 4;
-        /// Console.Write(l == r);
-        /// //Output = false;
-        /// </code></example>
-        /// <returns>Returns true if the left <see cref="JsonNumber.Value"/> does not equal the right <see cref="JsonNumber.Value"/>; otherwise false;</returns>
-        public static bool operator ==(JsonNumber left, JsonNumber right)
-        {
-            return left.Value == right.Value;
-        }
+        ///// <summary>
+        ///// Performs a equals operation between to <see cref="JsonNumber"/>.
+        ///// </summary>
+        ///// <param name="left">The left side of the operation.</param>
+        ///// <param name="right">The right side of the operation</param>
+        ///// <example><code>
+        ///// JsonNumber l = 2;
+        ///// JsonNumber r = 4;
+        ///// Console.Write(l == r);
+        ///// //Output = false;
+        ///// </code></example>
+        ///// <returns>Returns true if the left <see cref="JsonNumber.Value"/> does not equal the right <see cref="JsonNumber.Value"/>; otherwise false;</returns>
+        //public static bool operator ==(JsonNumber left, JsonNumber right)
+        //{
+        //    return left.Value == right.Value;
+        //}
 
-        /// <summary>
-        /// Performs a not equals operation between to <see cref="JsonNumber"/>.
-        /// </summary>
-        /// <param name="left">The left side of the operation.</param>
-        /// <param name="right">The right side of the operation</param>
-        /// <example><code>
-        /// JsonNumber l = 2;
-        /// JsonNumber r = 4;
-        /// Console.Write(l != r);
-        /// //Output = true;
-        /// </code></example>
-        /// <returns>Returns true if the left <see cref="JsonNumber.Value"/> does not equal the right <see cref="JsonNumber.Value"/>; otherwise false;</returns>
-        public static bool operator !=(JsonNumber left, JsonNumber right)
-        {
-            return left.Value != right.Value;
-        }
+        ///// <summary>
+        ///// Performs a not equals operation between to <see cref="JsonNumber"/>.
+        ///// </summary>
+        ///// <param name="left">The left side of the operation.</param>
+        ///// <param name="right">The right side of the operation</param>
+        ///// <example><code>
+        ///// JsonNumber l = 2;
+        ///// JsonNumber r = 4;
+        ///// Console.Write(l != r);
+        ///// //Output = true;
+        ///// </code></example>
+        ///// <returns>Returns true if the left <see cref="JsonNumber.Value"/> does not equal the right <see cref="JsonNumber.Value"/>; otherwise false;</returns>
+        //public static bool operator !=(JsonNumber left, JsonNumber right)
+        //{
+        //    return left.Value != right.Value;
+        //}
 
         /// <summary>
         /// Multiplies the left and right values.
