@@ -56,5 +56,6 @@ namespace TG.JSON.Tests
 
             Assert.IsTrue(value.ValueType == JsonValueTypes.Array);
         }
+
     }
 }

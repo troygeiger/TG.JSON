@@ -171,6 +171,19 @@
                 InternalAdd(base.ValueFromObject(item));
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonArray"/> and populating with the values of an array.
+        /// </summary>
+        /// <param name="enumerable">An <see cref="IEnumerable"/> used to populate the new <see cref="JsonArray"/></param>
+        public JsonArray(IEnumerable enumerable)
+            : this()
+        {
+            foreach (object item in enumerable)
+            {
+                InternalAdd(base.ValueFromObject(item));
+            }
+        }
+
 
 #if !NETSTANDARD1_0
         /// <summary>

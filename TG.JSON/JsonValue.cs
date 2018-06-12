@@ -996,6 +996,28 @@ namespace TG.JSON
         }
 
         /// <summary>
+        /// Returns the hash code for the current object.
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        /// <summary>
+        /// Determines if an object is equal the current object.
+        /// </summary>
+        /// <param name="obj">The object to compare.</param>
+        /// <returns>True if equal; otherwise false.</returns>
+        public override bool Equals(object obj)
+        {
+            JsonValue value = obj as JsonValue;
+            if (value == null) return false;
+
+            return this == value;
+        }
+
+        /// <summary>
         /// Determine if a <see cref="JsonValue"/> is null.
         /// </summary>
         /// <param name="value">A value to determine.</param>
@@ -1117,6 +1139,10 @@ namespace TG.JSON
                         {
                             return p.GlobalEncryptionHandler;
                         }
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
 
