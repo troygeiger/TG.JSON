@@ -675,17 +675,22 @@ namespace TG.JSON
             else
 #endif
             {
-                if (type == typeof(object) && this.ContainsProperty("_type"))
+                if (this.ContainsProperty("_type"))
                 {
                     Regex rex = new Regex(@"^([^,]+),\s([^,]+),\sVersion=(\d{1,}\.\d{1,}\.\d{1,}\.\d{1,}),\sCulture=(\w+),\sPublicKeyToken=(\w+)");
                     Match m = rex.Match((string)this["_type"]);
                     if (m.Success)
+                    {
 #if FULLNET
-                        obj = Activator.CreateInstance(m.Groups[2].Value, m.Groups[1].Value).Unwrap(); 
+                        obj = Activator.CreateInstance(m.Groups[2].Value, m.Groups[1].Value).Unwrap();
 #else
                         obj = Activator.CreateInstance(Type.GetType(m.Groups[2].Value));
 #endif
-
+                    }
+                    else
+                    {
+                        obj = Activator.CreateInstance(type);
+                    }
                 }
                 else
                     obj = Activator.CreateInstance(type);
