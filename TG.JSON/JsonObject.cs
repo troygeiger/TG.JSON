@@ -686,6 +686,7 @@ namespace TG.JSON
 #else
                         obj = Activator.CreateInstance(Type.GetType(m.Groups[2].Value));
 #endif
+                        type = obj.GetType();
                     }
                     else
                     {
