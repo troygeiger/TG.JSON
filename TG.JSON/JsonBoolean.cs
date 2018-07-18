@@ -101,7 +101,7 @@ namespace TG.JSON
         /// <returns>Returns true if the <see cref="JsonBoolean.Value"/>s are not equal; otherwise false.</returns>
         public static bool operator !=(JsonBoolean left, JsonBoolean right)
         {
-            return left.Value != right.Value;
+            return left?.Value != right?.Value;
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace TG.JSON
         /// <returns>Returns true if the <see cref="JsonBoolean.Value"/>s are equal; otherwise false.</returns>
         public static bool operator ==(JsonBoolean left, JsonBoolean right)
         {
-            return left.Value == right.Value;
+            return left?.Value == right?.Value;
         }
 
         /// <summary>

@@ -100,7 +100,7 @@
     <PostBuildEvent>
     </PostBuildEvent>
     <PackageLicenseUrl>https://github.com/troygeiger/TG.JSON/blob/master/TG.JSON/LICENCE.txt</PackageLicenseUrl>
-    <Version>1.4.2.0</Version>
+    <Version>1.4.3.0</Version>
     <Authors>Troy Geiger</Authors>
     <Description>TG.JSON is a versatile library for creating, parsing, encrypting values, binding, serializing and deserializing JSON. It's compact, fast and very easy to use.</Description>
     <Copyright>Copyright © Troy Geiger 2018</Copyright>
