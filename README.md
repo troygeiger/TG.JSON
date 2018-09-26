@@ -11,3 +11,5 @@ if (obj["age"] == 33)
 }
 string json = obj.ToString(Formatting.Indented);
 ```
+### Documentation
+You can find documentation at http://troy.geigernet.org/Help/TG/JSON
