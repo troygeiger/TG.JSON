@@ -1290,7 +1290,17 @@ namespace TG.JSON
                 return obj.ToString();
 #if !NETSTANDARD1_X
             if (obj is System.Drawing.Color)
-                return new JsonObject("color", ((System.Drawing.Color)obj).Name); 
+            {
+                System.Drawing.Color color = (System.Drawing.Color)obj;
+                if (color.IsNamedColor)
+                {
+                    return new JsonObject("color", color.Name);
+                }
+                else
+                {
+                    return new JsonObject("color", $"#{color.ToArgb().ToString("X8")}");
+                }
+            }
 #endif
             if (obj != null && serializationOptions.CurrentDepth > 0)
             {

@@ -668,7 +668,17 @@ namespace TG.JSON
             if (type == typeof(System.Drawing.Color))
             {
                 if (this.ContainsProperty("color"))
-                    obj = System.Drawing.Color.FromName((string)this["color"]);
+                {
+                    string clr = (string)this["color"];
+                    if (clr.StartsWith("#"))
+                    {
+                        obj = System.Drawing.Color.FromArgb(int.Parse(clr.Replace("#", ""), System.Globalization.NumberStyles.HexNumber));
+                    }
+                    else
+                    {
+                        obj = System.Drawing.Color.FromName(clr);
+                    }
+                }
                 else
                     obj = System.Drawing.Color.Black;
             } 
