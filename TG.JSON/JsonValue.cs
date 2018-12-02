@@ -49,7 +49,7 @@ namespace TG.JSON
     #region Enumerations
 
     /// <summary>
-    /// This represents the format of a <see cref="JsonValue"/> when outputting from <seealso cref="JsonValue.ToString()"/>.
+    /// This represents the format of a <see cref="JsonValue"/> when outputting from <seealso cref="JsonValue.ToString(Formatting)"/>.
     /// </summary>
     public enum Formatting
     {
@@ -128,7 +128,7 @@ namespace TG.JSON
 #endif
     public abstract class JsonValue
 #if !NETSTANDARD1_0
-        : IConvertible 
+        : IConvertible
 #endif
     {
         #region Fields
@@ -1163,8 +1163,22 @@ namespace TG.JSON
         /// <returns>JSON formatted string.</returns>
         public virtual string ToString(Formatting format)
         {
-            return this.InternalToString(format, 0);
+            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+            {
+                using (System.IO.StreamWriter writer = new System.IO.StreamWriter(ms))
+                {
+                    InternalWrite(writer, format, 0);
+                    writer.Flush();
+                    System.Text.UTF8Encoding encoding = new UTF8Encoding(false);
+                    string value = encoding.GetString(ms.ToArray(), 0, (int)ms.Length);
+                    
+                    encoding = null;
+                    return value;
+                }
+
+            }
         }
+        
 
 #if !NETSTANDARD1_0
         /// <summary>
@@ -1345,18 +1359,11 @@ namespace TG.JSON
                 generic = new JsonNull();
             return generic.ValueFromObject(obj, maxDepth, ignoreProperties);
         }
+        
 
-        /// <summary>
-        /// Use to stringify a <see cref="JsonValue"/>. This should be called by the ToString() method passing along a depth value of 0.
-        /// </summary>
-        /// <remarks>
-        /// The <paramref name="depth"/> argument should be used to
-        /// </remarks>
-        /// <param name="format"></param>
-        /// <param name="depth"></param>
-        /// <returns></returns>
-        internal abstract string InternalToString(Formatting format, int depth);
+        internal abstract void InternalWrite(System.IO.StreamWriter writer, Formatting format, int depth);
 
+        
         /// <summary>
         /// Executes the <see cref="JsonValue.ValueChanged"/> event.
         /// </summary>
@@ -1566,7 +1573,7 @@ namespace TG.JSON
 #if NETSTANDARD1_3
             else if (conversionType.GetTypeInfo().IsEnum)
 #else
-            else if (conversionType.IsEnum) 
+            else if (conversionType.IsEnum)
 #endif
             {
                 return Enum.Parse(conversionType, (string)this);

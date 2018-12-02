@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Text;
 
 namespace TG.JSON
@@ -177,7 +178,7 @@ namespace TG.JSON
         }
 
         /// <summary>
-        /// Implicitly casts a <see cref="JsonNumber"/> to a <see cref="double" value.
+        /// Implicitly casts a <see cref="JsonNumber"/> to a <see cref="double"/> value.
         /// </summary>
         /// <example><code>
         /// JsonNumber n = new JsonNumber(5.3M);
@@ -374,11 +375,7 @@ namespace TG.JSON
         /// <param name="obj">
         /// The <see cref="System.Object" /> to compare with the current <see cref="JsonNumber" />.
         /// </param>
-#if NETSTANDARD1_0
-        public bool Equals(object obj)
-#else
-        public override bool Equals(object obj) 
-#endif
+        public override bool Equals(object obj)
         {
             if (obj is JsonNumber)
                 return this.Value == ((JsonNumber)obj).Value;
@@ -389,29 +386,22 @@ namespace TG.JSON
 
         /// <summary>Serves as a hash function for a particular type. </summary>
         /// <returns>A hash code for the current <see cref="JsonNumber" />.</returns>
-#if NETSTANDARD1_0
-        public int GetHashCode()
-#else
         public override int GetHashCode() 
-#endif
         {
             return base.GetHashCode();
         }
 
         /// <summary>Converts the numeric value of this instance to its equivalent string representation.</summary>
         /// <returns>The string representation of the value of this instance.</returns>
-#if NETSTANDARD1_0
-        public string ToString()
-#else
+
         public override string ToString() 
-#endif
         {
             return this.Value.ToString(en_US);
         }
 
-        internal override string InternalToString(Formatting format, int depth)
+        internal override void InternalWrite(StreamWriter writer, Formatting format, int depth)
         {
-            return this.ToString();
+            writer.Write(this.ToString());
         }
 
         #endregion Methods

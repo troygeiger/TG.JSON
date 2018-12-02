@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Text;
 
 
@@ -173,11 +174,11 @@
             return value;
         }
 
-        internal override string InternalToString(Formatting format, int depth)
+        internal override void InternalWrite(StreamWriter writer, Formatting format, int depth)
         {
-            return string.Format("\"{0}\"", Escape(EncryptValue ? EncryptString(_value) : _value));
+            writer.Write($"\"{Escape(EncryptValue ? EncryptString(_value) : _value)}\"");
         }
-
+        
         internal string Unescape(string value)
         {
             if (!string.IsNullOrEmpty(value))

@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using System.Reflection;
+using System.IO;
 
 namespace TG.JSON
 {
@@ -55,17 +56,17 @@ namespace TG.JSON
     [System.Diagnostics.DebuggerStepThrough()]
 #endif
 #if !NETSTANDARD1_X
-    [TypeConverter(typeof(ComponentConverter))] 
+    [TypeConverter(typeof(ComponentConverter))]
 #endif
 #if !NETSTANDARD1_0
-    [Serializable] 
+    [Serializable]
 #endif
     public sealed partial class JsonObject : JsonValue, INotifyPropertyChanged, IXmlSerializable, IEnumerable
 #if !NETSTANDARD1_0
         , ISerializable
 #endif
 #if !NETSTANDARD1_X
-        , ICustomTypeDescriptor 
+        , ICustomTypeDescriptor
 #endif
     {
         #region Fields
@@ -95,10 +96,10 @@ namespace TG.JSON
         /// Initialize a new instance of <see cref="JsonObject"/> with an <see cref="IEncryptionHandler"/>.
         /// </summary>
         /// <param name="encryption">The <see cref="IEncryptionHandler"/> to use for encryption.</param>
-        public JsonObject(IEncryptionHandler encryption)
+        public JsonObject(IEncryptionHandler encryption) : this()
         {
             this.GlobalEncryptionHandler = encryption;
-        } 
+        }
 #endif
 
         /// <summary>
@@ -126,7 +127,7 @@ namespace TG.JSON
         {
             this.GlobalEncryptionHandler = encryption;
             this.InternalParser(json);
-        } 
+        }
 #endif
 
         /// <summary>
@@ -184,7 +185,7 @@ namespace TG.JSON
         {
             GlobalEncryptionHandler = encryption;
             SerializeObject(obj);
-        } 
+        }
 #endif
 
         /// <summary>
@@ -196,6 +197,7 @@ namespace TG.JSON
         /// <param name="includeAttributes">If True, the AttributeTable will be populated with the object's attributes.</param>
         /// <param name="includeTypeInformation">If True, a _type property will be added with the full Type.AssemblyQualifiedName.</param>
         public JsonObject(object obj, int maxDepth, bool includeAttributes, bool includeTypeInformation, params string[] ignoreProperties)
+            : this()
         {
             SerializeObject(obj, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties);
         }
@@ -211,10 +213,11 @@ namespace TG.JSON
         /// <param name="includeTypeInformation">If True, a _type property will be added with the full Type.AssemblyQualifiedName.</param>
         /// <param name="encryption">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
         public JsonObject(object obj, int maxDepth, bool includeAttributes, bool includeTypeInformation, IEncryptionHandler encryption, params string[] ignoreProperties)
+            : this()
         {
             GlobalEncryptionHandler = encryption;
             SerializeObject(obj, maxDepth, includeAttributes, includeTypeInformation, ignoreProperties);
-        } 
+        }
 #endif
 
 #if !NETSTANDARD1_0
@@ -225,17 +228,31 @@ namespace TG.JSON
         /// <param name="encryption">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
         /// <param name="serializationOptions">The options to use for serialization.</param>
         public JsonObject(object obj, IEncryptionHandler encryption, Serialization.JsonSerializationOptions serializationOptions)
+            : this()
         {
             GlobalEncryptionHandler = encryption;
             SerializeObject(obj, serializationOptions);
-        } 
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonObject"/> using the specified <see cref="JsonReader"/> to parse a JSON string.
+        /// </summary>
+        /// <param name="reader">The <see cref="JsonReader"/> that will be used to parse a JSON string.</param>
+        /// <param name="encryptionHandler">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonObject(JsonReader reader, IEncryptionHandler encryptionHandler)
+            : this()
+        {
+            GlobalEncryptionHandler = encryptionHandler;
+            InternalParser(reader);
+        }
+
 #endif
 
         /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> using the specified <see cref="JsonReader"/> to parse a JSON string.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> that will be used to parse a JSON string.</param>
-        public JsonObject(JsonReader reader)
+        public JsonObject(JsonReader reader) : this()
         {
             InternalParser(reader);
         }
@@ -250,6 +267,62 @@ namespace TG.JSON
             : this()
         {
             InternalParser(info.GetString("Value"));
+        }
+#endif
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonObject"/> using a source <see cref="System.IO.Stream"/>.
+        /// </summary>
+        /// <param name="stream">The <see cref="System.IO.Stream"/> to read from.</param>
+        public JsonObject(System.IO.Stream stream) : this()
+        {
+            using (JsonReader reader = new JsonReader(stream))
+            {
+                InternalParser(reader);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonObject"/> using a source <see cref="System.IO.StreamReader"/>.
+        /// </summary>
+        /// <param name="stream">The <see cref="System.IO.StreamReader"/> to read from.</param>
+        public JsonObject(System.IO.StreamReader stream) : this()
+        {
+            using (JsonReader reader = new JsonReader(stream))
+            {
+                InternalParser(reader);
+            }
+        }
+
+#if !NETSTANDARD1_0
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonObject"/> using a source <see cref="System.IO.Stream"/>.
+        /// </summary>
+        /// <param name="stream">The <see cref="System.IO.Stream"/> to read from.</param>
+        /// <param name="encryptionHandler">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonObject(System.IO.Stream stream, IEncryptionHandler encryptionHandler)
+            : this()
+        {
+            GlobalEncryptionHandler = encryptionHandler;
+            using (JsonReader reader = new JsonReader(stream))
+            {
+                InternalParser(reader);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonObject"/> using a source <see cref="System.IO.StreamReader"/>.
+        /// </summary>
+        /// <param name="stream">The <see cref="System.IO.StreamReader"/> to read from.</param>
+        /// <param name="encryptionHandler">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonObject(System.IO.StreamReader stream, IEncryptionHandler encryptionHandler)
+            : this()
+        {
+            GlobalEncryptionHandler = encryptionHandler;
+            using (JsonReader reader = new JsonReader(stream))
+            {
+                InternalParser(reader);
+            }
         }
 #endif
 
@@ -523,7 +596,7 @@ namespace TG.JSON
         public static JsonObject Parse(string json, IEncryptionHandler encryption)
         {
             return new JsonObject(json, encryption);
-        } 
+        }
 #endif
 
         /// <summary>
@@ -639,7 +712,7 @@ namespace TG.JSON
         {
             return new JsonObject(this.ToString()
 #if !NETSTANDARD1_0 
-                , GlobalEncryptionHandler 
+                , GlobalEncryptionHandler
 #endif
                 );
         }
@@ -681,7 +754,7 @@ namespace TG.JSON
                 }
                 else
                     obj = System.Drawing.Color.Black;
-            } 
+            }
             else
 #endif
             {
@@ -883,7 +956,7 @@ namespace TG.JSON
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("Value", this.ToString());
-        } 
+        }
 #endif
 
         System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema()
@@ -900,6 +973,32 @@ namespace TG.JSON
         {
             writer.WriteCData(this.ToString());
         }
+
+        /// <summary>
+        /// Reads JSON from a <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The <see cref="Stream"/> to read from.</param>
+        public void Read(System.IO.Stream stream)
+        {
+            using (JsonReader reader = new JsonReader(stream))
+            {
+                InternalParser(reader);
+            }
+        }
+
+#if !NETSTANDARD1_0
+        /// <summary>
+        /// Reads JSON from a file.
+        /// </summary>
+        /// <param name="path">The path to read from.</param>
+        public void Read(string path)
+        {
+            using (FileStream fs = new FileStream(path, FileMode.Open))
+            {
+                Read(fs);
+            }
+        } 
+#endif
 
         /// <summary>
         /// Removes an entry using the provided key string value.
@@ -1023,7 +1122,7 @@ namespace TG.JSON
                 if (serializationOptions.IgnoreProperties.Contains(property.Name) || property.IgnoreProperty || !property.CanRead
                     || (!property.IsPublic && property.JsonProperty == null))
                     continue;
-                if ((serializationOptions.CurrentDepth == serializationOptions.MaxDepth || serializationOptions.ApplySelectedPropertiesOnChildren) 
+                if ((serializationOptions.CurrentDepth == serializationOptions.MaxDepth || serializationOptions.ApplySelectedPropertiesOnChildren)
                     && serializationOptions.SelectedProperties.Count > 0 && !serializationOptions.SelectedProperties.Contains(property.Name))
                     continue;
                 try
@@ -1103,7 +1202,7 @@ namespace TG.JSON
         /// <param name="obj">The object to serialize.</param>
         /// <returns>The current instance of <see cref="JsonObject"/>. (Returns itself)</returns>
         [Obsolete("Use SerializeObject(object obj, bool includeAttributes) instead.")]
-		public JsonObject SerializeObjectWithAttributes(object obj)
+        public JsonObject SerializeObjectWithAttributes(object obj)
         {
             return SerializeObjectWithAttributes(obj, int.MaxValue);
         }
@@ -1281,11 +1380,7 @@ namespace TG.JSON
         /// <summary>
         /// Returns the JSON string generated by all key/values associated with this <see cref="TG.JSON.JsonObject"/>.
         /// </summary>
-#if !NETSTANDARD1_0
-        public override string ToString() 
-#else
-        public string ToString()
-#endif
+        public override string ToString()
         {
             return this.ToString(Formatting.Compressed);
         }
@@ -1302,6 +1397,54 @@ namespace TG.JSON
             return defaultValue;
         }
 
+        /// <summary>
+        /// Writes to a <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The <see cref="Stream"/> to write to.</param>
+        /// <param name="formatting">How the output should be formatted.</param>
+        public void Write(Stream stream, Formatting formatting)
+        {
+            using (StreamWriter writer = new StreamWriter(stream))
+            {
+                InternalWrite(writer, formatting, 0);
+            }
+        }
+
+        /// <summary>
+        /// Writes to a <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The <see cref="Stream"/> to write to.</param>
+        public void Write(Stream stream)
+        {
+            Write(stream, Formatting.Compressed);
+        }
+
+#if !NETSTANDARD1_X
+        /// <summary>
+        /// Writes to a <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="path">The file path to write to.</param>
+        /// <param name="formatting">How the output should be formatted.</param>
+        public void Write(string path, Formatting formatting)
+        {
+            using (StreamWriter writer = new StreamWriter(path))
+            {
+                InternalWrite(writer, formatting, 0);
+            }
+        } 
+
+
+        /// <summary>
+        /// Writes to a <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="path">The file path to write to.</param>
+        public void Write(string path)
+        {
+            Write(path, Formatting.Compressed);
+        }
+
+#endif
+
         internal JsonObject internalAdd(string property, JsonValue value)
         {
             if (value == null)
@@ -1315,39 +1458,8 @@ namespace TG.JSON
             return this;
         }
 
-        /*
-		/// <summary>
-		/// Returns the JSON string generated by all key/values associated with this <see cref="TGSolutions.JSON.JsonObject"/>.
-		/// </summary>
-		/// <param name="compress">False will generate the JSON with spaces in between each element for easier readability. True removes all spaces outside of keys and string values.</param>
-		public override string ToString(bool compress)
-		{
-			System.Text.StringBuilder result = new System.Text.StringBuilder();
-			result.Append("{");
-			if (!compress)
-				result.Append(" ");
-			int count = 0;
-			foreach (string key in keyValue.Keys)
-			{
-				string value = keyValue[key].ToString(compress);
-				if (value == null)
-					value = "";
-				if (compress)
-					result.Append(string.Format("{0}\"{1}\":{2}", count > 0 ? "," : "", Escape(key), value));
-				else
-					result.Append(string.Format("{0}\"{1}\" : {2}", count > 0 ? " , " : "", Escape(key), value));
-				count++;
-			}
-
-			if (!compress)
-				result.Append(" ");
-			result.Append("}");
-			return result.ToString();
-		}
-		*/
-        internal override string InternalToString(Formatting format, int depth)
+        internal override void InternalWrite(StreamWriter writer, Formatting format, int depth)
         {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
             int count = 0;
             int nextDepth = depth + 1;
             string root = null;
@@ -1355,76 +1467,68 @@ namespace TG.JSON
             switch (format)
             {
                 case Formatting.Compressed:
-                    sb.Append("{");
+                    writer.Write("{");
                     foreach (string key in propertyValue.Keys)
                     {
-                        string value = propertyValue[key].InternalToString(format, 0);
-                        if (value == null)
-                            value = "";
-                        sb.Append(string.Format("{0}\"{1}\":{2}", count > 0 ? "," : "", key, value));
+                        writer.Write($"{(count > 0 ? "," : "")}\"{key}\":");
+                        propertyValue[key].InternalWrite(writer, format, depth);
                         count++;
                     }
-                    sb.Append("}");
+                    writer.Write("}");
                     break;
                 case Formatting.Spaces:
-                    sb.Append("{ ");
+                    writer.Write("{ ");
                     foreach (string key in propertyValue.Keys)
                     {
-                        string value = propertyValue[key].InternalToString(format, 0);
-                        if (value == null)
-                            value = "";
-                        sb.Append(string.Format("{0}\"{1}\" : {2}", count > 0 ? " , " : "", key, value));
+                        writer.Write($"{(count > 0 ? " , " : "")}\"{key}\" : ");
+                        propertyValue[key].InternalWrite(writer, format, depth);
                         count++;
                     }
-                    sb.Append(" }");
+                    writer.Write(" }");
                     break;
                 case Formatting.Indented:
-                    sb.AppendLine("{");
-                    count = propertyValue.Count;
-
+                    writer.Write("{");
+                    
                     root = GenerateIndents(depth);
                     indent = GenerateIndents(nextDepth);
                     foreach (string key in propertyValue.Keys)
                     {
-                        sb.AppendLine(indent + string.Format("\"{1}\": {2}{0}",
-                            count > 1 ? "," : "",
-                            key,
-                            propertyValue[key].InternalToString(format, nextDepth)));
-                        count--;
-                    }
-                    sb.Append(root + "}");
-                    break;
-                case Formatting.JavascriptCompressed:
-                    sb.Append("{");
-                    foreach (string key in propertyValue.Keys)
-                    {
-                        string value = propertyValue[key].InternalToString(format, 0);
-                        if (value == null)
-                            value = "";
-                        sb.Append(string.Format("{0}{1}:{2}", count > 0 ? "," : "", key, value));
+                        writer.WriteLine(count > 0 ? "," : "");
+                        writer.Write($"{indent}\"{key}\": ");
+                        propertyValue[key].InternalWrite(writer, format, nextDepth);
                         count++;
                     }
-                    sb.Append("}");
+                    writer.WriteLine();
+                    writer.Write($"{root}}}");
+                    break;
+                case Formatting.JavascriptCompressed:
+                    writer.Write("{");
+                    foreach (string key in propertyValue.Keys)
+                    {
+                        writer.Write($"{(count > 0 ? "," : "")}{key}:");
+                        propertyValue[key].InternalWrite(writer, format, depth);
+                        count++;
+                    }
+                    writer.Write("}");
                     break;
                 case Formatting.JavascriptIndented:
-                    sb.AppendLine("{");
-                    count = propertyValue.Count;
+                    writer.Write("{");
+                   
                     root = GenerateIndents(depth);
                     indent = GenerateIndents(nextDepth);
                     foreach (string key in propertyValue.Keys)
                     {
-                        sb.AppendLine(indent + string.Format("{1}: {2}{0}",
-                            count > 1 ? "," : "",
-                            key,
-                            propertyValue[key].InternalToString(format, nextDepth)));
-                        count--;
+                        writer.WriteLine(count > 0 ? "," : "");
+                        writer.Write($"{indent}{key}: ");
+                        propertyValue[key].InternalWrite(writer, format, nextDepth);
+                        count++;
                     }
-                    sb.Append(root + "}");
+                    writer.WriteLine();
+                    writer.Write($"{root}}}");
                     break;
                 default:
                     break;
             }
-            return sb.ToString();
         }
 
         internal void OnPropertyChanged(string propertyName)
@@ -1505,7 +1609,7 @@ namespace TG.JSON
             return value;
         }
 
-        #if !NETSTANDARD1_X
+#if !NETSTANDARD1_X
 
         private PropertyDescriptor[] getProperties()
         {
@@ -1538,7 +1642,7 @@ namespace TG.JSON
                     desc = att.ValueType == JsonValueTypes.Object ? (string)(att as JsonObject)["Description"] : (string)pd["Description"];
 
                     att = pd["DefaultValue"];
-                    defaultValue = att.ValueType == JsonValueTypes.Object ? (att as JsonObject)["Value"] :  pd["DefaultValue"];
+                    defaultValue = att.ValueType == JsonValueTypes.Object ? (att as JsonObject)["Value"] : pd["DefaultValue"];
                     if (pd.ContainsProperty("Browsable"))
                     {
                         att = pd["Browsable"];
@@ -1610,8 +1714,7 @@ namespace TG.JSON
         private void InternalParser(JsonReader reader)
         {
             string key = null;
-            bool inObj = false;
-            bool inKey = false;
+            //bool inKey = false;
             bool inString = false;
             bool inEsc = false;
             char chr;
@@ -1659,13 +1762,10 @@ namespace TG.JSON
                     case '{':
                         if (inString)
                             buffer.Add(chr);
-                        else if (!inObj)
-                            inKey = inObj = true;
                         else
                         {
                             if (key != null)
                             {
-                                reader.Position--;
                                 this.internalAdd(key, new JsonObject(reader));
                             }
                         }
@@ -1732,7 +1832,6 @@ namespace TG.JSON
                             buffer.Add(chr);
                         else if (key != null)
                         {
-                            reader.Position--;
                             this.internalAdd(key, new JsonArray(reader));
                         }
                         break;
@@ -1797,7 +1896,7 @@ namespace TG.JSON
                 PropertyInfoEx[] ex = info.ToArray();
                 propertyCache.Add(type, ex);
                 return ex;
-            } 
+            }
 #else
             return new PropertyInfoEx[0];
 #endif

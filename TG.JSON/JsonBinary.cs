@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace TG.JSON
@@ -78,16 +79,17 @@ namespace TG.JSON
 			return new JsonBinary(this.Value);
 		}
 
-		internal override string InternalToString(Formatting format, int depth)
-		{
-			if (Value != null && Value.Length > 0)
-				return string.Concat("\"base64:",
-					Convert.ToBase64String(this.Value),
-				"\"");
-			else
-				return "\"base64:\"";
-		}
+        internal override void InternalWrite(StreamWriter writer, Formatting format, int depth)
+        {
+            if (Value != null && Value.Length > 0)
+                writer.Write(string.Concat("\"base64:",
+                    Convert.ToBase64String(this.Value),
+                "\""));
+            else
+                writer.Write("\"base64:\"");
+        }
 
+   
 		#endregion Methods
 	}
 }

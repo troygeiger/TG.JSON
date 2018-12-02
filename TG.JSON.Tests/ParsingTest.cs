@@ -35,6 +35,25 @@ namespace TG.JSON.Tests
         }
 
         [Test]
+        public void ParsePeopleStreamTest()
+        {
+            using (FileStream stream = File.OpenRead(GetTestFile("people.json")))
+            {
+                JsonArray array = new JsonArray(stream);
+                string v = array.ToString(Formatting.Indented);
+                Assert.NotZero(array.Count);
+
+                Assert.IsTrue(array[0].ValueType == JsonValueTypes.Object);
+
+                JsonObject obj = array[0] as JsonObject;
+
+                Assert.IsNotNull(obj["FirstName"], "FirstName doesn't exist or is missing.");
+
+                Assert.IsNotNull(obj["LastName"], "LastName doesn't exist or is missing.");
+            }
+        }
+
+        [Test]
         public void RoundTripParseTest()
         {
             string jsonText = File.ReadAllText(GetTestFile("people.json"));

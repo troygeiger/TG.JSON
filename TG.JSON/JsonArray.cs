@@ -4,6 +4,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.IO;
     using System.Reflection;
     using System.Text;
 
@@ -147,8 +148,72 @@
         {
             GlobalEncryptionHandler = encryption;
             InternalParse(json);
-        } 
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonArray"/> and parses using the provided <see cref="JsonReader"/>.
+        /// </summary>
+        /// <param name="reader">Used to read a string of json.</param>
+        /// <param name="encryptionHandler">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonArray(JsonReader reader, IEncryptionHandler encryptionHandler)
+            : this()
+        {
+
+            InternalParse(reader);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonArray"/> using a source <see cref="System.IO.Stream"/>.
+        /// </summary>
+        /// <param name="stream">The <see cref="System.IO.Stream"/> to read from.</param>
+        /// <param name="encryptionHandler">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonArray(System.IO.Stream stream, IEncryptionHandler encryptionHandler) : this()
+        {
+            GlobalEncryptionHandler = encryptionHandler;
+            using (JsonReader reader = new JsonReader(stream))
+            {
+                InternalParse(reader);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonArray"/> using a source <see cref="System.IO.Stream"/>.
+        /// </summary>
+        /// <param name="stream">The <see cref="System.IO.StreamReader"/> to read from.</param>
+        /// <param name="encryptionHandler">The <see cref="IEncryptionHandler"/> used to encrypt and decrypt values.</param>
+        public JsonArray(System.IO.StreamReader stream, IEncryptionHandler encryptionHandler) : this()
+        {
+            using (JsonReader reader = new JsonReader(stream))
+            {
+                InternalParse(reader);
+            }
+        }
+
 #endif
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonArray"/> using a source <see cref="System.IO.Stream"/>.
+        /// </summary>
+        /// <param name="stream">The <see cref="System.IO.Stream"/> to read from.</param>
+        public JsonArray(System.IO.Stream stream) : this()
+        {
+            using (JsonReader reader = new JsonReader(stream))
+            {
+                InternalParse(reader);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonArray"/> using a source <see cref="System.IO.Stream"/>.
+        /// </summary>
+        /// <param name="stream">The <see cref="System.IO.StreamReader"/> to read from.</param>
+        public JsonArray(System.IO.StreamReader stream) : this()
+        {
+            using (JsonReader reader = new JsonReader(stream))
+            {
+                InternalParse(reader);
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of <see cref="JsonArray"/> and parses using the provided <see cref="JsonReader"/>.
@@ -159,7 +224,7 @@
         {
             InternalParse(reader);
         }
-
+        
         /// <summary>
         /// Initializes a new instance of <see cref="JsonArray"/> and populating with the values of an array.
         /// </summary>
@@ -840,6 +905,32 @@
         }
 
         /// <summary>
+        /// Reads JSON from a <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The <see cref="Stream"/> to read from.</param>
+        public void Read(System.IO.Stream stream)
+        {
+            using (JsonReader reader = new JsonReader(stream))
+            {
+                InternalParse(reader);
+            }
+        }
+
+#if !NETSTANDARD1_0
+        /// <summary>
+        /// Reads JSON from a file.
+        /// </summary>
+        /// <param name="path">The path to read from.</param>
+        public void Read(string path)
+        {
+            using (FileStream fs = new FileStream(path, FileMode.Open))
+            {
+                Read(fs);
+            }
+        }
+#endif
+
+        /// <summary>
         /// Removes a <see cref="JsonValue"/> from the array.
         /// </summary>
         /// <param name="obj">A <see cref="JsonValue"/> to remove.</param>
@@ -1016,55 +1107,108 @@
         /// Generates a JSON formatted array string. Ex. [ \"Hello\" , 1 ]
         /// </summary>
         /// <returns>JSON formatted array string.</returns>
-#if !NETSTANDARD1_0
-
         public override string ToString() 
-#else
-        public string ToString()
-#endif
         {
             return this.ToString(Formatting.Compressed);
         }
-
-        ///<inheritdoc/>
-        internal override string InternalToString(Formatting format, int depth)
+        
+        internal override void InternalWrite(StreamWriter writer, Formatting format, int depth)
         {
-            StringBuilder sb = new StringBuilder();
-
             switch (format)
             {
                 case Formatting.JavascriptCompressed:
                 case Formatting.Compressed:
-                    sb.Append("[");
+                    writer.Write("[");
                     for (int i = 0; i < _values.Count; i++)
-                        sb.Append(string.Format("{0}{1}", i == 0 ? "" : ",", _values[i].InternalToString(format, 0)));
-                    sb.Append("]");
+                    {
+                        if (i > 0) writer.Write(",");
+                        _values[i].InternalWrite(writer, format, depth);
+                    }
+                    writer.Write("]");
                     break;
                 case Formatting.Spaces:
-                    sb.Append("[ ");
+                    writer.Write("[ ");
                     for (int i = 0; i < _values.Count; i++)
-                        sb.Append(string.Format("{0}{1}", i == 0 ? "" : " , ", _values[i].InternalToString(format, 0)));
-                    sb.Append(" ]");
+                    {
+                        if (i > 0) writer.Write(" , ");
+                        _values[i].InternalWrite(writer, format, depth);
+                    }
+                    writer.Write(" ]");
                     break;
                 case Formatting.JavascriptIndented:
                 case Formatting.Indented:
-                    sb.AppendLine("[");
+                    writer.Write("[");
                     int nextDepth = depth + 1;
                     string root = GenerateIndents(depth);
                     string indent = GenerateIndents(nextDepth);
-                    int count = _values.Count;
+                    int count = 0;
                     for (int i = 0; i < _values.Count; i++)
                     {
-                        sb.AppendLine(string.Format("{0}{1}{2}", indent, _values[i].InternalToString(format, nextDepth), count > 1 ? "," : ""));
-                        count--;
+                        writer.WriteLine(i > 0 ? "," : "");
+                        writer.Write(indent);
+                        _values[i].InternalWrite(writer, format, nextDepth);
+                        count++;
                     }
-                    sb.Append(root + "]");
+                    if (count > 0)
+                    {
+                        writer.WriteLine();
+                        writer.Write($"{root}]");
+                    }
+                    else
+                    {
+                        writer.Write("]");
+                    }
                     break;
                 default:
                     break;
             }
-            return sb.ToString();
         }
+
+        /// <summary>
+        /// Writes to a <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The <see cref="Stream"/> to write to.</param>
+        /// <param name="formatting">How the output should be formatted.</param>
+        public void Write(Stream stream, Formatting formatting)
+        {
+            using (StreamWriter writer = new StreamWriter(stream))
+            {
+                InternalWrite(writer, formatting, 0);
+            }
+        }
+
+        /// <summary>
+        /// Writes to a <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The <see cref="Stream"/> to write to.</param>
+        public void Write(Stream stream)
+        {
+            Write(stream, Formatting.Compressed);
+        }
+
+#if !NETSTANDARD1_X
+        /// <summary>
+        /// Writes to a <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="path">The file path to write to.</param>
+        /// <param name="formatting">How the output should be formatted.</param>
+        public void Write(string path, Formatting formatting)
+        {
+            using (StreamWriter writer = new StreamWriter(path))
+            {
+                InternalWrite(writer, formatting, 0);
+            }
+        }
+
+        /// <summary>
+        /// Writes to a <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="path">The file path to write to.</param>
+        public void Write(string path)
+        {
+            Write(path, Formatting.Compressed);
+        } 
+#endif
 
         /*
 		/// <summary>
@@ -1140,7 +1284,6 @@
 
         private void InternalParse(JsonReader reader)
         {
-            bool inArray = false;
             bool inString = false;
             bool inEsc = false;
             char chr;
@@ -1199,11 +1342,8 @@
                     case '[':
                         if (inString)
                             buffer.Add(chr);
-                        else if (!inArray)
-                            inArray = true;
-                        else
+                        else if (reader.Position > 1)
                         {
-                            reader.Position--;
                             this.InternalAdd(new JsonArray(reader));
                         }
                         break;
@@ -1228,7 +1368,6 @@
                             buffer.Add(chr);
                         else
                         {
-                            reader.Position--;
                             this.InternalAdd(new JsonObject(reader));
                         }
                         break;

@@ -1,17 +1,18 @@
 ﻿namespace TG.JSON
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Text;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
 
 #if !DEBUG
     [System.Diagnostics.DebuggerStepThrough()]
 #endif
-	/// <summary>
-	/// Represents a null json value.
-	/// </summary>
-	//[System.ComponentModel.TypeConverter(typeof(System.ComponentModel.NullableConverter))]
-	public class JsonNull : JsonValue
+    /// <summary>
+    /// Represents a null json value.
+    /// </summary>
+    //[System.ComponentModel.TypeConverter(typeof(System.ComponentModel.NullableConverter))]
+    public class JsonNull : JsonValue
 	{
 		#region Properties
 
@@ -57,11 +58,11 @@
 			return "null";
 		}
 
-		internal override string InternalToString(Formatting format, int depth)
-		{
-			return this.ToString();
-		}
-
+        internal override void InternalWrite(StreamWriter writer, Formatting format, int depth)
+        {
+            writer.Write(this.ToString());
+        }
+        
 		#endregion Methods
 	}
 }

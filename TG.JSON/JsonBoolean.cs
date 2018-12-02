@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace TG.JSON
@@ -164,11 +165,11 @@ namespace TG.JSON
             return this.Value.ToString().ToLower();
         }
 
-        internal override string InternalToString(Formatting format, int depth)
+        internal override void InternalWrite(StreamWriter writer, Formatting format, int depth)
         {
-            return this.ToString();
+            writer.Write(this.ToString());
         }
-
+        
         #endregion Methods
     }
 }

@@ -19,7 +19,7 @@ namespace TestApp
         static void Main(string[] args)
         {
             
-            switch (2)
+            switch (4)
             {
                 case 1:
 
@@ -47,6 +47,15 @@ namespace TestApp
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
                     Application.Run(new Form1());
+                    break;
+                case 4:
+                    JsonArray a = new JsonArray();
+                    a.Add(new JsonArray() { 1, 2, 3 });
+                    a.Add(new JsonArray() { 4, 5, 6 });
+                    a.Add(new JsonObject("Hello", "World", "Age", 33));
+                    string sa = a.ToString();
+                    a = new JsonArray(sa);
+                    string sa2 = a.ToString();
                     break;
                 default:
                     break;
