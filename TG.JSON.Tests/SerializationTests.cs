@@ -37,6 +37,21 @@ namespace TG.JSON.Tests
             JsonArray json2 = new JsonArray(people);
             Assert.IsTrue(json == json2);
         }
+
+        [Test]
+        public void ArraySerializationTest()
+        {
+            JsonArray array = new JsonArray();
+            array.Add(new JsonObject(new Person() { FirstName = "Name1" }));
+            array.Add(new JsonObject(new Person() { FirstName = "Name2" }));
+            Person[] items = array.DeserializeArray<Person[]>();
+            Assert.IsTrue(items.Length == array.Count);
+            for (int i = 0; i < items.Length; i++)
+            {
+                Assert.IsNotNull(items[i]);
+                Assert.IsTrue(!string.IsNullOrEmpty(items[i].FirstName));
+            }
+        }
     }
 
     public class Person

@@ -522,6 +522,10 @@
         /// <returns>A new instance of <paramref name="arrayType"/>.</returns>
         public object DeserializeArray(Type arrayType)
         {
+            if (arrayType.IsArray)
+            {
+                arrayType = arrayType.GetElementType();
+            }
             Array a = Array.CreateInstance(arrayType, Count);
             for (int i = 0; i < Count; i++)
             {
