@@ -33,7 +33,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="LICENCE.txt">
+    <None Include="LICENCE.txt" Pack="true" PackagePath="licenses\LICENSE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -99,7 +99,6 @@
   <PropertyGroup>
     <PostBuildEvent>
     </PostBuildEvent>
-    <PackageLicenseUrl>https://github.com/troygeiger/TG.JSON/blob/master/TG.JSON/LICENCE.txt</PackageLicenseUrl>
     <Version>1.5.1.0</Version>
     <Authors>Troy Geiger</Authors>
     <Description>TG.JSON is a versatile library for creating, parsing, encrypting values, binding, serializing and deserializing JSON. It's compact, fast and very easy to use.</Description>
@@ -112,6 +111,7 @@
 Change the parser to use streams if provided. This should help if reading from large files.</PackageReleaseNotes>
     <AssemblyVersion>1.5.1.0</AssemblyVersion>
     <FileVersion>1.5.1.0</FileVersion>
+    <PackageLicenseFile>licenses\LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)'=='net45'">
     <AssemblyTitle>TG.JSON</AssemblyTitle>
