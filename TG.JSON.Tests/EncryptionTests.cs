@@ -33,11 +33,26 @@ namespace TG.JSON.Tests
             string secret = "I'm a secret.";
             json.Add("Secret", new JsonString(secret) { EncryptValue = true });
             string output = json.ToString();
-       
+
             JsonObject json2 = new JsonObject(json);
 
             Assert.AreNotEqual(secret, (string)json2["Secret"]);
             Console.WriteLine((string)json2["Secret"]);
+        }
+
+        [Test]
+        public void SerializeEncryptTest()
+        {
+            EncryptClass obj = new EncryptClass() { MySecretProperty = "I'm a secret." };
+            var handler = new EncryptionHandler("MySecret");
+            JsonObject json = new JsonObject(obj, handler);
+            Assert.IsTrue(((JsonString)json["MySecretProperty"]).EncryptValue);
+        }
+
+        public class EncryptClass
+        {
+            [JsonEncryptValue]
+            public string MySecretProperty { get; set; }
         }
     }
 }

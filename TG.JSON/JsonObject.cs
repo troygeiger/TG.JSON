@@ -1151,7 +1151,7 @@ namespace TG.JSON
                     else
                     {
                         JsonValue value;
-                        if (property.EncryptValue && pval != null && !(pval is System.Collections.IEnumerable))
+                        if (property.EncryptValue && pval != null && !(pval is System.Collections.IEnumerable && property.PropertyType != typeof(string)))
                         {
                             value = new JsonString(pval?.ToString()) { EncryptValue = true };
 
