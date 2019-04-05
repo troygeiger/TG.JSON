@@ -257,6 +257,12 @@ namespace TG.JSON
             InternalParser(reader);
         }
 
+        internal JsonObject(JsonReader reader, JsonValue parent): this()
+        {
+            SetParent(parent);
+            InternalParser(reader);
+        }
+
 #if !NETSTANDARD1_0
         /// <summary>
         /// Initializes a new instance of <see cref="JsonObject"/> using for deserialization.
@@ -1766,7 +1772,7 @@ namespace TG.JSON
                         {
                             if (key != null)
                             {
-                                this.internalAdd(key, new JsonObject(reader));
+                                this.internalAdd(key, new JsonObject(reader, this));
                             }
                         }
                         break;
@@ -1832,7 +1838,7 @@ namespace TG.JSON
                             buffer.Add(chr);
                         else if (key != null)
                         {
-                            this.internalAdd(key, new JsonArray(reader));
+                            this.internalAdd(key, new JsonArray(reader, this));
                         }
                         break;
                     default:

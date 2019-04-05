@@ -19,7 +19,7 @@ namespace TestApp
         static void Main(string[] args)
         {
             
-            switch (4)
+            switch (1)
             {
                 case 1:
 
@@ -28,10 +28,11 @@ namespace TestApp
                     test.Numbers.AddRange(new int[] { 3, 2, 1 });
                     test.InitMyObject();
                     test.SubTest.Add(new Test2() { Name = "Sub Test" });
+                    test.SubClass.Value = "Hello, world";
 
                     EncryptionHandler encryption = new EncryptionHandler("Hello World");
                     JsonObject obj = new JsonObject(encryption);
-                    obj.SerializeObject(test, new JsonSerializationOptions(5, false, false, null, new string[] { "Number" }));
+                    obj.SerializeObject(test, new JsonSerializationOptions(5, false, false, null, new string[] { "SubClass" }));
 
                     string s = obj.ToString(Formatting.Indented);
                     obj = new JsonObject(s, encryption);
@@ -56,6 +57,9 @@ namespace TestApp
                     string sa = a.ToString();
                     a = new JsonArray(sa);
                     string sa2 = a.ToString();
+                    break;
+                case 5:
+
                     break;
                 default:
                     break;
@@ -133,6 +137,8 @@ namespace TestApp
 
         public List<Test2> SubTest { get; } = new List<Test2>();
 
+        public MyClassToEncrypt SubClass { get; set; } = new MyClassToEncrypt();
+
     }
 
     class Test2Collection : System.Collections.DictionaryBase
@@ -152,5 +158,11 @@ namespace TestApp
     {
         [Category("Test")]
         public string Name { get; set; }
+    }
+
+    class MyClassToEncrypt
+    {
+        [JsonEncryptValue]
+        public string Value { get; set; }
     }
 }

@@ -225,6 +225,13 @@
             InternalParse(reader);
         }
         
+        internal JsonArray(JsonReader reader, JsonValue parent)
+            : this()
+        {
+            SetParent(parent);
+            InternalParse(reader);
+        }
+
         /// <summary>
         /// Initializes a new instance of <see cref="JsonArray"/> and populating with the values of an array.
         /// </summary>
@@ -1348,7 +1355,7 @@
                             buffer.Add(chr);
                         else if (reader.Position > 1)
                         {
-                            this.InternalAdd(new JsonArray(reader));
+                            this.InternalAdd(new JsonArray(reader, this));
                         }
                         break;
                     case ']':
@@ -1372,7 +1379,7 @@
                             buffer.Add(chr);
                         else
                         {
-                            this.InternalAdd(new JsonObject(reader));
+                            this.InternalAdd(new JsonObject(reader, this));
                         }
                         break;
                     case '\r':
