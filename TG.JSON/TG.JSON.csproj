@@ -99,7 +99,7 @@
   <PropertyGroup>
     <PostBuildEvent>
     </PostBuildEvent>
-    <Version>1.5.3.0</Version>
+    <Version>1.5.4.0</Version>
     <Authors>Troy Geiger</Authors>
     <Description>TG.JSON is a versatile library for creating, parsing, encrypting values, binding, serializing and deserializing JSON. It's compact, fast and very easy to use.</Description>
     <Copyright>Copyright © Troy Geiger 2018</Copyright>
@@ -109,8 +109,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageReleaseNotes>JsonObject and JsonArray can now read directly to and from files or streams.
 Change the parser to use streams if provided. This should help if reading from large files.</PackageReleaseNotes>
-    <AssemblyVersion>1.5.3.0</AssemblyVersion>
-    <FileVersion>1.5.3.0</FileVersion>
+    <AssemblyVersion>1.5.4.0</AssemblyVersion>
+    <FileVersion>1.5.4.0</FileVersion>
     <PackageLicenseFile>licenses\LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)'=='net45'">

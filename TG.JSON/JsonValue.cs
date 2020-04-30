@@ -749,7 +749,8 @@ namespace TG.JSON
             if (value != null && value.ValueType == JsonValueTypes.String)
             {
                 DateTime time;
-                if (DateTime.TryParse((string)value, out time))
+                if (DateTime.TryParse((string)value, System.Globalization.CultureInfo.InvariantCulture
+                                  , System.Globalization.DateTimeStyles.RoundtripKind, out time))
                     return time;
             }
             return null;

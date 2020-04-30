@@ -9,14 +9,14 @@ namespace TG.JSON.Serialization
     /// </summary>
     public class JsonSerializationOptions
     {
-        int _maxDepth = int.MaxValue;
+        int _maxDepth;
 
         /// <summary>
         /// Creates a new instance of <see cref="JsonSerializationOptions"/>.
         /// </summary>
         public JsonSerializationOptions()
         {
-
+            MaxDepth = int.MaxValue;
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace TG.JSON.Serialization
                 _maxDepth = value;
                 CurrentDepth = value;
             }
-        } 
+        }
 
 
         internal int CurrentDepth { get; set; }
