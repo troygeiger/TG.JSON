@@ -22,6 +22,14 @@
     <None Remove="NuGet-Create NuSpec.bat" />
     <None Remove="NuGet-Package.bat" />
     <None Remove="nuget.exe" />
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\TG.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net20' or '$(TargetFramework)'=='net35' or '$(TargetFramework)'=='net40' or '$(TargetFramework)'=='net45'">
     <Reference Include="System" />
@@ -31,11 +39,6 @@
     <Reference Include="System.Drawing.Design" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="LICENCE.txt" Pack="true" PackagePath="licenses\LICENSE.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
     <PackageReference Include="System.Dynamic.Runtime">
@@ -99,19 +102,18 @@
   <PropertyGroup>
     <PostBuildEvent>
     </PostBuildEvent>
-    <Version>1.5.4.0</Version>
+    <Version>1.5.5.0</Version>
     <Authors>Troy Geiger</Authors>
     <Description>TG.JSON is a versatile library for creating, parsing, encrypting values, binding, serializing and deserializing JSON. It's compact, fast and very easy to use.</Description>
-    <Copyright>Copyright © Troy Geiger 2018</Copyright>
+    <Copyright>Copyright © Troy Geiger 2020</Copyright>
     <PackageProjectUrl>https://github.com/troygeiger/TG.JSON</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/troygeiger/TG.INI/master/TG.INI/TG.png</PackageIconUrl>
     <PackageTags>JSON Parse Serialize .NET C# ASP.NET Encrypt</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageReleaseNotes>JsonObject and JsonArray can now read directly to and from files or streams.
 Change the parser to use streams if provided. This should help if reading from large files.</PackageReleaseNotes>
-    <AssemblyVersion>1.5.4.0</AssemblyVersion>
-    <FileVersion>1.5.4.0</FileVersion>
-    <PackageLicenseFile>licenses\LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>TG.png</PackageIcon>
+    <RepositoryUrl></RepositoryUrl>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)'=='net45'">
     <AssemblyTitle>TG.JSON</AssemblyTitle>

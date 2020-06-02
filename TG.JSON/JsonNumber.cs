@@ -45,6 +45,15 @@ namespace TG.JSON
         /// <summary>
         /// Initializes a new instance of <see cref="JsonNumber"/> with a value provided by the value parameter.
         /// </summary>
+        /// <param name="value">The <see cref="byte"/> value to set the new instance. This get converted to a double.</param>
+        public JsonNumber(byte value)
+        {
+            this.Value = Convert.ToDecimal(value);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonNumber"/> with a value provided by the value parameter.
+        /// </summary>
         /// <param name="value">The decimal value to set the new instance. This get converted to a double.</param>
         public JsonNumber(decimal value)
         {
@@ -126,6 +135,19 @@ namespace TG.JSON
         #region Methods
 
         /// <summary>
+        /// Implicitly casts a <see cref="JsonNumber"/> to a <see cref="byte"/> value.
+        /// </summary>
+        /// <example><code>
+        /// JsonNumber n = new JsonNumber(5);
+        /// decimal d = n;
+        /// </code></example>
+        /// <param name="value">The value to be cast.</param>
+        public static implicit operator byte (JsonNumber value)
+        {
+            return Convert.ToByte(value.Value);
+        }
+
+        /// <summary>
         /// Implicitly casts a <see cref="JsonNumber"/> to a <see cref="decimal"/> value.
         /// </summary>
         /// <example><code>
@@ -189,6 +211,19 @@ namespace TG.JSON
         public static implicit operator double (JsonNumber value)
         {
             return Convert.ToDouble(value.Value);
+        }
+
+        /// <summary>
+        /// Implicitly casts a <see cref="byte"/> to a <see cref="JsonNumber"/> value.
+        /// </summary>
+        /// <example><code>
+        /// byte d = 5;
+        /// JsonNumber n = d;
+        /// </code></example>
+        /// <param name="value">The value to be cast.</param>
+        public static implicit operator JsonNumber(byte value)
+        {
+            return new JsonNumber(value);
         }
 
         /// <summary>

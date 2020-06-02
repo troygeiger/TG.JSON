@@ -573,9 +573,9 @@ namespace TG.JSON
                     return b;
                 case JsonValueTypes.Number:
                     JsonNumber n = value as JsonNumber;
-                    if (n.Value >= 0 && n.Value < 255)
+                    if (n.Value >= 0 && n.Value <= byte.MaxValue)
                         return Convert.ToByte(n.Value);
-                    if (n.Value > 255)
+                    if (n.Value > byte.MaxValue)
                         return byte.MaxValue;
                     return byte.MinValue;
                 case JsonValueTypes.Boolean:
