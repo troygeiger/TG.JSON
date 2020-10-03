@@ -52,6 +52,24 @@ namespace TG.JSON.Tests
                 Assert.IsTrue(!string.IsNullOrEmpty(items[i].FirstName));
             }
         }
+
+        [Test]
+        public void CharTest()
+        {
+            CharProp item = new CharProp() { Value = 'L' };
+            JsonObject json = new JsonObject(item);
+            CharProp item2 = json.DeserializeObject<CharProp>();
+            Assert.AreEqual(item.Value, item2.Value);
+        }
+
+        [Test]
+        public void CharArrayTest()
+        {
+            var a1 = new char[] { 'A', 'B', 'C' };
+            JsonArray array = new JsonArray(a1);
+            var output = array.DeserializeArray<char[]>();
+            Assert.AreEqual(a1, output);
+        }
     }
 
     public class Person
@@ -67,5 +85,10 @@ namespace TG.JSON.Tests
         public Person Spouse { get; set; }
 
         public List<Person> Children { get; } = new List<Person>();
+    }
+
+    public class CharProp
+    {
+        public char Value { get; set; }
     }
 }

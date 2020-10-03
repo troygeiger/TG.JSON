@@ -1259,6 +1259,8 @@ namespace TG.JSON
 
             if (obj is string)
                 return (string)obj;
+            if (obj is char)
+                return new JsonString(obj.ToString());
             if (obj is bool)
                 return new JsonBoolean((bool)obj);
 #if !NETSTANDARD1_X
@@ -1440,6 +1442,14 @@ namespace TG.JSON
         /// <returns><see cref="char"/></returns>
         char IConvertible.ToChar(IFormatProvider provider)
         {
+            if (this.ValueType == JsonValueTypes.String)
+            {
+                JsonString value = (JsonString)this;
+                if (!string.IsNullOrEmpty(value.Value))
+                {
+                    return value.Value[0];
+                }
+            }
             return char.MinValue;
         }
 

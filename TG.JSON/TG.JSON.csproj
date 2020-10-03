@@ -102,18 +102,18 @@
   <PropertyGroup>
     <PostBuildEvent>
     </PostBuildEvent>
-    <Version>1.5.5.0</Version>
+    <Version>1.5.6.0</Version>
     <Authors>Troy Geiger</Authors>
     <Description>TG.JSON is a versatile library for creating, parsing, encrypting values, binding, serializing and deserializing JSON. It's compact, fast and very easy to use.</Description>
     <Copyright>Copyright © Troy Geiger 2020</Copyright>
     <PackageProjectUrl>https://github.com/troygeiger/TG.JSON</PackageProjectUrl>
     <PackageTags>JSON Parse Serialize .NET C# ASP.NET Encrypt</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageReleaseNotes>JsonObject and JsonArray can now read directly to and from files or streams.
-Change the parser to use streams if provided. This should help if reading from large files.</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed where char values were not being serialized.</PackageReleaseNotes>
     <PackageIcon>TG.png</PackageIcon>
     <RepositoryUrl></RepositoryUrl>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)'=='net45'">
     <AssemblyTitle>TG.JSON</AssemblyTitle>
@@ -145,5 +145,8 @@ Change the parser to use streams if provided. This should help if reading from l
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|AnyCPU'">
+    <Optimize>false</Optimize>
   </PropertyGroup>
 </Project>

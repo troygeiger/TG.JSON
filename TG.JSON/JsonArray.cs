@@ -542,6 +542,8 @@
                     case JsonValueTypes.String:
                         if (arrayType == typeof(string))
                             a.SetValue((string)v, i);
+                        else if (arrayType == typeof(char))
+                            a.SetValue(Convert.ChangeType(v, typeof(char)), i);
                         break;
                     case JsonValueTypes.Object:
                         a.SetValue(((JsonObject)v).DeserializeObject(arrayType), i);
