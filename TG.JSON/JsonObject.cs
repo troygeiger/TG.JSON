@@ -773,7 +773,7 @@ namespace TG.JSON
 #if FULLNET
                         obj = Activator.CreateInstance(m.Groups[2].Value, m.Groups[1].Value).Unwrap();
 #else
-                        obj = Activator.CreateInstance(Type.GetType(m.Groups[2].Value));
+                        obj = Activator.CreateInstance(Type.GetType(m.Value));
 #endif
                         type = obj.GetType();
                     }
