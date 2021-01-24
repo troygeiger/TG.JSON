@@ -36,7 +36,7 @@
 # For a complete CI/CD sample to get started with GitHub Action workflows for Desktop Applications,
 # refer to https://github.com/microsoft/github-actions-for-desktop-apps
 
-name: .NET Core Desktop
+name: NuGet Build & Deploy
 
 on:
   push:
@@ -70,12 +70,12 @@ jobs:
 
     # Execute all unit tests in the solution
     - name: Execute unit tests
-      run: dotnet test -c $env.Configuration $env.TestProject_Name
+      run: dotnet test -c $Configuration $TestProject_Name
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
+      run: msbuild $Solution_Name /t:Restore /p:Configuration=$Configuration
 
     # Build 
     - name: Build TG.JSON project
-      run: msbuild $env.Project_Name /p:Configuration=$env.Configuration
+      run: msbuild $Project_Name /p:Configuration=$Configuration
