@@ -70,12 +70,12 @@ jobs:
 
     # Execute all unit tests in the solution
     - name: Execute unit tests
-      run: dotnet test -c $Configuration $TestProject_Name
+      run: dotnet test -c $env:Configuration $env:TestProject_Name
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
-      run: msbuild $Solution_Name /t:Restore /p:Configuration=$Configuration
+      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
 
     # Build 
     - name: Build TG.JSON project
-      run: msbuild $Project_Name /p:Configuration=$Configuration
+      run: msbuild $env:Project_Name /p:Configuration=$env:Configuration
