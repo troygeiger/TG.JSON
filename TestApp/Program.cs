@@ -19,7 +19,7 @@ namespace TestApp
         static void Main(string[] args)
         {
             
-            switch (1)
+            switch (2)
             {
                 case 1:
 
@@ -78,21 +78,43 @@ namespace TestApp
                 Strings = { "Hello", "World" }
             };
             Console.WriteLine("Press Ctrl+c to Exit; Enter to run again.");
-            EncryptionHandler encryption = new EncryptionHandler("Hello World");
+            //EncryptionHandler encryption = new EncryptionHandler("Hello World");
 
             Stopwatch stopwatch = new Stopwatch();
             JsonValue value;
             DoAgain:
             stopwatch.Reset();
             stopwatch.Start();
-            string json = new JsonObject(test, encryption).ToString(Formatting.Indented);// new JsonObject(test).ToString(Formatting.Indented);
+            string json = new JsonObject(test).ToString(Formatting.Indented);// new JsonObject(test).ToString(Formatting.Indented);
             stopwatch.Stop();
             Console.WriteLine($"Serialize Elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
             stopwatch.Reset();
             stopwatch.Start();
-            Test test2 = new JsonObject(json, encryption).DeserializeObject<Test>();
+            Test test2 = new JsonObject(json).DeserializeObject<Test>();
             stopwatch.Stop();
             Console.WriteLine($"Deserialize Elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
+
+            stopwatch.Reset();
+            stopwatch.Start();
+            json = Newtonsoft.Json.JsonConvert.SerializeObject(test);
+            stopwatch.Stop();
+            Console.WriteLine($"Newtonsoft Serialize Elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
+            stopwatch.Reset();
+            stopwatch.Start();
+            test2 = Newtonsoft.Json.JsonConvert.DeserializeObject<Test>(json);
+            stopwatch.Stop();
+            Console.WriteLine($"Newtonsoft Deserialize Elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
+
+            test = new Test()
+            {
+                Name = "TEST",
+                Date = DateTime.Now,
+                Number = 1,
+                Numbers = { 1, 2, 3, 4, 5 },
+                Strings = { "Hello", "World" }
+            };
+
+
             string cmd = Console.ReadLine();
             if (cmd == "") goto DoAgain;
         }
@@ -118,17 +140,17 @@ namespace TestApp
         [JsonProperty]
         private JsonObject MyObject { get; set; }
 
-        [JsonEncryptValue]
+  //      [JsonEncryptValue]
         public string Name { get; set; }
 
-        [JsonEncryptValue]
+//        [JsonEncryptValue]
         public DateTime? Date { get; set; }
 
-        [JsonEncryptValue, DisplayName("Some Number")]
+        //[JsonEncryptValue, DisplayName("Some Number")]
         public int Number { get; set; }
         //public Test2Collection Tests { get; } = new Test2Collection();
 
-        [JsonEncryptValue]
+//        [JsonEncryptValue]
         public List<int> Numbers { get; } = new List<int>();
 
         public List<string> Strings { get; } = new List<string>();
