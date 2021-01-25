@@ -79,3 +79,6 @@ jobs:
     # Build 
     - name: Build TG.JSON project
       run: msbuild $env:Project_Name /p:Configuration=$env:Configuration
+
+    - name: Push to NuGet.org
+      run: dotnet nuget push .\TG.JSON\bin\Release\TG.JSON.*.nupkg --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json
