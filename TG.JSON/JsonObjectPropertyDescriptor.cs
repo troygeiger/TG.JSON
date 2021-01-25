@@ -269,40 +269,44 @@ namespace TG.JSON
         public override void SetValue(object component, object value)
         {
             JsonValue jsonComponent = component as JsonValue;
-            LoopNext:
             if (jsonComponent == null) return;
-            switch (jsonComponent.ValueType)
+            bool shouldBreak;
+            do
             {
-                case JsonValueTypes.String:
-                    (jsonComponent as JsonString).Value = value as string;
-                    break;
-                case JsonValueTypes.Object:
-                    JsonObject obj = jsonComponent as JsonObject;
-                    if (value is JsonValue)
-                        obj[Name] = ((JsonValue)value).Clone();
-                    else
-                    {
-                        jsonComponent = obj[Name];
-                        goto LoopNext;
-                        //obj[Name] = obj.ValueFromObject(value);
-                    }
+                shouldBreak = true;
+                switch (jsonComponent.ValueType)
+                {
+                    case JsonValueTypes.String:
+                        (jsonComponent as JsonString).Value = value as string;
+                        break;
+                    case JsonValueTypes.Object:
+                        JsonObject obj = jsonComponent as JsonObject;
+                        if (value is JsonValue)
+                            obj[Name] = ((JsonValue)value).Clone();
+                        else
+                        {
+                            jsonComponent = obj[Name];
+                            shouldBreak = false;
+                            //obj[Name] = obj.ValueFromObject(value);
+                        }
 
-                    break;
-                case JsonValueTypes.Array:
+                        break;
+                    case JsonValueTypes.Array:
 
-                    break;
-                case JsonValueTypes.Number:
-                    (jsonComponent as JsonNumber).Value = Convert.ToDecimal(value);
-                    break;
-                case JsonValueTypes.Boolean:
-                    (jsonComponent as JsonBoolean).Value = Convert.ToBoolean(value);
-                    break;
-                case JsonValueTypes.Binary:
-                    (jsonComponent as JsonBinary).Value = value as byte[];
-                    break;
-                default:
-                    break;
-            }
+                        break;
+                    case JsonValueTypes.Number:
+                        (jsonComponent as JsonNumber).Value = Convert.ToDecimal(value);
+                        break;
+                    case JsonValueTypes.Boolean:
+                        (jsonComponent as JsonBoolean).Value = Convert.ToBoolean(value);
+                        break;
+                    case JsonValueTypes.Binary:
+                        (jsonComponent as JsonBinary).Value = value as byte[];
+                        break;
+                    default:
+                        break;
+                }
+            } while (shouldBreak);
             OnValueChanged(component, EventArgs.Empty);
 
             Owner?.OnPropertyChanged(Name);
