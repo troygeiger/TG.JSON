@@ -1,8 +1,10 @@
 ﻿using NUnit.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace TG.JSON.Tests
 {
@@ -85,6 +87,17 @@ namespace TG.JSON.Tests
             Assert.IsTrue(people[0].FirstName == "John");
         }
 #endif
+        [Test]
+        public void TestCustomCollection()
+        {
+            CustomPeopleCollection people = new CustomPeopleCollection();
+            people.Add(new Person() { FirstName = "John", LastName = "Doe" });
+            JsonArray array = new JsonArray(people);
+            Assert.IsTrue(array.Count == 1);
+            people = array.Deserialize<CustomPeopleCollection>();
+            Assert.IsTrue(people.Count == 1);
+            Assert.IsTrue(people[0].FirstName == "John");
+        }
     }
 
     public class Person
@@ -105,5 +118,25 @@ namespace TG.JSON.Tests
     public class CharProp
     {
         public char Value { get; set; }
+    }
+
+    public class CustomPeopleCollection : CollectionBase
+    {
+        public void Add(Person person)
+        {
+            List.Add(person);
+        }
+
+        public Person this[int index]
+        {
+            get
+            {
+                return (Person)List[index];
+            }
+            set
+            {
+                List[index] = value;
+            }
+        }
     }
 }
