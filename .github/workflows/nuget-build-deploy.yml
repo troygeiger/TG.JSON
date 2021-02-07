@@ -40,9 +40,8 @@ name: NuGet Build & Deploy
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+      - 'v*.*.*'
   workflow_dispatch:
 
 jobs:
@@ -81,4 +80,6 @@ jobs:
       run: msbuild $env:Project_Name /p:Configuration=$env:Configuration
 
     - name: Push to NuGet.org
-      run: dotnet nuget push .\TG.JSON\bin\Release\TG.JSON.*.nupkg --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push .\TG.JSON\bin\Release\TG.JSON.*.nupkg --api-key "$NUGET_TOKEN" --source https://api.nuget.org/v3/index.json
+      env:
+        NUGET_TOKEN: ${{ secrets.NUGET_KEY }}
