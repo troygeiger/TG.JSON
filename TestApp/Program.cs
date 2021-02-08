@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.ComponentModel;
 using System.Diagnostics;
 using TG.JSON.Serialization;
+using System.Security.Cryptography;
 
 namespace TestApp
 {
@@ -18,8 +19,8 @@ namespace TestApp
         [STAThread]
         static void Main(string[] args)
         {
-            
-            switch (1)
+
+            switch (2)
             {
                 case 1:
 
@@ -44,7 +45,7 @@ namespace TestApp
                     PerformanceTest();
                     break;
                 case 3:
-                    
+
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
                     Application.Run(new Form1());
@@ -64,7 +65,7 @@ namespace TestApp
                 default:
                     break;
             }
-            
+
         }
 
         static void PerformanceTest()
@@ -78,23 +79,47 @@ namespace TestApp
                 Strings = { "Hello", "World" }
             };
             Console.WriteLine("Press Ctrl+c to Exit; Enter to run again.");
-            EncryptionHandler encryption = new EncryptionHandler("Hello World");
+            //EncryptionHandler encryption = new EncryptionHandler("Hello World");
 
             Stopwatch stopwatch = new Stopwatch();
             JsonValue value;
-            DoAgain:
-            stopwatch.Reset();
-            stopwatch.Start();
-            string json = new JsonObject(test, encryption).ToString(Formatting.Indented);// new JsonObject(test).ToString(Formatting.Indented);
-            stopwatch.Stop();
-            Console.WriteLine($"Serialize Elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
-            stopwatch.Reset();
-            stopwatch.Start();
-            Test test2 = new JsonObject(json, encryption).DeserializeObject<Test>();
-            stopwatch.Stop();
-            Console.WriteLine($"Deserialize Elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
-            string cmd = Console.ReadLine();
-            if (cmd == "") goto DoAgain;
+            string cmd = "";
+            do
+            {
+                stopwatch.Reset();
+                stopwatch.Start();
+                string json = new JsonObject(test).ToString(Formatting.Indented);// new JsonObject(test).ToString(Formatting.Indented);
+                stopwatch.Stop();
+                Console.WriteLine($"Serialize Elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
+                stopwatch.Reset();
+                stopwatch.Start();
+                Test test2 = new JsonObject(json).DeserializeObject<Test>();
+                stopwatch.Stop();
+                Console.WriteLine($"Deserialize Elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
+
+                stopwatch.Reset();
+                stopwatch.Start();
+                json = Newtonsoft.Json.JsonConvert.SerializeObject(test);
+                stopwatch.Stop();
+                Console.WriteLine($"Newtonsoft Serialize Elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
+                stopwatch.Reset();
+                stopwatch.Start();
+                test2 = Newtonsoft.Json.JsonConvert.DeserializeObject<Test>(json);
+                stopwatch.Stop();
+                Console.WriteLine($"Newtonsoft Deserialize Elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
+
+                test = new Test()
+                {
+                    Name = "TEST",
+                    Date = DateTime.Now,
+                    Number = 1,
+                    Numbers = { 1, 2, 3, 4, 5 },
+                    Strings = { "Hello", "World" }
+                };
+
+
+                cmd = Console.ReadLine();
+            } while (cmd == "");
         }
 
         private static void Program_ValueChanged(object sender, EventArgs e)
@@ -107,7 +132,7 @@ namespace TestApp
     {
         public Test()
         {
-            
+
         }
 
         public void InitMyObject()
@@ -118,17 +143,17 @@ namespace TestApp
         [JsonProperty]
         private JsonObject MyObject { get; set; }
 
-        [JsonEncryptValue]
+        //      [JsonEncryptValue]
         public string Name { get; set; }
 
-        [JsonEncryptValue]
+        //        [JsonEncryptValue]
         public DateTime? Date { get; set; }
 
-        [JsonEncryptValue, DisplayName("Some Number")]
+        //[JsonEncryptValue, DisplayName("Some Number")]
         public int Number { get; set; }
         //public Test2Collection Tests { get; } = new Test2Collection();
 
-        [JsonEncryptValue]
+        //        [JsonEncryptValue]
         public List<int> Numbers { get; } = new List<int>();
 
         public List<string> Strings { get; } = new List<string>();
