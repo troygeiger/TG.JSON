@@ -102,14 +102,14 @@
   <PropertyGroup>
     <PostBuildEvent>
     </PostBuildEvent>
-    <Version>1.5.7.0</Version>
+    <Version>1.5.8.0</Version>
     <Authors>Troy Geiger</Authors>
     <Description>TG.JSON is a versatile library for creating, parsing, encrypting values, binding, serializing and deserializing JSON. It's compact, fast and very easy to use.</Description>
     <Copyright>Copyright © Troy Geiger 2020</Copyright>
     <PackageProjectUrl>https://github.com/troygeiger/TG.JSON</PackageProjectUrl>
     <PackageTags>JSON Parse Serialize .NET C# ASP.NET Encrypt</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageReleaseNotes>Fixed where char values were not being serialized.</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed issue with JsonBinary not being deserialized.</PackageReleaseNotes>
     <PackageIcon>TG.png</PackageIcon>
     <RepositoryUrl></RepositoryUrl>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
