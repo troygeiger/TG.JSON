@@ -1582,12 +1582,17 @@ namespace TG.JSON
                 return Convert.ChangeType(this, ntype);
             }
 #if NETSTANDARD1_3
-            else if (conversionType.GetTypeInfo().IsEnum)
+            if (conversionType.GetTypeInfo().IsEnum)
 #else
-            else if (conversionType.IsEnum)
+            if (conversionType.IsEnum)
 #endif
             {
                 return Enum.Parse(conversionType, (string)this);
+            }
+
+            if (this.ValueType == JsonValueTypes.Binary)
+            {
+                return ((JsonBinary)this).Value;
             }
             return null;
         }
