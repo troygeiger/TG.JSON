@@ -1321,6 +1321,22 @@ namespace TG.JSON
             table[property] = details;
         }
 
+#if !NETSTANDARD1_X
+        /// <summary>
+        /// Sets a TypeConverter, for the given property, to the _attributesTable and is utilized in the <see cref="JsonObjectPropertyDescriptor"/>.
+        /// </summary>
+        /// <param name="property">The name of the property to associate with the <see cref="TypeConverter"/>.</param>
+        /// <param name="converterType">The <see cref="Type"/> for the <see cref="TypeConverter"/>.</param>
+        public void SetPropertyTypeConverter(string property, Type converterType)
+        {
+            if (string.IsNullOrEmpty(property) || converterType == null)
+                return;
+            JsonObject details = AttributesTable[property] as JsonObject ?? new JsonObject();
+            details["TypeConverter"] = new JsonObject("ConverterTypeName", converterType.AssemblyQualifiedName);
+            AttributesTable[property] = details; 
+        }
+#endif
+
         /// <summary>
         /// Sets the property details for the given property to the _attributesTable <see cref="JsonObject"/>.
         /// </summary>
@@ -1630,6 +1646,7 @@ namespace TG.JSON
 			*/
             foreach (string key in this.PropertyNames)
             {
+                List<Attribute> attributes = new List<Attribute>();
                 if (key == dt)
                     continue;
                 JsonObject pd = details[key] as JsonObject;
@@ -1660,6 +1677,13 @@ namespace TG.JSON
                         att = pd["ReadOnly"];
                         readOnly = att.ValueType == JsonValueTypes.Object ? (bool)(att as JsonObject)["IsReadOnly"] : (bool)pd["ReadOnly"];
                     }
+
+                    if (pd.ContainsProperty("TypeConverter"))
+                    {
+                        att = pd["TypeConverter"];
+                        JsonObject tcObj = (JsonObject)att;
+                        attributes.Add(new TypeConverterAttribute(tcObj["ConverterTypeName"]));
+                    }
                 }
 
                 if (key.StartsWith("_"))
@@ -1682,16 +1706,21 @@ namespace TG.JSON
                     case JsonValueTypes.Boolean:
                         ptype = typeof(bool);
                         break;
+                    case JsonValueTypes.Binary:
+                        ptype = typeof(byte[]);
+                        break;
                     case JsonValueTypes.Object:
                     case JsonValueTypes.Array:
-                    case JsonValueTypes.Binary:
                     case JsonValueTypes.Null:
                     default:
                         ptype = value.GetType();
                         break;
                 }
+                attributes.Add(new BrowsableAttribute(browsable));
+                attributes.Add(new ReadOnlyAttribute(readOnly));
 
-                props.Add(new JsonObjectPropertyDescriptor(key, ptype, category, desc, readOnly, browsable)
+
+                props.Add(new JsonObjectPropertyDescriptor(key, ptype, category, desc, readOnly, attributes.ToArray())
                 {
                     DefaultValue = defaultValue
 

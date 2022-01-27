@@ -68,6 +68,27 @@ namespace TG.JSON
             _description = description;
         }
 
+        /// <summary>
+        /// Initialized a new instance of <see cref="JsonObjectPropertyDescriptor"/>.
+        /// </summary>
+        /// <param name="name">The name of the property.</param>
+        /// <param name="propertyType">The value type the property gets and sets.</param>
+        /// <param name="category">The category the property belongs.</param>
+        /// <param name="description">A description of the property.</param>
+        /// <param name="readOnly">Determines if the property is read only.</param>
+        /// <param name="attributes">An array of <see cref="Attribute"/> associated with the property.</param>
+        public JsonObjectPropertyDescriptor(string name, Type propertyType, string category, string description, bool readOnly, Attribute[] attributes)
+            : base(name, attributes)
+        {
+            _readOnly = readOnly;
+            _displayName = name.Replace("_", "");
+            CanSetNull = true;
+            _propertyType = propertyType;
+            _category = category;
+            _description = description;
+        }
+
+
         #endregion Constructors
 
         #region Properties
@@ -196,6 +217,9 @@ namespace TG.JSON
                                     return (DateTime)value;
                                 else
                                     return (string)value;
+                            case JsonValueTypes.Binary:
+                                return ((JsonBinary)value).Value;
+                                
                             default:
                                 return value;
                         }
@@ -270,43 +294,45 @@ namespace TG.JSON
         {
             JsonValue jsonComponent = component as JsonValue;
             if (jsonComponent == null) return;
-            bool shouldBreak;
-            do
+            //bool shouldBreak;
+            //do
+            //{
+            //shouldBreak = true;
+            switch (jsonComponent.ValueType)
             {
-                shouldBreak = true;
-                switch (jsonComponent.ValueType)
-                {
-                    case JsonValueTypes.String:
-                        (jsonComponent as JsonString).Value = value as string;
+                case JsonValueTypes.String:
+                    (jsonComponent as JsonString).Value = value as string;
+                    break;
+                case JsonValueTypes.Object:
+                    JsonObject obj = jsonComponent as JsonObject;
+                    if (value is JsonValue)
+                    {
+                        obj[Name] = ((JsonValue)value).Clone();
                         break;
-                    case JsonValueTypes.Object:
-                        JsonObject obj = jsonComponent as JsonObject;
-                        if (value is JsonValue)
-                            obj[Name] = ((JsonValue)value).Clone();
-                        else
-                        {
-                            jsonComponent = obj[Name];
-                            shouldBreak = false;
-                            //obj[Name] = obj.ValueFromObject(value);
-                        }
+                    }
 
-                        break;
-                    case JsonValueTypes.Array:
+                    jsonComponent = obj[Name];
+                    // shouldBreak = false;
+                    obj[Name] = obj.ValueFromObject(value);
 
-                        break;
-                    case JsonValueTypes.Number:
-                        (jsonComponent as JsonNumber).Value = Convert.ToDecimal(value);
-                        break;
-                    case JsonValueTypes.Boolean:
-                        (jsonComponent as JsonBoolean).Value = Convert.ToBoolean(value);
-                        break;
-                    case JsonValueTypes.Binary:
-                        (jsonComponent as JsonBinary).Value = value as byte[];
-                        break;
-                    default:
-                        break;
-                }
-            } while (shouldBreak);
+
+                    break;
+                case JsonValueTypes.Array:
+
+                    break;
+                case JsonValueTypes.Number:
+                    (jsonComponent as JsonNumber).Value = Convert.ToDecimal(value);
+                    break;
+                case JsonValueTypes.Boolean:
+                    (jsonComponent as JsonBoolean).Value = Convert.ToBoolean(value);
+                    break;
+                case JsonValueTypes.Binary:
+                    (jsonComponent as JsonBinary).Value = value as byte[];
+                    break;
+                default:
+                    break;
+            }
+            //} while (shouldBreak);
             OnValueChanged(component, EventArgs.Empty);
 
             Owner?.OnPropertyChanged(Name);

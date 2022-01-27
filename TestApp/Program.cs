@@ -20,7 +20,7 @@ namespace TestApp
         static void Main(string[] args)
         {
 
-            switch (2)
+            switch (3)
             {
                 case 1:
 
