@@ -412,10 +412,15 @@ namespace TG.JSON
         /// </param>
         public override bool Equals(object obj)
         {
+            if (obj == null) return false;
+            
             if (obj is JsonNumber)
                 return this.Value == ((JsonNumber)obj).Value;
-            else if (!(obj is decimal))
-                return this.Value == (decimal)obj;
+            JsonValue value = JsonValue.GetValueFromObject(obj);
+
+            if (value.ValueType == JsonValueTypes.Number)
+                return this == value;
+            
             return base.Equals(obj);
         }
 
