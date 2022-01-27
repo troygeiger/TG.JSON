@@ -715,7 +715,7 @@ namespace TG.JSON
         /// Returns the underlying byte array.
         /// </summary>
         /// <param name="value">A <see cref="JsonBinary"/>. If value is not a <see cref="JsonBinary"/>, null is returned.</param>
-        public static implicit operator byte[] (JsonValue value)
+        public static implicit operator byte[](JsonValue value)
         {
             if (value != null && value.ValueType == JsonValueTypes.Binary)
                 return (value as JsonBinary).Value;
@@ -744,7 +744,7 @@ namespace TG.JSON
         /// Parses a date string value from a <see cref="JsonString"/> to a nullable <see cref="DateTime"/>.
         /// </summary>
         /// <param name="value">A <see cref="JsonString"/> with a date value. If value is not a <see cref="JsonString"/> or the value could not be parsed, null is returned.</param>
-        public static implicit operator DateTime? (JsonValue value)
+        public static implicit operator DateTime?(JsonValue value)
         {
             if (value != null && value.ValueType == JsonValueTypes.String)
             {
@@ -1172,14 +1172,14 @@ namespace TG.JSON
                     writer.Flush();
                     System.Text.UTF8Encoding encoding = new UTF8Encoding(false);
                     string value = encoding.GetString(ms.ToArray(), 0, (int)ms.Length);
-                    
+
                     encoding = null;
                     return value;
                 }
 
             }
         }
-        
+
 
 #if !NETSTANDARD1_0
         /// <summary>
@@ -1362,11 +1362,11 @@ namespace TG.JSON
                 generic = new JsonNull();
             return generic.ValueFromObject(obj, maxDepth, ignoreProperties);
         }
-        
+
 
         internal abstract void InternalWrite(System.IO.StreamWriter writer, Formatting format, int depth);
 
-        
+
         /// <summary>
         /// Executes the <see cref="JsonValue.ValueChanged"/> event.
         /// </summary>
@@ -1590,10 +1590,11 @@ namespace TG.JSON
                 return Enum.Parse(conversionType, (string)this);
             }
 
-            if (this.ValueType == JsonValueTypes.Binary)
+            if (this.ValueType == JsonValueTypes.Binary && conversionType == typeof(byte[]))
             {
                 return ((JsonBinary)this).Value;
             }
+            
             return null;
         }
 
