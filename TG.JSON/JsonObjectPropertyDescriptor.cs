@@ -5,11 +5,6 @@ using System.ComponentModel;
 namespace TG.JSON
 {
 
-    //public sealed partial class JsonObject
-    //{
-
-    #region Nested Types
-
     /// <summary>
     /// A <see cref="PropertyDescriptor"/> to represent the properties of a <see cref="JsonObject"/>.
     /// </summary>
@@ -391,8 +386,6 @@ namespace TG.JSON
         #endregion Methods
     }
 
-    #endregion Nested Types
-    //}
 }
 
 #endif

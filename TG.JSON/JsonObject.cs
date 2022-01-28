@@ -649,7 +649,7 @@ namespace TG.JSON
         public JsonObject Add(JsonPropertyDefinition propertyDefinition, JsonValue value)
         {
             this.internalAdd(propertyDefinition.PropertyName, value);
-            propertyDefinition.CreateAttributeEntry(AttributesTable);
+            propertyDefinition.ApplyAttributes(AttributesTable);
             OnValueChanged();
             OnPropertyChanged(propertyDefinition.PropertyName);
             return this;
@@ -690,7 +690,7 @@ namespace TG.JSON
                 {
                     var pDef = p as JsonPropertyDefinition;
                     this.internalAdd(pDef.PropertyName, ValueFromObject(propertiesValues[i + 1]));
-                    pDef.CreateAttributeEntry(AttributesTable);
+                    pDef.ApplyAttributes(AttributesTable);
                 }
             }
             OnValueChanged();
@@ -1276,7 +1276,7 @@ namespace TG.JSON
                         this.internalAdd(property.Name, value);
                     }
                     JsonPropertyDefinition pdef = new JsonPropertyDefinition(property.Info);
-                    pdef.CreateAttributeEntry(AttributesTable);
+                    pdef.ApplyAttributes(AttributesTable);
                 }
                 catch (Exception)
                 {
@@ -1370,7 +1370,7 @@ namespace TG.JSON
         public void SetPropertyAttributes(JsonPropertyDefinition propertyDefinition)
         {
             if (propertyDefinition != null)
-                propertyDefinition.CreateAttributeEntry(AttributesTable);
+                propertyDefinition.ApplyAttributes(AttributesTable);
         }
 
         /// <summary>

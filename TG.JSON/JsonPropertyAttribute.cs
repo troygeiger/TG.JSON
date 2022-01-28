@@ -230,38 +230,29 @@ namespace TG.JSON
         }
 
         /// <summary>
-        /// Creates an attribute definition that can be inserted into the <see cref="JsonObject.AttributesTable"/>.
-        /// </summary>
-        /// <returns>A new attribute entry as <see cref="JsonObject"/>.</returns>
-        internal JsonObject CreateAttributeEntry()
-        {
-            JsonObject e = new JsonObject();
-            if (!string.IsNullOrEmpty(Category))
-                e.Add("Category", Category);
-            if (!string.IsNullOrEmpty(Description))
-                e.Add("Description", Description);
-            if (DefaultValue != null)
-                e.Add("DefaultValue", DefaultValue);
-            if (!Browsable)
-                e.Add("Browsable", false);
-            if (ReadOnly)
-                e.Add("ReadOnly", true);
-            if (!string.IsNullOrEmpty(DisplayName))
-                e.Add("DisplayName", DisplayName);
-            return e;
-        }
-
-        /// <summary>
         /// Creates an attribute definition and then inserts it into the <see cref="JsonObject.AttributesTable"/>.
         /// </summary>
         /// <param name="attributesTable">An <see cref="JsonObject.AttributesTable"/> to add the entry to.</param>
         /// <returns>A new attribute entry as <see cref="JsonObject"/>.</returns>
-        internal JsonObject CreateAttributeEntry(JsonObject attributesTable)
+        internal JsonObject ApplyAttributes(JsonObject attributesTable)
         {
-            JsonObject att = CreateAttributeEntry();
-            if (att.Count > 0 && attributesTable != null)
-                attributesTable[PropertyName] = att;
-            return att;
+            JsonObject atts = attributesTable[PropertyName] as JsonObject ?? new JsonObject();
+
+            if (!string.IsNullOrEmpty(Category))
+                atts["Category"] = Category;
+            if (!string.IsNullOrEmpty(Description))
+                atts["Description"] = Description;
+            if (DefaultValue != null)
+                atts["DefaultValue"] = DefaultValue;
+            if (!Browsable)
+                atts["Browsable"] = false;
+            if (ReadOnly)
+                atts["ReadOnly"] = true;
+            if (!string.IsNullOrEmpty(DisplayName))
+                atts["DisplayName"] = DisplayName;
+
+                attributesTable[PropertyName] = atts;
+            return attributesTable;
         }
 
         #endregion Methods
