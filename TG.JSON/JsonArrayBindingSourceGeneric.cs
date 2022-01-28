@@ -44,8 +44,18 @@ namespace TG.JSON
         /// <param name="sourceArray">The source array containing values.</param>
         /// <param name="prototype">The <see cref="JsonValue"/> used as a prototype for new values.</param>
         public JsonArrayBindingSource(JsonArray sourceArray, T prototype)
-        {
+            : this(sourceArray, prototype, false)
+        { }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonArrayBindingSource"/> with a source <see cref="JsonArray"/>, the type of <see cref="JsonValue"/> that is contained in the array and the properties that should be used or available.
+        /// </summary>
+        /// <param name="sourceArray">The source array containing values.</param>
+        /// <param name="prototype">The <see cref="JsonValue"/> used as a prototype for new values.</param>
+        /// <param name="subscribeToValueChangedEvents">If true, all property changes made from the PropertyDescriptor will trigger a <see cref="ListChanged"/> event.</param>
+        public JsonArrayBindingSource(JsonArray sourceArray, T prototype, bool subscribeToValueChangedEvents)
+        {
+            SubscribeToValueChangedEvents = subscribeToValueChangedEvents;
             _array = sourceArray ?? throw new ArgumentNullException("sourceArray");
             _prototype = prototype ?? throw new ArgumentNullException("prototype");
 
@@ -195,6 +205,11 @@ namespace TG.JSON
         }
 
         /// <summary>
+        /// If true, property changes to list values will subscribed to.
+        /// </summary>
+        public bool SubscribeToValueChangedEvents { get; set; }
+
+        /// <summary>
         /// Gets whether the binding source supports change notifications. Always returns true.
         /// </summary>
         public bool SupportsChangeNotification
@@ -248,7 +263,10 @@ namespace TG.JSON
                 Position = index;
                 if (value is JsonValue)
                 {
-                    List[index] = (JsonValue)value;
+                    UnsubscribeValueChanged(List[index]);
+                    JsonValue item = (JsonValue)value;
+                    List[index] = item;
+                    SubscribeValueChanged(item);
                     OnListChanged(ListChangedType.ItemChanged, index);
                 }
             }
@@ -283,6 +301,7 @@ namespace TG.JSON
             if (value is JsonValue)
             {
                 int i = List.Add(value);
+                SubscribeValueChanged(value);
                 OnListChanged(ListChangedType.ItemAdded, i);
                 return i;
             }
@@ -305,6 +324,7 @@ namespace TG.JSON
         public object AddNew()
         {
             JsonValue newValue = _prototype.Clone();
+            SubscribeValueChanged(newValue);
             newPos = List.Add(newValue);
             this.Position = newPos;
             if (newPos != -1)
@@ -446,7 +466,9 @@ namespace TG.JSON
         {
             if (value is JsonValue)
             {
-                List.Values.Insert(index, (JsonValue)value);
+                JsonValue item = (JsonValue)value;
+                List.Values.Insert(index, item);
+                SubscribeValueChanged(item);
                 OnListChanged(ListChangedType.ItemAdded, index);
             }
         }
@@ -470,7 +492,11 @@ namespace TG.JSON
         {
             int i = this.IndexOf(value);
             if (value is JsonValue)
-                List.Remove((JsonValue)value);
+            {
+                JsonValue item = (JsonValue)value;
+                List.Remove(item);
+                UnsubscribeValueChanged(item);
+            }
             if (i != -1)
                 OnListChanged(ListChangedType.ItemDeleted, i);
         }
@@ -481,6 +507,7 @@ namespace TG.JSON
         /// <param name="index">The index to remove from.</param>
         public void RemoveAt(int index)
         {
+            UnsubscribeValueChanged(List[index]);
             List.RemoveAt(index);
             OnListChanged(ListChangedType.ItemDeleted, index);
         }
@@ -498,6 +525,31 @@ namespace TG.JSON
         /// </summary>
         public void RemoveSort()
         {
+        }
+
+        private void ValueChanged(object sender, EventArgs e)
+        {
+            ListChanged?.Invoke(sender, new ListChangedEventArgs(ListChangedType.ItemChanged, -1));
+        }
+
+        private void SubscribeValueChanged(JsonValue item)
+        {
+            if (SubscribeToValueChangedEvents == false || item == null) return;
+
+            for (int i = 0; i < props.Count; i++)
+            {
+                props[i].AddValueChanged(item, ValueChanged);
+            }
+        }
+
+        private void UnsubscribeValueChanged(JsonValue item)
+        {
+            if (SubscribeToValueChangedEvents == false || item == null) return;
+
+            for (int i = 0; i < props.Count; i++)
+            {
+                props[i].RemoveValueChanged(item, ValueChanged);
+            }
         }
 
         //private void ReadProperties()
