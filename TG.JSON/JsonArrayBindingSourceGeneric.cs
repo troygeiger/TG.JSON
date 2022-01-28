@@ -24,7 +24,7 @@ namespace TG.JSON
 	/// textBox1.DataBindings.Add("Text", bs, "hello", true, DataSourceUpdateMode.OnPropertyChanged);
     /// </code>
     /// </example>
-    public class JsonArrayBindingSource : IBindingList, ICancelAddNew, ITypedList
+    public class JsonArrayBindingSource<T> : IBindingList, ICancelAddNew, ITypedList where T : JsonValue
     {
         #region Fields
 
@@ -32,81 +32,18 @@ namespace TG.JSON
         PropertyDescriptorCollection props = null;
         //Type vtype;
         JsonArray _array;
-        JsonValue _prototype = null;
+        T _prototype = null;
 
         #endregion Fields
 
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of <see cref="JsonArrayBindingSource"/> with a source <see cref="JsonArray"/> and the type of <see cref="JsonValue"/> that is contained in the array.
-        /// </summary>
-        /// <param name="sourceArray">The source array containing values.</param>
-        /// <param name="valueType">The type of <see cref="JsonValue"/> the <see cref="JsonArray"/> contains.</param>
-        /// <remarks>
-        /// If the source <see cref="JsonArray"/> is empty, use the constructor with the constructor <see cref="JsonArrayBindingSource.JsonArrayBindingSource(JsonArray, Type, IEnumerable{JsonObjectPropertyDescriptor})"/> to define the properties that should be available.
-        /// </remarks>
-        [Obsolete("Depreciated! Use JsonArrayBindingSource(JsonArray sourceArray, JsonValue prototype).")]
-        public JsonArrayBindingSource(JsonArray sourceArray, Type valueType)
-        {
-            throw new NotImplementedException("This constructor is obsolete. Use JsonArrayBindingSource(JsonArray sourceArray, JsonValue prototype).");
-            //_array = sourceArray;
-            //vtype = valueType;
-
-            //if (sourceArray.Count > 0)
-            //    ReadProperties();
-            //else
-            //{
-
-            //    if (valueType == typeof(JsonString) || valueType == typeof(JsonNumber) || valueType == typeof(JsonBoolean))
-            //    {
-            //        PropertyDescriptorCollection c = TypeDescriptor.GetProperties(valueType);
-            //        PropertyDescriptor[] ca = new PropertyDescriptor[1];
-            //        foreach (PropertyDescriptor item in c)
-            //        {
-            //            if (item.Name == "Value")
-            //            {
-            //                ca[0] = item;
-            //                props = new PropertyDescriptorCollection(ca);
-            //                break;
-            //            }
-            //        }
-            //    }
-            //    else
-            //        props = TypeDescriptor.GetProperties(valueType);
-            //}
-        }
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="JsonArrayBindingSource"/> with a source <see cref="JsonArray"/>, the type of <see cref="JsonValue"/> that is contained in the array and the properties that should be used or available.
-        /// </summary>
-        /// <param name="sourceArray">The source array containing values.</param>
-        /// <param name="valueType">The type of <see cref="JsonValue"/> the <see cref="JsonArray"/> contains.</param>
-        /// <param name="properties">A list of properties that should be used or available.</param>
-        [Obsolete("Depreciated! Use JsonArrayBindingSource(JsonArray sourceArray, JsonValue prototype).")]
-        public JsonArrayBindingSource(JsonArray sourceArray, Type valueType, IEnumerable<JsonObjectPropertyDescriptor> properties)
-        {
-            throw new NotImplementedException("This constructor is obsolete. Use JsonArrayBindingSource(JsonArray sourceArray, JsonValue prototype).");
-            //List<JsonObjectPropertyDescriptor> p = new List<JsonObjectPropertyDescriptor>();
-            //if (properties != null)
-            //{
-            //    foreach (JsonObjectPropertyDescriptor item in properties)
-            //    {
-            //        item.CanSetNull = false;
-            //        p.Add(item);
-            //    }
-            //}
-            //props = new PropertyDescriptorCollection(p.ToArray());
-            //_array = sourceArray;
-            //vtype = valueType;
-        }
-
-        /// <summary>
         /// Initializes a new instance of <see cref="JsonArrayBindingSource"/> with a source <see cref="JsonArray"/>, the type of <see cref="JsonValue"/> that is contained in the array and the properties that should be used or available.
         /// </summary>
         /// <param name="sourceArray">The source array containing values.</param>
         /// <param name="prototype">The <see cref="JsonValue"/> used as a prototype for new values.</param>
-        public JsonArrayBindingSource(JsonArray sourceArray, JsonValue prototype)
+        public JsonArrayBindingSource(JsonArray sourceArray, T prototype)
         {
 
             _array = sourceArray ?? throw new ArgumentNullException("sourceArray");
@@ -330,12 +267,27 @@ namespace TG.JSON
         {
             if (value is JsonValue)
             {
-                int i = List.Add((JsonValue)value);
+                return Add((T)value);
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Adds a value to the source <see cref="JsonArray"/>.
+        /// </summary>
+        /// <param name="value">The value to add to the array.</param>
+        /// <returns>Returns the index of the newly added value within the array.</returns>
+        public int Add(T value)
+        {
+            if (value is JsonValue)
+            {
+                int i = List.Add(value);
                 OnListChanged(ListChangedType.ItemAdded, i);
                 return i;
             }
-            else
-                return -1;
+
+            return -1;
         }
 
         /// <summary>
@@ -352,37 +304,12 @@ namespace TG.JSON
         /// <returns>Returns the newly created instance.</returns>
         public object AddNew()
         {
-
-
             JsonValue newValue = _prototype.Clone();
             newPos = List.Add(newValue);
             this.Position = newPos;
             if (newPos != -1)
                 this.OnListChanged(ListChangedType.ItemAdded, newPos);
 
-
-            //if (vtype == typeof(JsonString))
-            //    newValue = new JsonString();
-            //else if (vtype == typeof(JsonNumber))
-            //    newValue = new JsonNumber();
-            //else if (vtype == typeof(JsonBoolean))
-            //    newValue = new JsonBoolean();
-            //else if (vtype == typeof(JsonObject))
-            //{
-            //    JsonObject obj = new JsonObject();
-            //    foreach (PropertyDescriptor prop in props)
-            //    {
-            //        var constr = prop.PropertyType.GetConstructors();
-            //        obj.Add(prop.Name, (JsonValue)Activator.CreateInstance(prop.PropertyType));
-            //    }
-
-            //    newValue = obj;
-            //}
-            //if (newValue != null)
-            //{
-            //    newPos = List.Add(newValue);
-            //    this.Position = newPos;
-            //}
             return newValue;
         }
 
@@ -429,8 +356,8 @@ namespace TG.JSON
         {
             if (value is JsonValue)
                 return List.Contains((JsonValue)value);
-            else
-                return false;
+
+            return false;
         }
 
         /// <summary>
@@ -506,8 +433,8 @@ namespace TG.JSON
         {
             if (value is JsonValue)
                 return List.Values.IndexOf((JsonValue)value);
-            else
-                return -1;
+
+            return -1;
         }
 
         /// <summary>
@@ -618,5 +545,5 @@ namespace TG.JSON
 
         #endregion Methods
     }
-} 
+}
 #endif
