@@ -53,8 +53,8 @@ jobs:
 
     env:
       Solution_Name: TG.JSON.sln
-      Project_Name: .\TG.JSON\TG.JSON.csproj 
-      TestProject_Name:  .\TG.JSON.Tests\TG.JSON.Tests.csproj
+      Project_Name: .\src\TG.JSON\TG.JSON.csproj 
+      TestProject_Name:  .\src\TG.JSON.Tests\TG.JSON.Tests.csproj
       Configuration: Release
 
     steps:
