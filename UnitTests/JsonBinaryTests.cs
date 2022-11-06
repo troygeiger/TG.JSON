@@ -15,7 +15,7 @@ namespace TG.JSON.Tests
         public void CloneTest()
         {
             JsonBinary binary = new JsonBinary(new byte[] { 1, 2, 3, 4 });
-            JsonBinary copy = binary.Clone() as JsonBinary;
+            JsonBinary copy = (JsonBinary)binary.Clone();
             Assert.AreEqual(binary.Value, copy.Value);
         }
     }

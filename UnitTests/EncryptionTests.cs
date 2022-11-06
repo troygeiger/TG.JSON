@@ -52,7 +52,7 @@ namespace TG.JSON.Tests
         public class EncryptClass
         {
             [JsonEncryptValue]
-            public string MySecretProperty { get; set; }
+            public string? MySecretProperty { get; set; }
         }
     }
 }

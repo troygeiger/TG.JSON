@@ -1,12 +1,13 @@
-﻿namespace TG.JSON
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Reflection;
+using System.Text;
+namespace TG.JSON
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.IO;
-    using System.Reflection;
-    using System.Text;
+
 
     /// <summary>
     /// Represents a json array. Ex. { "array" : [ 1 , 2 , true, false] }
@@ -33,7 +34,7 @@
     System.Collections.IList,
 #if !NETSTANDARD1_0
     System.Runtime.Serialization.ISerializable,
-    System.Xml.Serialization.IXmlSerializable, 
+    System.Xml.Serialization.IXmlSerializable,
 #endif
     INotifyPropertyChanged
     {
@@ -70,7 +71,7 @@
         {
             GlobalEncryptionHandler = encryption;
             enumerator = _values.GetEnumerator();
-        } 
+        }
 #endif
 
         /// <summary>
@@ -94,7 +95,7 @@
         {
             GlobalEncryptionHandler = encryption;
             AddRange(range);
-        } 
+        }
 #endif
 
 
@@ -224,7 +225,7 @@
         {
             InternalParse(reader);
         }
-        
+
         internal JsonArray(JsonReader reader, JsonValue parent)
             : this()
         {
@@ -269,7 +270,7 @@
             //info.AddValue("Value", this.ToString());
             if (info.MemberCount > 0)
                 InternalParse(info.GetString("Value"));
-        } 
+        }
 #endif
 
         #endregion Constructors
@@ -666,9 +667,9 @@
         {
             if (lst == null)
                 return;
-            
+
             Type paramType = GetListAddType(lst.GetType());
-            
+
 
             for (int i = 0; i < Count; i++)
             {
@@ -716,7 +717,7 @@
             Type keyType = types[0];
             Type valueType = types[1];
 
-            
+
 
             for (int i = 0; i < Count; i++)
             {
@@ -1012,7 +1013,7 @@
         {
 #if FULLNET || NETSTANDARD2_0
             if (!typeof(System.Collections.IEnumerable).IsAssignableFrom(obj.GetType()))
-                return this; 
+                return this;
 #else
             if (!typeof(System.Collections.IEnumerable).GetTypeInfo().IsAssignableFrom(obj.GetType().GetTypeInfo()))
                 return this;
@@ -1113,18 +1114,18 @@
         void System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter writer)
         {
             writer.WriteCData(this.ToString());
-        } 
+        }
 #endif
 
         /// <summary>
         /// Generates a JSON formatted array string. Ex. [ \"Hello\" , 1 ]
         /// </summary>
         /// <returns>JSON formatted array string.</returns>
-        public override string ToString() 
+        public override string ToString()
         {
             return this.ToString(Formatting.Compressed);
         }
-        
+
         internal override void InternalWrite(StreamWriter writer, Formatting format, int depth)
         {
             switch (format)
@@ -1220,7 +1221,7 @@
         public void Write(string path)
         {
             Write(path, Formatting.Compressed);
-        } 
+        }
 #endif
 
         /*
@@ -1307,7 +1308,7 @@
                 chr = reader.Read();
                 if (inEsc)
                 {
-#region Handle Escape Char
+                    #region Handle Escape Char
                     char echr;
                     switch (chr)
                     {
@@ -1333,7 +1334,7 @@
                     buffer.Add(echr);
                     inEsc = false;
                     continue;
-#endregion Handle Escape Char
+                    #endregion Handle Escape Char
                 }
                 switch (chr)
                 {
@@ -1405,6 +1406,6 @@
             return Nullable.GetUnderlyingType(type) != null;
         }
 
-#endregion Methods
+        #endregion Methods
     }
 }

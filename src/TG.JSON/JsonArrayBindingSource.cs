@@ -24,7 +24,10 @@ namespace TG.JSON
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of <see cref="JsonArrayBindingSource"/> with a source <see cref="JsonArray"/>, the type of <see cref="JsonValue"/> that is contained in the array and the properties that should be used or available.
+        /// Initializes a new instance of <see cref="JsonArrayBindingSource"/>
+        /// with a source <see cref="JsonArray"/>, the type of <see
+        /// cref="JsonValue"/> that is contained in the array and the properties
+        /// that should be used or available.
         /// </summary>
         /// <param name="sourceArray">The source array containing values.</param>
         /// <param name="prototype">The <see cref="JsonValue"/> used as a prototype for new values.</param>

@@ -27,7 +27,7 @@ namespace TG.JSON.Tests
 
             Assert.IsTrue(array[0].ValueType == JsonValueTypes.Object);
 
-            JsonObject obj = array[0] as JsonObject;
+            JsonObject obj = (JsonObject)array[0];
 
             Assert.IsNotNull(obj["FirstName"], "FirstName doesn't exist or is missing.");
 
@@ -45,7 +45,7 @@ namespace TG.JSON.Tests
 
                 Assert.IsTrue(array[0].ValueType == JsonValueTypes.Object);
 
-                JsonObject obj = array[0] as JsonObject;
+                JsonObject obj = (JsonObject)array[0];
 
                 Assert.IsNotNull(obj["FirstName"], "FirstName doesn't exist or is missing.");
 
