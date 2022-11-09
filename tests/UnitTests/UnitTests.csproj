@@ -19,6 +19,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\TG.JSON\TG.JSON.csproj" />
+    <ProjectReference Include="..\..\src\TG.JSON\TG.JSON.csproj" />
   </ItemGroup>
 </Project>
