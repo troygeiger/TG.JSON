@@ -999,7 +999,7 @@ namespace TG.JSON
         /// <param name="path">The path to read from.</param>
         public void Read(string path)
         {
-            using (FileStream fs = new FileStream(path, FileMode.Open))
+            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
                 Read(fs);
             }
