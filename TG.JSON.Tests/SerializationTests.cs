@@ -98,6 +98,24 @@ namespace TG.JSON.Tests
             Assert.IsTrue(people.Count == 1);
             Assert.IsTrue(people[0].FirstName == "John");
         }
+
+        [Test]
+        public void TestPropertyWithSerializedObjectString()
+        {
+            ObjWithJsonString classObj = new ObjWithJsonString();
+            Person person = new Person()
+            {
+                FirstName = "John",
+                LastName = "Doe"
+            };
+            classObj.Value = new JsonObject(person).ToString(Formatting.Indented);
+            JsonObject final = new JsonObject(classObj);
+            string x = final.ToString(Formatting.Indented);
+
+            final = new JsonObject(x);
+            classObj = final.DeserializeObject<ObjWithJsonString>();
+
+        }
     }
 
     public class Person
@@ -118,6 +136,11 @@ namespace TG.JSON.Tests
     public class CharProp
     {
         public char Value { get; set; }
+    }
+
+    public class ObjWithJsonString
+    {
+        public string Value { get; set; }
     }
 
     public class CustomPeopleCollection : CollectionBase

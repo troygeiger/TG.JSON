@@ -1258,7 +1258,7 @@ namespace TG.JSON
             }
 
             if (obj is string)
-                return (string)obj;
+                return new JsonString((string)obj);
             if (obj is char)
                 return new JsonString(obj.ToString());
             if (obj is bool)
