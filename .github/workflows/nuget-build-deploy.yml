@@ -80,6 +80,6 @@ jobs:
       run: msbuild $env:Project_Name /p:Configuration=$env:Configuration
 
     - name: Push to NuGet.org
-      run: dotnet nuget push .\TG.JSON\bin\Release\TG.JSON.*.nupkg --api-key "$env:$NUGET_TOKEN" --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+      run: dotnet nuget push .\TG.JSON\bin\Release\TG.JSON.*.nupkg --api-key "$env:NUGET_TOKEN" --source "https://api.nuget.org/v3/index.json" --skip-duplicate
       env:
         NUGET_TOKEN: ${{ secrets.NUGET_KEY }}
