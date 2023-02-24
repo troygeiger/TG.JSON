@@ -17,20 +17,20 @@
 		<DocumentationFile>bin\Release\TG.JSON.xml</DocumentationFile>
 		<TreatWarningsAsErrors>False</TreatWarningsAsErrors>
 		<IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+		<MinVerTagPrefix>v</MinVerTagPrefix>
 	</PropertyGroup>
 	<PropertyGroup>
 		<PostBuildEvent>
 		</PostBuildEvent>
-		<Version>1.6.0.0</Version>
 		<Authors>Troy Geiger</Authors>
 		<Description>TG.JSON is a versatile library for creating, parsing, encrypting values, binding, serializing and deserializing JSON. It's compact, fast and very easy to use.</Description>
-		<Copyright>Copyright © Troy Geiger 2022</Copyright>
+		<Copyright>Copyright © Troy Geiger 2023</Copyright>
 		<PackageProjectUrl>https://github.com/troygeiger/TG.JSON</PackageProjectUrl>
 		<PackageTags>JSON Parse Serialize Binding Bind Encrypt</PackageTags>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageIcon>TG.png</PackageIcon>
-		<RepositoryUrl></RepositoryUrl>
-		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<RepositoryUrl>https://github.com/troygeiger/TG.JSON</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 	<ItemGroup>
@@ -38,8 +38,6 @@
 		<None Remove="NuGet-Package.bat" />
 		<None Remove="nuget.exe" />
 		<None Include="..\LICENSE.txt">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
 		</None>
 		<None Include="..\TG.png">
 			<Pack>True</Pack>
@@ -113,6 +111,12 @@
 		<PackageReference Include="System.Xml.XmlSerializer">
 			<Version>4.3.0</Version>
 		</PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="MinVer" Version="4.3.0">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
 	</ItemGroup>
 	<PropertyGroup Condition="'$(TargetFramework)'=='net45'">
 		<AssemblyTitle>TG.JSON</AssemblyTitle>
